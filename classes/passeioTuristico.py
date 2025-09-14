@@ -67,3 +67,6 @@ class PasseioTuristico:
     @grupo_passeio.setter
     def grupo_passeio(self, grupo_passeio):
         self.__grupo_passeio = grupo_passeio
+
+
+    

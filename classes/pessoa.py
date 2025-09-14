@@ -11,7 +11,7 @@ class Pessoa:
         if isinstance(idade, int):
             self.__idade = idade
         if isinstance(telefone, int):
-            self.__telefone = int
+            self.__telefone = telefone
         if isinstance(cpf, int):
             self.__cpf = cpf
     
@@ -48,4 +48,3 @@ class Pessoa:
     def cpf(self, cpf):
         self.__cpf = cpf
         
-    
