@@ -2,7 +2,6 @@
 
 # Sobre o projeto.
 
-Nosso projeto de **Desenvolvimento orientado ao objeto** utilizamos do tema padrão.
+Projeto de Desenvolvimento orientado ao objeto, seguindo o tema padrão proposto pelo professor.
 
-Implementar um sistema orientado a objetos em Python para gerenciamento de viagens em
-grupos de pessoas.
+Implementar um sistema orientado a objetos em Python para gerenciamento de viagens em grupos de pessoas.
