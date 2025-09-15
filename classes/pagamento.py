@@ -1,16 +1,19 @@
+from datetime import datetime
 from pessoa import Pessoa
 
 class Pagamento:
 
-    def __init__(self, pagante:Pessoa, valor:float, data:str):
+    def __init__(self, pagante:Pessoa, valor:float):
 
+        if not isinstance(pagante, Pessoa):
+            raise TypeError("pagante deve ser uma instância da classe Pessoa.")
+        if not isinstance(valor, float):
+            raise TypeError("valor deve ser um número (float ou int).")
+        
         self.__pagante = None
-        self.__valor = 0
-
-        if isinstance(pagante, Pessoa):
-            self.__pagante = pagante
-        if isinstance(valor, float):
-            self.__valor = valor
+        self.__valor = valor
+        self.__data = datetime.now()
+        self.__pagamento_efetuado = False
 
     @property
     def pagante(self):
@@ -22,8 +25,13 @@ class Pagamento:
     @property
     def valor(self):
         return self.__valor
-    @valor.setter
-    def valor(self, valor):
-        self.__valor = valor
+
+    @property
+    def data(self):
+        return self.__data
+
+    def marcar_como_efetuado(self):
+        # alterar o status do pagamento para 'efetuado' (True)
+        self.__pagamento_efetuado = True
         
 
