@@ -2,7 +2,7 @@ from pessoa import Pessoa
 
 class Pagamento:
 
-    def __init__(self, pagante:Pessoa, valor:float):
+    def __init__(self, pagante:Pessoa, valor:float, data:str):
 
         self.__pagante = None
         self.__valor = 0
