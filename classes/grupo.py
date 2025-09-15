@@ -7,7 +7,7 @@ class Grupo:
         if not isinstance(pessoa, Pessoa):
             raise TypeError ("pessoa deve ser uma instância da classe Pessoa.")
 
-        self.__pessoas: [] 
+        self.__pessoas = [] 
 
     @property
     def pessoas(self):
