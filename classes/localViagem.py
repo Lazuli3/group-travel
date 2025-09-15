@@ -1,14 +1,15 @@
+from datetime import datetime
 
 class LocalViagem():
     
-    def __init__(self,cidade:str, pais:str):
-        self.__cidade = None
-        self.__pais = None
+    def __init__(self, cidade: str, pais: str):
+        if not isinstance(cidade, str):
+            raise TypeError ("cidade deve ser uma instância da classe str.")
+        if not isinstance(pais, str):
+            raise TypeError ("pais deve ser uma instância da classe str.")
 
-        if isinstance(cidade, str):
-            self.__cidade = None
-        if isinstance(pais, str):
-            self.__pais = None
+        self.__cidade = cidade
+        self.__pais = pais
 
     @property
     def cidade(self):
