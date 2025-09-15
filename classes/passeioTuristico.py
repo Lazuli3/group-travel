@@ -1,30 +1,31 @@
-
+from datetime import datetime
 from localViagem import LocalViagem
 from grupo import Grupo
 
 class PasseioTuristico:
 
-    def __init__(self, localizacao: LocalViagem, atracao_turistica: str, horario_inicio:int, horario_fim:int, valor:float, grupo_passeio: Grupo):
+    def __init__(self, localizacao: LocalViagem, atracao_turistica: str, horario_inicio: datetime, horario_fim: datetime, valor: float, grupo_passeio: Grupo):
 
-        self.__localizacao = None
-        self.__atracao_turistica = None
-        self.__horario_inicio = 0
-        self.__horario_fim = 0
-        self.__valor = 0
-        self.__grupo_passeio: []
-
-        if isinstance(localizacao, LocalViagem):
-            self.__localizacao = localizacao
-        if isinstance(atracao_turistica, str):
-            self.__atracao_turistica = atracao_turistica
-        if isinstance(horario_inicio, int):
-            self.__horario_inicio = horario_inicio
-        if isinstance(horario_fim, int):
-            self.__horario_fim = horario_fim
-        if isinstance(valor, float):
-            self.__valor = valor
-        if isinstance(grupo_passeio, Grupo):
-            self.__grupo_passeio = grupo_passeio
+        if not isinstance(localizacao, LocalViagem):
+            raise TypeError ("localizacao deve ser uma instância da classe LocalViagem.")
+        if not isinstance(atracao_turistica, str):
+            raise TypeError ("atracao_turistica deve ser uma instância da classe str.")
+        if not isinstance(horario_inicio, datetime):
+            raise TypeError ("horario_inicio deve ser uma instância da classe datetime.")
+        if not isinstance(horario_fim, datetime):
+            raise TypeError ("horario_fim deve ser uma instância da classe datetime.")
+        if not isinstance(valor, float):
+            raise TypeError ("valor deve ser uma instância da classe float.")
+        if not isinstance(grupo_passeio, Grupo):
+            raise TypeError ("grupo_passeio deve ser uma instância da classe Grupo.")
+        
+        self.__localizacao = LocalViagem
+        self.__atracao_turistica = atracao_turistica
+        self.__horario_inicio = datetime
+        self.__horario_fim = datetime
+        self.__valor = valor
+        self.__grupo_passeio = Grupo
+        
     
     @property
     def localizacao(self):
