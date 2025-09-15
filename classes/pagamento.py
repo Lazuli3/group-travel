@@ -2,7 +2,7 @@ from datetime import datetime
 from pessoa import Pessoa
 
 class Pagamento:
-
+# Representa um registro de pagamento
     def __init__(self, pagante:Pessoa, valor:float):
 
         if not isinstance(pagante, Pessoa):
@@ -10,7 +10,7 @@ class Pagamento:
         if not isinstance(valor, float):
             raise TypeError("valor deve ser um número (float ou int).")
         
-        self.__pagante = None
+        self.__pagante = pagante
         self.__valor = valor
         self.__data = datetime.now()
         self.__pagamento_efetuado = False
