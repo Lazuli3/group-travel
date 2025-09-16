@@ -1,7 +1,8 @@
 from datetime import datetime
 from pessoa import Pessoa
+from abc import ABC, abstractmethod
 
-class Pagamento:
+class Pagamento(ABC):
 # Representa um registro de pagamento
     def __init__(self, pagante:Pessoa, valor:float):
 
