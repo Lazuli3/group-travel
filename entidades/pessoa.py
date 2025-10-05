@@ -1,19 +1,19 @@
 
 class Pessoa:
-    def __init__(self, nome:str, idade: int, telefone: int, cpf: int):
-        self.__nome = None
-        self.__idade = 0
-        self.__telefone = 0
-        self.__cpf = 0
+    def __init__(self, nome:str, idade: int, telefone: str, cpf: str):
+        self.__nome = nome
+        self.__idade = idade
+        self.__telefone = telefone
+        self.__cpf = cpf
 
-        if isinstance(nome, str):
-            self.__nome = nome 
-        if isinstance(idade, int):
-            self.__idade = idade
-        if isinstance(telefone, int):
-            self.__telefone = telefone
-        if isinstance(cpf, int):
-            self.__cpf = cpf
+        if not isinstance(nome, str):
+            raise TypeError("A variavel nome tem que ser do tipo string.") 
+        if not isinstance(idade, int):
+            raise TypeError("A variável idade tem que ser do tipo inteiro.")
+        if not isinstance(telefone, str):
+            raise TypeError("A variável telefone tem que ser do tipo string")
+        if not isinstance(cpf, str):
+            raise TypeError('A variável cpf tem que ser do tipo string.')
     
     
     @property
@@ -47,4 +47,9 @@ class Pessoa:
     @cpf.setter
     def cpf(self, cpf):
         self.__cpf = cpf
+
+    def maior_idade(self):
+        return self.__idade >= 18
+            
+    
         
