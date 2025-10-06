@@ -1,5 +1,5 @@
 from datetime import datetime
-from localViagem import LocalViagem
+from local_viagem import LocalViagem
 from grupo import Grupo
 
 class PasseioTuristico:

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-class LocalViagem():
+class LocalViagem:
     
     def __init__(self, cidade: str, pais: str):
         if not isinstance(cidade, str):

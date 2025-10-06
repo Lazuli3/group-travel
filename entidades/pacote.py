@@ -1,4 +1,4 @@
-from passeioTuristico import PasseioTuristico
+from passeio_turistico import PasseioTuristico
 from passagem import Passagem
 from pagamento import Pagamento
 from grupo import Grupo

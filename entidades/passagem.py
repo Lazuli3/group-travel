@@ -1,4 +1,4 @@
-from localViagem import LocalViagem
+from local_viagem import LocalViagem
 from empresa import Empresa
 from transporte import Transporte
 
