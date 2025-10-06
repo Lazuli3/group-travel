@@ -11,7 +11,7 @@ class TelaPessoa:
         try:
             return int(input('Escolha uma das opções do menu: '))
         
-        except TypeError:
+        except ValueError:
             self.mostra_mensagem("Escolha uma opção válida do menu, intervado de [0,1,2,3].")
 
     def pega_dados_pessoa(self):
@@ -19,7 +19,7 @@ class TelaPessoa:
         nome = str(input('Nome: '))
         try:
             idade = int(input('Idade: '))
-        except TypeError:
+        except ValueError:
             self.mostra_mensagem("A idade tem que ser um valor inteiro para ser válido.")
             idade = 0
         telefone = str(input('Telefone: '))
