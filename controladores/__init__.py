@@ -1,1 +1,2 @@
 from .controlador_pessoa import ControladorPessoa
+from .controlador_local_viagem import ControladorLocalViagem
