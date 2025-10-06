@@ -1,0 +1,1 @@
+from .controlador_pessoa import ControladorPessoa
