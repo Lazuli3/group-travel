@@ -36,7 +36,7 @@ class ControladorLocalViagem:
         if not self.__locais_viagem:
             self.__tela_local_viagem.mostra_mensagem('Nenhum local de viagem cadastrado.')
         else:
-            self.__tela_local_viagem.lista_locais_viagem(self.__locais_viagem)
+            self.__tela_local_viagem.lista_locais_viagem(self.__locais_viagem) #passar lista de dicionários ao invés da lista privada
 
     def excluir_local_viagem(self):
         if not self.__locais_viagem:
