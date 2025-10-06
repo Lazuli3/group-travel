@@ -1,0 +1,1 @@
+from .tela_pessoa import TelaPessoa
