@@ -10,7 +10,7 @@ class TelaLocalViagem:
             1 - Incluir local de viagem")
             2 - Listar local de viagem')
             3 - Excluir local de viagem')
-            0- Sair
+            0 - Sair
         '''
 
         try:
