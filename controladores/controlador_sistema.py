@@ -1,0 +1,8 @@
+from controlador_local_viagem import ControladorLocalViagem
+from controlador_pacote import ControladorPacote
+from controlador_pagamento import ControladorPagamento
+from controlador_passagem import ControladorPassagem
+from controlador_passeio_turistico import ControladorPasseioTuristico
+from controlador_pessoa import ControladorPessoa
+
+from view.tela_sistema import TelaSistema
