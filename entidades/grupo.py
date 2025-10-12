@@ -1,26 +1,86 @@
-from pessoa import Pessoa
-
 class Grupo:
-
-    def __init__(self, pessoa: Pessoa):
-
-        if not isinstance(pessoa, Pessoa):
-            raise TypeError ("pessoa deve ser uma instância da classe Pessoa.")
-
-        self.__pessoas = [] 
-
+    """Classe que representa um grupo de pessoas"""
+    
+    def __init__(self, id_grupo, nome, descricao=""):
+        self.__id = id_grupo
+        self.__nome = nome
+        self.__descricao = descricao
+        self.__membros_cpf = []  # Lista de CPFs dos membros
+    
+    # ====== GETTERS ======
+    
     @property
-    def pessoas(self):
-        return self.__pessoas
-
-    def incluir_pessoa(self, pessoa: Pessoa):
-        if pessoa not in self.__pessoas:
-            self.__pessoas.append(pessoa)
-
-    def excluir_pessoa(self, pessoa: Pessoa):
-        if pessoa in self.__pessoas:
-            self.__pessoas.remove(pessoa)
-                
-
-
-        
+    def id(self):
+        return self.__id
+    
+    @property
+    def nome(self):
+        return self.__nome
+    
+    @property
+    def descricao(self):
+        return self.__descricao
+    
+    @property
+    def membros_cpf(self):
+        """Retorna cópia da lista de CPFs para proteção"""
+        return self.__membros_cpf.copy()
+    
+    # ====== SETTERS ======
+    
+    @nome.setter
+    def nome(self, nome):
+        self.__nome = nome
+    
+    @descricao.setter
+    def descricao(self, descricao):
+        self.__descricao = descricao
+    
+    # ====== MÉTODOS DE MANIPULAÇÃO DE MEMBROS ======
+    
+    def adicionar_membro(self, cpf):
+        """
+        Adiciona um membro ao grupo
+        Retorna True se adicionado com sucesso, False se já era membro
+        """
+        if cpf not in self.__membros_cpf:
+            self.__membros_cpf.append(cpf)
+            return True
+        return False
+    
+    def remover_membro(self, cpf):
+        """
+        Remove um membro do grupo
+        Retorna True se removido com sucesso, False se não era membro
+        """
+        if cpf in self.__membros_cpf:
+            self.__membros_cpf.remove(cpf)
+            return True
+        return False
+    
+    def tem_membro(self, cpf):
+        """Verifica se um CPF é membro do grupo"""
+        return cpf in self.__membros_cpf
+    
+    def total_membros(self):
+        """Retorna o total de membros do grupo"""
+        return len(self.__membros_cpf)
+    
+    def obter_lista_membros(self):
+        """
+        Retorna a lista interna de membros (sem cópia)
+        Use apenas quando precisar iterar sobre os membros
+        """
+        return self.__membros_cpf
+    
+    def limpar_membros(self):
+        """Remove todos os membros do grupo"""
+        self.__membros_cpf.clear()
+    
+    # ====== MÉTODOS ESPECIAIS ======
+    
+    def __str__(self):
+        return f"Grupo: {self.__nome} (ID: {self.__id}, Membros: {self.total_membros()})"
+    
+    def __repr__(self):
+        return f"Grupo(id={self.__id}, nome='{self.__nome}', membros={self.total_membros()})"
