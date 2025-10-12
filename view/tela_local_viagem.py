@@ -5,13 +5,12 @@ class TelaLocalViagem:
         print(msg)
 
     def mostra_opcoes(self):
-        '''
-            ============ Menu ============
+        print(''' ============ Menu ============
             1 - Incluir local de viagem
             2 - Listar local de viagem
             3 - Excluir local de viagem
             0 - Sair
-        '''
+        ''')
 
         try:
             return int(input('Escolha uma das opções do menu: '))

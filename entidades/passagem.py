@@ -1,32 +1,58 @@
-from local_viagem import LocalViagem
-from empresa import Empresa
-from transporte import Transporte
+from datetime import datetime
 
-
-# aqui que eu acho que a gente consegue puxar a empresa diretpo de transporte, trazendo o atributo, não sei o que achas...
 class Passagem:
-
-    def __init__(self, local_viagem: LocalViagem, transporte: Transporte):
-
-        self.__local_viagem = None
-        self.__transporte = None
-
-        if isinstance(local_viagem, LocalViagem):
-            self.__local_viagem = local_viagem
-        if isinstance(transporte, Transporte):
-            self.__transporte = transporte
-        
-
+    """Classe que representa uma passagem de viagem"""
+    
+    def __init__(self, data, valor, local_origem, local_destino, transporte):
+        self.__data = data  # datetime
+        self.__valor = valor  # float
+        self.__local_origem = local_origem  # LocalViagem
+        self.__local_destino = local_destino  # LocalViagem
+        self.__transporte = transporte  # Transporte
+    
     @property
-    def local_viagem(self):
-        return self.__local_viagem
-    @local_viagem.setter
-    def local_viagem(self, local_viagem):
-        self.__local_viagem = local_viagem
-
+    def data(self):
+        return self.__data
+    
+    @property
+    def valor(self):
+        return self.__valor
+    
+    @property
+    def local_origem(self):
+        return self.__local_origem
+    
+    @property
+    def local_destino(self):
+        return self.__local_destino
+    
     @property
     def transporte(self):
         return self.__transporte
+    
+    @data.setter
+    def data(self, data):
+        self.__data = data
+    
+    @valor.setter
+    def valor(self, valor):
+        self.__valor = valor
+    
+    @local_origem.setter
+    def local_origem(self, local_origem):
+        self.__local_origem = local_origem
+    
+    @local_destino.setter
+    def local_destino(self, local_destino):
+        self.__local_destino = local_destino
+    
     @transporte.setter
     def transporte(self, transporte):
         self.__transporte = transporte
+    
+    def __str__(self):
+        data_formatada = self.__data.strftime("%d/%m/%Y")
+        return f"Passagem: {self.__local_origem.cidade} → {self.__local_destino.cidade} | {data_formatada} | R$ {self.__valor:.2f}"
+    
+    def __repr__(self):
+        return f"Passagem(origem='{self.__local_origem.cidade}', destino='{self.__local_destino.cidade}', valor={self.__valor})"

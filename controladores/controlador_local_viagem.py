@@ -59,3 +59,5 @@ class ControladorLocalViagem:
     def sair(self):
         self.__tela_local_viagem.mostra_mensagem('Encerrando o cadastro.')
         return True
+    
+    
