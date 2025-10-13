@@ -60,9 +60,5 @@ class ControladorSistema():
 
         while True:
             opcao_escolhida = self.__tela_sistema.tela_opcoes()
-            
-            if opcao_escolhida in lista_opcoes:
-                funcao_escolhida = lista_opcoes[opcao_escolhida]
-                funcao_escolhida()
-            else:
-                self.__tela_sistema.mostra_mensagem("Opção inválida!")
+            funcao_escolhida = lista_opcoes[opcao_escolhida]
+            funcao_escolhida()
