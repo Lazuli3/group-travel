@@ -1,6 +1,6 @@
 from datetime import datetime
-from local_viagem import LocalViagem
-from grupo import Grupo
+from entidades.local_viagem import LocalViagem
+from entidades.grupo import Grupo
 
 class PasseioTuristico:
 
@@ -25,12 +25,12 @@ class PasseioTuristico:
         if not isinstance(grupo_passeio, Grupo):
             raise TypeError ("Grupo do passeio deve ser uma instância da classe Grupo.")
 
-        self.__localizacao = LocalViagem
+        self.__localizacao = localizacao
         self.__atracao_turistica = atracao_turistica
-        self.__horario_inicio = datetime
-        self.__horario_fim = datetime
+        self.__horario_inicio = horario_inicio
+        self.__horario_fim = horario_fim
         self.__valor = valor
-        self.__grupo_passeio = Grupo
+        self.__grupo_passeio = grupo_passeio
 
     @property
     def localizacao(self):

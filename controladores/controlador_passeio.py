@@ -6,7 +6,7 @@ class ControladorPasseioTuristico:
     def __init__(self, controlador_sistema):
         self.__controlador_sistema = controlador_sistema
         self.__passeios = []
-        self._tela_passeio = TelaPasseioTuristico()
+        self.__tela_passeio = TelaPasseioTuristico()
 
     def inicia(self):
         switcher = {
@@ -47,9 +47,17 @@ class ControladorPasseioTuristico:
     
     def valida_grupo(self, id_grupo):
         '''Valida se o id (e o grupo) passado pelo usuário existe'''
-        grupo = self.__controlador_sistema.controlador_grupo.buscar_por_id(id_grupo)
+        try:
+            id_int = int(id_grupo)
+        except(ValueError, TypeError):
+            self.__tela_passeio.mostra_mensagem(
+                f'ID de grupo inválido: {id_grupo}'
+            )
+            return None
+        
+        grupo = self.__controlador_sistema.controlador_grupo.buscar_por_id(id_int)
         if grupo is None:
-            self.__tela_passeio.mostra_mensagem(f"Grupo com ID {id_grupo} não encontrado.")
+            self.__tela_passeio.mostra_mensagem(f"Grupo com ID {id_int} não encontrado.")
             return None
         return grupo
     
@@ -142,12 +150,13 @@ class ControladorPasseioTuristico:
             novo_dict = {
                 'localizacao': f"{passeio.localizacao.cidade}, {passeio.localizacao.pais}",
                 'atracao': passeio.atracao_turistica,
-                'horario_inicio': passeio.horario_inicio,
-                'horario_fim': passeio.horario_fim,
-                'valor': passeio.valor,
+                'horario_inicio': passeio.horario_inicio.strftime("%d/%m/%Y %H:%M"),
+                'horario_fim': passeio.horario_fim.strftime("%d/%m/%Y %H:%M"),
+                'valor': f"R$ {passeio.valor:.2f}",
                 'grupo': passeio.grupo_passeio.nome
             }
             passeios_dict.append(novo_dict)
+        return passeios_dict
 
     def listar_passeios(self):
         if not self.__passeios:
@@ -155,11 +164,11 @@ class ControladorPasseioTuristico:
         else:
             self.__tela_passeio.lista_passeios_turisticos(self.passeios_para_dict())
 
-    def excluir_passeio_turistico(self):
+    def excluir_passeio(self):
         if not self.__passeios:
             return
         
-        indice = self.__tela_passeio.seleciona_local(self.passeios_para_dict())
+        indice = self.__tela_passeio.seleciona_passeio(self.passeios_para_dict())
 
         if indice is None:
             return
@@ -168,10 +177,9 @@ class ControladorPasseioTuristico:
         del self.__passeios[indice]
         self.__tela_passeio.mostra_mensagem(
             f'''Passeio para atração turística '{passeio_excluido.atracao_turistica}'
-            do grupo '{passeio_excluido.grupo_passeio}' excluído com sucesso.'''
+            do grupo '{passeio_excluido.grupo_passeio.nome}' excluído com sucesso.'''
         )
         
     def sair(self):
         self.__tela_passeio.mostra_mensagem('Encerrando o cadastro.')
         return True
-
