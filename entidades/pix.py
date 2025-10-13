@@ -31,7 +31,8 @@ class Pix(Pagamento):
         
         pix_dict.update({
             'tipo': 'Pix',
-            'banco': self.__banco
+            'banco': self.__banco,
+            'chave ': self.__chave
         })
         
         return pix_dict
