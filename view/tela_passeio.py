@@ -40,4 +40,32 @@ class TelaPasseioTuristico:
             'id_grupo': id_grupo
         }
 
+    def lista_passeios_turisticos(self, passeios_dict: list):
+        print('============ Lista de passeios ============')
+        for i, passeio in enumerate(passeios_dict, 1):
+            print(f'''{i}. Atração: {passeio['atracao']}
+                   Localização: {passeio['localizacao']}
+                   Horário de início: {passeio['horario_inicio']}
+                   Horário de fim: {passeio['horario_fim']}
+                   Valor: {passeio['valor']}
+                   Grupo do passeio: {passeio['grupo']}''')
 
+    def seleciona_passeio(self, passeios_dict: list):
+        self.lista_passeios_turisticos(passeios_dict)
+
+        while True:
+            try:
+                opcao = int(input('\nDigite o número do passeio ou 0 para cancelar.'))
+
+                if opcao == 0:
+                    return None
+
+                if 1 <= opcao <= len(passeios_dict):
+                    return opcao - 1 #índice real e ajustado
+                else:
+                    self.mostra_mensagem(
+                        f'Digite um número entre 1 e {len(passeios_dict)}.'
+                    )
+
+            except ValueError:
+                self.mostra_mensagem('Digite um número válido.')
