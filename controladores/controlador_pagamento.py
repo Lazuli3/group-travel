@@ -11,12 +11,15 @@ class ControladorPagamento:
         self.__pagamentos = []
         self.__tela_pagamento = TelaPagamento()
 
-    def criar_pagamento(self, valor: float, pessoa):
+    def inicia(self, valor: float, pessoa):
+        """
+        Inicia o processo de pagamento e RETORNA o pagamento criado
+        """
         switcher = {
             1: lambda: self.cria_pagamento_cartao(valor, pessoa),
             2: lambda: self.cria_pagamento_pix(valor, pessoa),
             3: lambda: self.cria_pagamento_dinheiro(valor, pessoa),
-            0: lambda: self.sair()
+            0: lambda: None  # Retorna None se cancelar
         }
         
         while True:
@@ -24,20 +27,21 @@ class ControladorPagamento:
 
             funcao_escolhida = switcher.get(
                 opcao,
-                lambda: self.__tela_pagamento.mostra_mensagem(
-                    'Opção inválida.'
-                )
+                lambda: self.__tela_pagamento.mostra_mensagem('Opção inválida.')
             )
             
-            if funcao_escolhida() is True:
-                break
+            resultado = funcao_escolhida()
+            
+            # Se retornou um pagamento ou None (cancelamento), sai do loop
+            if resultado is not None or opcao == 0:
+                return resultado
 
     def cria_pagamento_cartao(self, valor: float, pessoa):
         while True:
             dados = self.__tela_pagamento.pega_dados_cartao(valor)
             
             if dados is None:
-                return
+                return None
 
             # Validação do número de cartão
             num_cartao = dados['num_cartao']
@@ -76,7 +80,7 @@ class ControladorPagamento:
                 self.__tela_pagamento.mostra_mensagem(
                     f"Pagamento de R$ {valor:.2f} em {parcelas}x de R$ {valor_parcela:.2f} realizado!"
                 )
-                return pagamento
+                return pagamento  # RETORNA O PAGAMENTO
             
             except (ValueError, TypeError) as e:
                 self.__tela_pagamento.mostra_mensagem(f"Erro: {e}")
@@ -87,7 +91,7 @@ class ControladorPagamento:
             dados = self.__tela_pagamento.pega_dados_pix(valor)
 
             if dados is None:
-                return
+                return None
             
             status_efetuado = self.__tela_pagamento.status_pagamento()
             
@@ -104,7 +108,7 @@ class ControladorPagamento:
                 self.__tela_pagamento.mostra_mensagem(
                     f"Pagamento de R$ {valor:.2f} via PIX realizado!"
                 )
-                return pagamento
+                return pagamento  # RETORNA O PAGAMENTO
 
             except (TypeError, ValueError) as e:
                 self.__tela_pagamento.mostra_mensagem(f"Erro: {e}")
@@ -115,7 +119,7 @@ class ControladorPagamento:
             dados = self.__tela_pagamento.pega_dados_dinheiro(valor)
             
             if dados is None:
-                return
+                return None
             
             try:
                 valor_entregue = float(dados['valor_entregue'].replace(',', '.'))
@@ -149,7 +153,7 @@ class ControladorPagamento:
                 if troco > 0:
                     self.__tela_pagamento.mostra_mensagem(f"Troco: R$ {troco:.2f}")
                 
-                return pagamento
+                return pagamento  # RETORNA O PAGAMENTO
 
             except (ValueError, TypeError) as e:
                 self.__tela_pagamento.mostra_mensagem(f"Erro: {e}")
@@ -172,4 +176,4 @@ class ControladorPagamento:
         
     def sair(self):
         self.__tela_pagamento.mostra_mensagem('Encerrando.')
-        return True
+        return None  # Retorna None ao invés de True

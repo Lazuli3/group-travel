@@ -7,7 +7,10 @@ class TelaSistema:
         print("1 - Pessoas")
         print("2 - Grupos")
         print("3 - Local de viagem")
-        print("4 - Passagem")
+        print("4 - Passeio")
+        print('5 - Passagem')
+        print("6 - Pacote")
         print("0 - Finalizar sistema")
         opcao = int(input("Escolha a opcao:"))
         return opcao
+    

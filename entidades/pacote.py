@@ -1,82 +1,94 @@
-from passeio_turistico import PasseioTuristico
-from passagem import Passagem
-from pagamento import Pagamento
-from grupo import Grupo
+# ====== entidades/pacote.py ======
 
 class Pacote:
-
-    def __init__(self, passeio: PasseioTuristico, passagem: Passagem, pagamento: Pagamento, grupo: Grupo):
-
-        if not isinstance(passeio, PasseioTuristico):
-            raise TypeError ("passeio deve ser uma instância da classe PasseioTuristico.")
-        if not isinstance(passagem, Passagem):
-            raise TypeError ("passagem deve ser uma instância da classe Passagem.")
-        if not isinstance(pagamento, Pagamento):
-            raise TypeError ("pagamento deve ser uma instância da classe Pagamento.")
-        if not isinstance(grupo, Grupo):
-            raise TypeError ("grupo deve ser uma instância da classe Grupo.")
+    """Classe que representa um pacote de viagem"""
+    
+    def __init__(self, passeio, passagem, grupo):
+        """
+        Construtor do Pacote
         
-        self.__passeios = []
-        self.__passagens = []
+        Args:
+            passeio: Lista de objetos PasseioTuristico
+            passagem: Lista de objetos Passagem
+            grupo: Objeto Grupo
+        """
+        self.__passeios = passeio if isinstance(passeio, list) else []
+        self.__passagens = passagem if isinstance(passagem, list) else []
+        self.__grupo = grupo
         self.__pagamentos = []
-        self.__grupo = Grupo
-
-        
-    @property
+    
+    # ====== GETTERS (conforme UML) ======
+    
     def passeios(self):
+        """Retorna a lista de passeios turísticos"""
         return self.__passeios
-
-    def adicionar_passeio(self, passeio):
-        if passeio not in self.__passeios:
-            self.__passeios.append(passeio)
-
-    def excluir_passeio(self, passeio):
-        if passeio in self.__passeios:
-            self.__passeios.remove(passeio)
-
-    @property
+    
     def passagens(self):
+        """Retorna a lista de passagens"""
         return self.__passagens
     
+    def pagamentos(self):
+        """Retorna a lista de pagamentos"""
+        return self.__pagamentos
+    
+    def grupo(self):
+        """Retorna o grupo associado ao pacote"""
+        return self.__grupo
+    
+    # ====== MÉTODOS DE GERENCIAMENTO (conforme UML) ======
+    
+    def adicionar_passeio(self, passeio_turistico):
+        """Adiciona um passeio turístico ao pacote"""
+        self.__passeios.append(passeio_turistico)
+    
+    def excluir_passeio(self, passeio_turistico):
+        """Remove um passeio turístico do pacote"""
+        if passeio_turistico in self.__passeios:
+            self.__passeios.remove(passeio_turistico)
+    
     def adicionar_passagem(self, passagem):
-        if passagem not in self.__passagens:
-            self.__passagens.append(passagem)
-
+        """Adiciona uma passagem ao pacote"""
+        self.__passagens.append(passagem)
+    
     def excluir_passagem(self, passagem):
+        """Remove uma passagem do pacote"""
         if passagem in self.__passagens:
             self.__passagens.remove(passagem)
     
-    @property
-    def pagamentos(self):
-        return self.__pagamentos
-    
     def adicionar_pagamento(self, pagamento):
-        if pagamento not in self.__pagamentos:
-            self.__pagamentos.append(pagamento)
-
+        """Adiciona um pagamento ao pacote"""
+        self.__pagamentos.append(pagamento)
+    
+    # ====== MÉTODOS DE CÁLCULO (conforme UML) ======
+    
     def valor_total(self):
-        valor_passagens = 0.0
-        valor_passeios = 0.0
+        """
+        Calcula o valor total do pacote
+        Soma: passagens + passeios
+        """
+        total = 0.0
         
+        # Soma valor das passagens
         for passagem in self.__passagens:
-            valor_passagens += passagem.valor
-
-        for passeio in self.__passeios:
-            valor_passeios += passeio.valor
+            total += passagem.valor
         
-        return valor_passagens + valor_passeios
+        # Soma valor dos passeios
+        for passeio in self.__passeios:
+            if hasattr(passeio, 'valor'):
+                total += passeio.valor
+        
+        return total
     
     def calcular_valor_pago(self):
+        """Calcula o total já pago (soma dos pagamentos)"""
         total_pago = 0.0
-
+        
         for pagamento in self.__pagamentos:
-            total_pago += pagamento.valor()
-
+            if hasattr(pagamento, 'valor'):
+                total_pago += pagamento.valor
+        
         return total_pago
     
     def calcular_valor_restante(self):
-        return self.valor_total - self.calcular_valor_pago()
-    
-    @property
-    def grupo(self):
-        return self.__grupo
+        """Calcula o valor restante a pagar"""
+        return self.valor_total() - self.calcular_valor_pago()

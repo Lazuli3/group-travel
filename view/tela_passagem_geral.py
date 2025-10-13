@@ -93,42 +93,68 @@ class TelaPassagemGeral:
     #PASSAGEM
     
     def pega_dados_passagem(self, controlador_local_viagem):
+        """Pega os dados para cadastrar uma passagem"""
         print("\n--- CADASTRO DE PASSAGEM ---")
-
-        print("\nData da viagem:")
-        dia = int(input("  Dia: "))
-        mes = int(input("  Mês: "))
-        ano = int(input("  Ano: "))
-        data = datetime(ano, mes, dia)
         
-        valor = float(input("\nValor da passagem (R$): "))
-
-        print("\n--- SELECIONE A ORIGEM ---")
-        locais = controlador_local_viagem._ControladorLocalViagem__locais_viagem
-        indice_origem = controlador_local_viagem._ControladorLocalViagem__tela_local_viagem.seleciona_local(locais)
+        try:
+            # Seleciona transporte
+            indice_transporte = int(input("Digite o número do transporte: "))
+            
+            # Mostra locais disponíveis
+            print("\n--- LOCAIS DISPONÍVEIS ---")
+            locais = controlador_local_viagem._ControladorLocalViagem__locais_viagem
+            
+            if len(locais) < 2:
+                self.mostra_mensagem("É necessário ter pelo menos 2 locais cadastrados!")
+                return None
+            
+            # Lista os locais (agora corretamente acessando atributos do objeto)
+            for i, local in enumerate(locais):
+                print(f"{i}. Cidade: {local.cidade} | País: {local.pais}")
+            
+            # Seleciona origem
+            print("\n--- LOCAL DE ORIGEM ---")
+            indice_origem = int(input("Digite o número do local de origem: "))
+            
+            if indice_origem < 0 or indice_origem >= len(locais):
+                self.mostra_mensagem("Índice de origem inválido!")
+                return None
+            
+            # Seleciona destino
+            print("\n--- LOCAL DE DESTINO ---")
+            indice_destino = int(input("Digite o número do local de destino: "))
+            
+            if indice_destino < 0 or indice_destino >= len(locais):
+                self.mostra_mensagem("Índice de destino inválido!")
+                return None
+            
+            if indice_origem == indice_destino:
+                self.mostra_mensagem("Origem e destino não podem ser iguais!")
+                return None
+            
+            # Pega data e valor
+            data_str = input("Data da viagem (dd/mm/aaaa): ")
+            from datetime import datetime
+            data = datetime.strptime(data_str, "%d/%m/%Y")
+            
+            valor = float(input("Valor da passagem: R$ ").replace(',', '.'))
+            
+            # Retorna os dados com os objetos LocalViagem corretos
+            return {
+                'indice_transporte': indice_transporte,
+                'local_origem': locais[indice_origem],  # Retorna o objeto completo
+                'local_destino': locais[indice_destino],  # Retorna o objeto completo
+                'data': data,
+                'valor': valor
+            }
         
-        if indice_origem is None:
-            return None  # Usuário cancelou
+        except ValueError as e:
+            self.mostra_mensagem(f"Erro: Entrada inválida - {e}")
+            return None
+        except Exception as e:
+            self.mostra_mensagem(f"Erro inesperado: {e}")
+            return None
         
-        local_origem = locais[indice_origem]
-        
-        print("\n--- SELECIONE O DESTINO ---")
-        indice_destino = controlador_local_viagem._ControladorLocalViagem__tela_local_viagem.seleciona_local(locais)
-        
-        if indice_destino is None:
-            return None  # Usuário cancelou
-        
-        local_destino = locais[indice_destino]
-        indice_transporte = int(input("\nNúmero do transporte: "))
-        
-        return {
-            'data': data,
-            'valor': valor,
-            'local_origem': local_origem,
-            'local_destino': local_destino,
-            'indice_transporte': indice_transporte
-        }
-    
     def seleciona_passagem(self):
         try:
             indice = int(input("\nDigite o número da passagem: "))
