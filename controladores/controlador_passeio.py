@@ -1,11 +1,10 @@
-from entidades.passeio_turistico import *
+from datetime import datetime
+from entidades.passeio_turistico import PasseioTuristico
 from view.tela_passeio import TelaPasseioTuristico
 
 class ControladorPasseioTuristico:
     def __init__(self, controlador_sistema):
         self.__controlador_sistema = controlador_sistema
-        self.__locais_viagem = locais_viagem
-        self.__grupos = grupos
         self.__passeios = []
         self._tela_passeio = TelaPasseioTuristico()
 
@@ -34,7 +33,7 @@ class ControladorPasseioTuristico:
 
         for local in locais:
             if local.cidade.lower() == cidade.lower() and local.pais.lower() == pais.lower():
-            return local
+                return local
 
         return None
     
