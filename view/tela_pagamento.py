@@ -54,6 +54,24 @@ class TelaPagamento:
             'valor': valor
         }
 
+    def status_pagamento(self) -> bool:
+        """Pergunta ao usuário se o pagamento foi realizado"""
+        print('\n===== Status do Pagamento =====')
+        print('1 - Pagamento EFETUADO (Concluído)')
+        print('2 - Pagamento PENDENTE (Agendado ou a Confirmar)')
+        
+        while True:
+            try:
+                opcao = int(input('Selecione o status (1 ou 2): '))
+                if opcao == 1:
+                    return True  # Pagamento Efetuado
+                elif opcao == 2:
+                    return False # Pagamento Pendente
+                else:
+                    self.mostra_mensagem("Opção inválida. Digite 1 ou 2.")
+            except ValueError:
+                self.mostra_mensagem("Entrada inválida. Digite apenas o número 1 ou 2.")
+
     def lista_pagamentos(self, pagamentos_dict: list):
         if not pagamentos_dict:
             self.mostra_mensagem("Nenhum pagamento registrado.")
@@ -61,8 +79,13 @@ class TelaPagamento:
 
         print('\n============ Histórico de Pagamentos ============')
         for i, pag in enumerate(pagamentos_dict, 1):
-            status = "[✓] Efetuado" if pag.pagamento_efetuado else "[X] Pendente"
-            print(f"{i}. Pagante: {pag.pagante.nome}")
-            print(f"   Valor: R$ {pag.valor:.2f}")
-            print(f"   Data: {pag.data.strftime('%d/%m/%Y %H:%M')}")
+            tipo = pag['tipo'] 
+            valor = pag['valor']
+            pagante = pag['pagante']
+            data = pag['data']
+            status = pag['status']
+
+            print(f"{i}. Pagante: {pagante} | Tipo: {tipo}")
+            print(f"   Valor: R$ {valor:.2f}")
+            print(f"   Data: {data}")
             print(f"   Status: {status}\n")
