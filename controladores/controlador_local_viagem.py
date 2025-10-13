@@ -32,6 +32,10 @@ class ControladorLocalViagem:
         self.__locais_viagem.append(novo)
         self.__tela_local_viagem.mostra_mensagem('Local de viagem cadastrado.')
 
+    def obter_locais(self):
+        '''Retorna a lista de locais, mas sem exibir'''
+        return self.__locais_viagem
+
     def listar_locais_viagem(self):
         if not self.__locais_viagem:
             self.__tela_local_viagem.mostra_mensagem('Nenhum local de viagem cadastrado.')
