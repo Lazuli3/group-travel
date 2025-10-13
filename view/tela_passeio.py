@@ -20,21 +20,24 @@ class TelaPasseioTuristico:
 
     def pega_dados_passeio(self):
         print('\n============ Cadastro ============')
-        while True:
-            atracao_turistica = input('Nome da atração turística: ')
-            cidade = input('Cidade: ')
-            pais = input('País: ')
-            dia = input('Digite o dia (DD/MM/YYYY): ')
-            horario_inicio = input('Digite o horário de início (HH:MM): ')
-            horario_fim = input('Digite o horário de fim (HH:MM): ')
-            valor = input('Digite o valor (R$): ')
-            grupo_passeio = input('Digite o nome do grupo: ')
+        atracao_turistica = input('Nome da atração turística: ')
+        cidade = input('Cidade: ')
+        pais = input('País: ')
+        dia = input('Digite o dia (DD/MM/YYYY): ')
+        horario_inicio = input('Digite o horário de início (HH:MM): ')
+        horario_fim = input('Digite o horário de fim (HH:MM): ')
+        valor = input('Digite o valor (R$): ')
+        id_grupo = input('Digite o ID do grupo: ')
 
-            if dt_fim <= dt_inicio:
-                self.mostra_mensagem("Erro: horário de fim deve ser após o início!")
-                continue
-
-            return {
-                '
+        return {
+            'atracao_turistica': atracao_turistica,
+            'cidade': cidade,
+            'pais': pais,
+            'dia': dia,
+            'horario_inicio': horario_inicio,
+            'horario_fim': horario_fim,
+            'valor': valor,
+            'id_grupo': id_grupo
+        }
 
 
