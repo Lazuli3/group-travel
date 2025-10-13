@@ -86,6 +86,6 @@ class TelaPagamento:
             status = pag['status']
 
             print(f"{i}. Pagante: {pagante} | Tipo: {tipo}")
-            print(f"   Valor: R$ {valor:.2f}")
+            print(f"   Valor: {valor}")
             print(f"   Data: {data}")
             print(f"   Status: {status}\n")
