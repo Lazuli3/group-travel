@@ -31,7 +31,7 @@ class CartaoCredito(Pagamento):
         self.__bandeira = bandeira
     
     @property
-    def parcelas(self, parcelas):
+    def parcelas(self):
         return self.__parcelas
     @parcelas.setter
     def parcelas(self, parcelas):
