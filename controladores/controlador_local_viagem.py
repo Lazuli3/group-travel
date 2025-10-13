@@ -61,14 +61,12 @@ class ControladorLocalViagem:
         if indice is None:
             return
 
-        if 0 <= indice < len(self.__locais_viagem):
-            local_excluido = self.__locais_viagem[indice]
-            del self.__locais_viagem[indice]
-            self.__tela_local_viagem.mostra_mensagem(
-                f"Local '{local_excluido.cidade}, {local_excluido.pais}' excluído com sucesso!"
-            )
-        else:
-            self.__tela_local_viagem.mostra_mensagem("Número inválido.")
+        # Vai direto para a exclusão pois a validação já está na tela
+        local_excluido = self.__locais_viagem[indice]
+        del self.__locais_viagem[indice]
+        self.__tela_local_viagem.mostra_mensagem(
+            f"Local '{local_excluido.cidade}, {local_excluido.pais}' excluído com sucesso!"
+        )
 
     def sair(self):
         self.__tela_local_viagem.mostra_mensagem('Encerrando o cadastro.')
