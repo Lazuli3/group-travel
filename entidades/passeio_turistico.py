@@ -4,7 +4,7 @@ from grupo import Grupo
 
 class PasseioTuristico:
 
-    def __init__(self, localizacao: LocalViagem, atracao_turistica: str, dia: datetime, horario_inicio: datetime, horario_fim: datetime, valor: float, grupo_passeio: Grupo):
+    def __init__(self, localizacao: LocalViagem, atracao_turistica: str, horario_inicio: datetime, horario_fim: datetime, valor: float, grupo_passeio: Grupo):
 
         if not isinstance(localizacao, LocalViagem):
             raise TypeError ("Localizacão deve ser uma instância da classe LocalViagem.")
@@ -14,8 +14,6 @@ class PasseioTuristico:
         if not atracao_turistica.strip():
             raise ValueError("Atração turística não pode ser vazia.")
 
-        if not isinstance(dia, datetime):
-            raise TypeError ("Dia deve ser uma instância da classe datetime.")
         if not isinstance(horario_inicio, datetime):
             raise TypeError ("Horário de início deve ser uma instância da classe datetime.")
         if not isinstance(horario_fim, datetime):
@@ -29,7 +27,6 @@ class PasseioTuristico:
 
         self.__localizacao = LocalViagem
         self.__atracao_turistica = atracao_turistica
-        self.__dia = datetime
         self.__horario_inicio = datetime
         self.__horario_fim = datetime
         self.__valor = valor
@@ -48,13 +45,6 @@ class PasseioTuristico:
     @atracao_turistica.setter
     def atracao_turistica(self, atracao_turistica):
         self.__atracao_turistica = atracao_turistica
-
-    @property
-    def dia(self):
-        return self.__dia
-    @dia.setter
-    def dia(self, dia):
-        self.__dia = dia
 
     @property
     def horario_inicio(self):
