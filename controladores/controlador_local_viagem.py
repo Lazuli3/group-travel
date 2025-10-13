@@ -35,33 +35,28 @@ class ControladorLocalViagem:
     def obter_locais(self):
         '''Retorna a lista de locais, mas sem exibir'''
         return self.__locais_viagem
-
-    def listar_locais_viagem(self):
-        if not self.__locais_viagem:
-            self.__tela_local_viagem.mostra_mensagem('Nenhum local de viagem cadastrado.')
-        else:
-            locais_dict = []
-            for local in self.__locais_viagem:
-                novo_dict = {
-                    'cidade': local.cidade,
-                    'pais': local.pais
-                }
-                locais_dict.append(novo_dict)
-
-            self.__tela_local_viagem.lista_locais_viagem(locais_dict)
-
-    def excluir_local_viagem(self):
-        if not self.__locais_viagem:
-            return
-        
+    
+    def locais_para_dict(self):
+        """Converte locais_viagem para lista de dicionários"""
         locais_dict = []
         for local in self.__locais_viagem:
             locais_dict.append({
                 'cidade': local.cidade,
                 'pais': local.pais
             })
+        return locais_dict
 
-        indice = self.__tela_local_viagem.seleciona_local(locais_dict)
+    def listar_locais_viagem(self):
+        if not self.__locais_viagem:
+            self.__tela_local_viagem.mostra_mensagem('Nenhum local de viagem cadastrado.')
+        else:
+            self.__tela_local_viagem.lista_locais_viagem(self.locais_para_dict())
+
+    def excluir_local_viagem(self):
+        if not self.__locais_viagem:
+            return
+        
+        indice = self.__tela_local_viagem.seleciona_local(self.locais_para_dict())
 
         if indice is None:
             return
