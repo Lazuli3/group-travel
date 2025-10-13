@@ -16,7 +16,7 @@ class Pagamento(ABC):
         self.__pagante = pagante
         self.__valor = float(valor)
         self.__data = datetime.now()
-        self.__pagamento_efetuado = False
+        self.__pagamento_efetuado = pagamento_efetuado
 
     @property
     def pagante(self):
