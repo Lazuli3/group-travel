@@ -53,8 +53,15 @@ class ControladorLocalViagem:
     def excluir_local_viagem(self):
         if not self.__locais_viagem:
             return
+        
+        locais_dict = []
+        for local in self.__locais_viagem:
+            locais_dict.append({
+                'cidade': local.cidade,
+                'pais': local.pais
+            })
 
-        indice = self.__tela_local_viagem.seleciona_local(self.__locais_viagem)
+        indice = self.__tela_local_viagem.seleciona_local(locais_dict)
 
         if indice is None:
             return
