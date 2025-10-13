@@ -131,3 +131,47 @@ class ControladorPasseioTuristico:
                 # e mostra o erro específico no construtor(raise ValueError)
                 self.__tela_passeio.mostra_mensagem(f"Erro ao criar passeio: {e}")
 
+    def obter_passeios(self):
+        '''Retorna a lista de passeios, mas sem exibir'''
+        return self.__passeios
+    
+    def passeios_para_dict(self):
+        '''Converte passseios em uma lista de dicionários'''
+        passeios_dict = []
+        for passeio in self.__passeios:
+            novo_dict = {
+                'localizacao': f"{passeio.localizacao.cidade}, {passeio.localizacao.pais}",
+                'atracao': passeio.atracao_turistica,
+                'horario_inicio': passeio.horario_inicio,
+                'horario_fim': passeio.horario_fim,
+                'valor': passeio.valor,
+                'grupo': passeio.grupo_passeio.nome
+            }
+            passeios_dict.append(novo_dict)
+
+    def listar_passeios(self):
+        if not self.__passeios:
+            self.__tela_passeio.mostra_mensagem('Nenhum passeio turístico cadastrado.')
+        else:
+            self.__tela_passeio.lista_passeios_turisticos(self.passeios_para_dict())
+
+    def excluir_passeio_turistico(self):
+        if not self.__passeios:
+            return
+        
+        indice = self.__tela_passeio.seleciona_local(self.passeios_para_dict())
+
+        if indice is None:
+            return
+        
+        passeio_excluido = self.__passeios[indice]
+        del self.__passeios[indice]
+        self.__tela_passeio.mostra_mensagem(
+            f'''Passeio para atração turística '{passeio_excluido.atracao_turistica}'
+            do grupo '{passeio_excluido.grupo_passeio}' excluído com sucesso.'''
+        )
+        
+    def sair(self):
+        self.__tela_passeio.mostra_mensagem('Encerrando o cadastro.')
+        return True
+
