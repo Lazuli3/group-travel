@@ -3,8 +3,9 @@ from entidades.passeio_turistico import PasseioTuristico
 from view.tela_passeio import TelaPasseioTuristico
 
 class ControladorPasseioTuristico:
-    def __init__(self, controlador_sistema):
+    def __init__(self, controlador_sistema, controlador_local_viagem):
         self.__controlador_sistema = controlador_sistema
+        self.__controlador_local_viagem = controlador_local_viagem
         self.__passeios = []
         self.__tela_passeio = TelaPasseioTuristico()
 
