@@ -28,13 +28,13 @@ class TelaLocalViagem:
             'pais': pais
         }
 
-    def lista_locais_viagem(self, locais_viagem: list):
+    def lista_locais_viagem(self, locais_dict: list):
         print('============ Lista de locais ============')
-        for i, local in enumerate(locais_viagem, 1):
-            print(f"{i}. Cidade: {local.cidade} | País: {local.pais}")
+        for i, local in enumerate(locais_dict, 1):
+            print(f"{i}. Cidade: {local['cidade']} | País: {local['pais']}")
 
-    def seleciona_local(self, locais_viagem: list):
-        self.lista_locais_viagem(locais_viagem)
+    def seleciona_local(self, locais_dict: list):
+        self.lista_locais_viagem(locais_dict)
 
         while True:
             try:
@@ -43,11 +43,11 @@ class TelaLocalViagem:
                 if opcao == 0:
                     return None
 
-                if 1 <= opcao <= len(locais_viagem):
+                if 1 <= opcao <= len(locais_dict):
                     return opcao - 1  #índice ajustado
                 else:
                     self.mostra_mensagem(
-                        f"Digite um número entre 1 e {len(locais_viagem)}."
+                        f"Digite um número entre 1 e {len(locais_dict)}."
                     )
 
             except ValueError:
