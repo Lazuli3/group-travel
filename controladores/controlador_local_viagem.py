@@ -65,7 +65,7 @@ class ControladorLocalViagem:
             local_excluido = self.__locais_viagem[indice]
             del self.__locais_viagem[indice]
             self.__tela_local_viagem.mostra_mensagem(
-            f"Local '{local_excluido.cidade}, {local_excluido.pais}' excluído com sucesso!"
+                f"Local '{local_excluido.cidade}, {local_excluido.pais}' excluído com sucesso!"
             )
         else:
             self.__tela_local_viagem.mostra_mensagem("Número inválido.")
