@@ -23,5 +23,10 @@ class Dinheiro(Pagamento):
             self.__troco = self.__valor_entregue - self.__valor
         return self.__troco
 
-
-        
+    def conversao_dict(self):
+        return {
+            'tipo': 'Dinheiro',
+            'valor': f"R$ {self.valor:.2f}",
+            'pagante': self.pagante.nome,
+            'troco': f"Troco: R$ {self.__troco}"
+        }

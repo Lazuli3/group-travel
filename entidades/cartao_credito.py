@@ -36,3 +36,12 @@ class CartaoCredito(Pagamento):
     @parcelas.setter
     def parcelas(self, parcelas):
         self.__parcelas = parcelas
+
+    def conversao_dict(self):
+        return {
+            'tipo': 'Cartão de Crédito',
+            'pagante': self.__pagante.nome,
+            'valor': f"R$ {self.__valor:.2f}",
+            'parcelas': f"{self.__parcelas}x",
+            'bandeira': {self.__bandeira}
+        }

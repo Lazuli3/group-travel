@@ -25,3 +25,11 @@ class Pix(Pagamento):
     @chave.setter
     def chave(self, chave):
         self.__chave = chave
+        
+    def conversao_dict(self):
+        return {
+            'tipo': 'Pix',
+            'pagante': {self.pagante.nome},
+            'valor': f"R$ {self.valor:.2f}",
+            'banco': {self.__banco}
+        }
