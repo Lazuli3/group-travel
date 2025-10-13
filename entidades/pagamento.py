@@ -4,13 +4,13 @@ from abc import ABC, abstractmethod
 
 class Pagamento(ABC):
 # Representa um registro de pagamento
-    def __init__(self, pagante:Pessoa, valor:float):
+    def __init__(self, pagante: Pessoa, valor: float, pagamento_efetuado: bool = False):
 
         if not isinstance(pagante, Pessoa):
             raise TypeError("Pagante deve ser uma instância da classe Pessoa.")
         if not isinstance(valor, (int, float)):
             raise TypeError("Valor deve ser um número (float ou int).")
-        if not valor < 0:
+        if valor < 0:
             raise ValueError("Valor deve ser positivo.")
         
         self.__pagante = pagante
@@ -39,8 +39,16 @@ class Pagamento(ABC):
         return self.__pagamento_efetuado
     
     def conversao_dict(self):
-        raise NotImplementedError("Subclasses devem implementar o método 'to_dict()'")
-
+        status = "[✓] Efetuado" if self.pagamento_efetuado else "[X] Pendente"
+        data_formatada = self.data.strftime('%d/%m/%Y %H:%M')
+        
+        return {
+            'pagante': self.pagante.nome,
+            'valor': f"R$ {self.valor:.2f}",
+            'data': data_formatada,
+            'status': status
+        }
+            
     def marcar_como_efetuado(self):
         # alterar o status do pagamento para 'efetuado' (True)
         self.__pagamento_efetuado = True

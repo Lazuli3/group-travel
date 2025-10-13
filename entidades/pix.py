@@ -1,15 +1,15 @@
-from pagamento import Pagamento
+from entidades.pagamento import Pagamento
 
 class Pix(Pagamento):
 
-    def __init__(self, pagante, valor, banco:str, chave:int):
-        super().__init__(pagante, valor)
+    def __init__(self, pagante, valor, pagamento_efetuado, banco:str, chave:str):
+        super().__init__(pagante, valor, pagamento_efetuado)
         self.__banco = None
-        self.__chave = 0
+        self.__chave = None
 
         if isinstance(banco, str):
             self.__banco = banco
-        if isinstance(chave, int):
+        if isinstance(chave, str):
             self.__chave = chave
 
     @property 
@@ -27,9 +27,11 @@ class Pix(Pagamento):
         self.__chave = chave
         
     def conversao_dict(self):
-        return {
+        pix_dict = super().conversao_dict() 
+        
+        pix_dict.update({
             'tipo': 'Pix',
-            'pagante': {self.pagante.nome},
-            'valor': f"R$ {self.valor:.2f}",
-            'banco': {self.__banco}
-        }
+            'banco': self.__banco
+        })
+        
+        return pix_dict

@@ -1,14 +1,14 @@
-from pagamento import Pagamento
+from entidades.pagamento import Pagamento
 
 class CartaoCredito(Pagamento):
 
-    def __init__(self, pagante, valor, num_cartao:int, bandeira:str, parcelas:int):
-        super().__init__(pagante, valor)
-        self.__num_cartao = 0
+    def __init__(self, pagante, valor, pagamento_efetuado, num_cartao:str, bandeira:str, parcelas:int):
+        super().__init__(pagante, valor, pagamento_efetuado)
+        self.__num_cartao = None
         self.__bandeira = None
         self.__parcelas = 0
 
-        if isinstance(num_cartao, int):
+        if isinstance(num_cartao, str):
             self.__num_cartao = num_cartao
         if isinstance(bandeira, str):
             self.__bandeira = bandeira
@@ -20,7 +20,7 @@ class CartaoCredito(Pagamento):
     def num_cartao(self):
         return self.__num_cartao
     @num_cartao.setter
-    def n_cartao(self, num_cartao):
+    def num_cartao(self, num_cartao):
         self.__num_cartao = num_cartao
     
     @property
@@ -38,10 +38,12 @@ class CartaoCredito(Pagamento):
         self.__parcelas = parcelas
 
     def conversao_dict(self):
-        return {
+        cartao_dict = super().conversao_dict()
+        
+        cartao_dict.update({
             'tipo': 'Cartão de Crédito',
-            'pagante': self.__pagante.nome,
-            'valor': f"R$ {self.__valor:.2f}",
             'parcelas': f"{self.__parcelas}x",
-            'bandeira': {self.__bandeira}
-        }
+            'bandeira': self.__bandeira
+        })
+        
+        return cartao_dict
