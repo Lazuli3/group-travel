@@ -51,6 +51,10 @@ class TelaPasseioTuristico:
                    Grupo do passeio: {passeio['grupo']}''')
 
     def seleciona_passeio(self, passeios_dict: list):
+        if not passeios_dict:
+            self.mostra_mensagem("Nenhum passeio disponível para seleção.")
+            return None
+
         self.lista_passeios_turisticos(passeios_dict)
 
         while True:
