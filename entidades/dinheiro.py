@@ -4,11 +4,12 @@ class Dinheiro(Pagamento):
 
     def __init__(self, pagante, valor, pagamento_efetuado, valor_entregue: float):
         super().__init__(pagante, valor, pagamento_efetuado)
-        self.__valor_entregue = 0.0
-        self.__troco = 0.0
 
         if isinstance(valor_entregue, (int, float)):
             self.__valor_entregue = float(valor_entregue)
+        
+        self.__valor_entregue = 0.0
+        self.__troco = 0.0
 
     @property
     def valor_entregue(self):
@@ -28,6 +29,7 @@ class Dinheiro(Pagamento):
 
         dinheiro_dict.update({
             'tipo': 'Dinheiro',
+            'valor_entregue': f"R$ {self.__valor_entregue:.2f}",
             'troco': f"Troco: R$ {self.__troco:.2f}"
         })
         
