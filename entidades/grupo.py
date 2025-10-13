@@ -1,5 +1,4 @@
 class Grupo:
-    """Classe que representa um grupo de pessoas"""
     
     def __init__(self, id_grupo, nome, descricao=""):
         self.__id = id_grupo
@@ -23,7 +22,6 @@ class Grupo:
     
     @property
     def membros_cpf(self):
-        """Retorna cópia da lista de CPFs para proteção"""
         return self.__membros_cpf.copy()
     
     # ====== SETTERS ======
@@ -36,7 +34,7 @@ class Grupo:
     def descricao(self, descricao):
         self.__descricao = descricao
     
-    # ====== MÉTODOS DE MANIPULAÇÃO DE MEMBROS ======
+    #MANIPULAÇÃO
     
     def adicionar_membro(self, cpf):
         """
@@ -76,9 +74,7 @@ class Grupo:
     def limpar_membros(self):
         """Remove todos os membros do grupo"""
         self.__membros_cpf.clear()
-    
-    # ====== MÉTODOS ESPECIAIS ======
-    
+
     def __str__(self):
         return f"Grupo: {self.__nome} (ID: {self.__id}, Membros: {self.total_membros()})"
     
