@@ -57,12 +57,16 @@ class ControladorPagamento:
                     "O número de parcelas deve ser um número inteiro positivo."
                 )
                 continue
+            
+            status_efetuado = self.__tela_pagamento.status_pagamento()
 
             try:
                 pagamento = CartaoCredito(
                     pagante = pessoa,
                     valor = valor,
+                    pagamento_efetuado = status_efetuado,
                     num_cartao = num_cartao,
+                    bandeira = dados['bandeira'],
                     parcelas = parcelas
                 )
                 self.__pagamentos.append(pagamento)
@@ -85,10 +89,13 @@ class ControladorPagamento:
             if dados is None:
                 return
             
+            status_efetuado = self.__tela_pagamento.status_pagamento()
+            
             try:
                 pagamento = Pix(
                     pagante = pessoa,
                     valor = valor,
+                    pagamento_efetuado = status_efetuado,
                     chave = dados['chave'],
                     banco = dados['banco']
                 )
@@ -104,37 +111,49 @@ class ControladorPagamento:
                 return None
 
     def cria_pagamento_dinheiro(self, valor: float, pessoa):
-        dados = self.__tela_pagamento.pega_dados_dinheiro(valor)
-        
-        try:
-            valor_entregue = float(dados['valor_entregue'].replace(',', '.'))
+        while True:
+            dados = self.__tela_pagamento.pega_dados_dinheiro(valor)
             
-            if valor_entregue < valor:
+            if dados is None:
+                return
+            
+            try:
+                valor_entregue = float(dados['valor_entregue'].replace(',', '.'))
+                if valor_entregue < valor:
+                    self.__tela_pagamento.mostra_mensagem(
+                        f"Erro: Valor insuficiente! Faltam R$ {valor - valor_entregue:.2f}"
+                    )
+                    return None
+            except ValueError:
                 self.__tela_pagamento.mostra_mensagem(
-                    f"Erro: Valor insuficiente! Faltam R$ {valor - valor_entregue:.2f}"
+                    "O valor entregue deve ser maior que o valor total."
                 )
-                return None
+                continue
             
-            pagamento = Dinheiro(
-                pagante = pessoa,
-                valor = valor,
-                valor_entregue = valor_entregue
-            )
-            
-            troco = pagamento.calc_troco()
-            self.__pagamentos.append(pagamento)
-            
-            self.__tela_pagamento.mostra_mensagem(
-                f"Pagamento de R$ {valor:.2f} realizado!"
-            )
-            if troco > 0:
-                self.__tela_pagamento.mostra_mensagem(f"Troco: R$ {troco:.2f}")
-            
-            return pagamento
+            status_efetuado = self.__tela_pagamento.status_pagamento()
+                
+            try:
+                pagamento = Dinheiro(
+                    pagante = pessoa,
+                    valor = valor,
+                    pagamento_efetuado = status_efetuado,
+                    valor_entregue = valor_entregue
+                )
+                
+                troco = pagamento.calc_troco()
+                self.__pagamentos.append(pagamento)
+                
+                self.__tela_pagamento.mostra_mensagem(
+                    f"Pagamento de R$ {valor:.2f} realizado!"
+                )
+                if troco > 0:
+                    self.__tela_pagamento.mostra_mensagem(f"Troco: R$ {troco:.2f}")
+                
+                return pagamento
 
-        except (ValueError, TypeError) as e:
-            self.__tela_pagamento.mostra_mensagem(f"Erro: {e}")
-            return None
+            except (ValueError, TypeError) as e:
+                self.__tela_pagamento.mostra_mensagem(f"Erro: {e}")
+                return None
 
     def pagamentos_para_dict(self):
         pagamentos_dict = []
@@ -150,14 +169,6 @@ class ControladorPagamento:
             
     def obter_pagamentos(self):
         return self.__pagamentos
-        
-    def marcar_pagamento_efetuado(self, pagamento):
-        """Marca um pagamento como efetuado"""
-        if pagamento in self.__pagamentos:
-            pagamento.marcar_como_efetuado()
-            self.__tela_pagamento.mostra_mensagem("Pagamento marcado como efetuado!")
-            return True
-        return False
         
     def sair(self):
         self.__tela_pagamento.mostra_mensagem('Encerrando.')
