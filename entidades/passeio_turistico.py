@@ -13,14 +13,14 @@ class PasseioTuristico:
             raise TypeError ("Atração turística deve ser uma instância da classe str.")
         if not atracao_turistica.strip():
             raise ValueError("Atração turística não pode ser vazia.")
+        
+        if horario_fim <= horario_inicio:
+            raise ValueError("Horário de fim deve ser após o início.")
 
-        if not isinstance(horario_inicio, datetime):
-            raise TypeError ("Horário de início deve ser uma instância da classe datetime.")
-        if not isinstance(horario_fim, datetime):
-            raise TypeError ("Horário de fim deve ser uma instância da classe datetime.")
-
-        if not isinstance(valor, float):
+        if not isinstance(valor, (int, float)):
             raise TypeError ("Valor deve ser uma instância da classe float.")
+        if valor < 0:
+            raise ValueError("Valor deve ser um número positivo.")
 
         if not isinstance(grupo_passeio, Grupo):
             raise TypeError ("Grupo do passeio deve ser uma instância da classe Grupo.")
