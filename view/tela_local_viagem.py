@@ -34,6 +34,10 @@ class TelaLocalViagem:
             print(f"{i}. Cidade: {local['cidade']} | País: {local['pais']}")
 
     def seleciona_local(self, locais_dict: list):
+        if not locais_dict:
+            self.mostra_mensagem("Nenhum local disponível para seleção.")
+            return None
+
         self.lista_locais_viagem(locais_dict)
 
         while True:
