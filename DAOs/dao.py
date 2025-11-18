@@ -2,9 +2,11 @@ from abc import ABC, abstractmethod
 import pickle
 
 class DAO(ABC):
+    @abstractmethod
     def __init__ (self, datasource=''):
         self.__datasource = datasource
         self.__cache = {}
+        ids = []
         try:
             self.__load()
         except FileNotFoundError:
@@ -35,3 +37,11 @@ class DAO(ABC):
 
     def get_all(self):
         return self.__cache.values()
+
+    def gerar_id(self):
+        id = 0
+        for i in self.ids:
+            if i == id:
+                id +=1
+        self.ids.append(id)
+        return id
