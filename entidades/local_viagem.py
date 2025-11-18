@@ -19,6 +19,7 @@ class LocalViagem:
 
         self.__cidade = cidade
         self.__pais = pais
+        self.__id = 0
 
     @property
     def cidade(self):
@@ -35,3 +36,11 @@ class LocalViagem:
     @pais.setter
     def pais(self, pais):
         self.__pais = pais
+
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id(self, id):
+        self.__id = id

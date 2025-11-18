@@ -16,7 +16,7 @@ class ControladorSistema():
         self.__controlador_local_viagem = ControladorLocalViagem()
         self.__controlador_passagem = ControladorPassagem(self.controlador_local_viagem)
         self.__controlador_pagamento = ControladorPagamento(ControladorSistema)
-        self.__controlador_passeio = ControladorPasseioTuristico(ControladorSistema)
+        self.__controlador_passeio = ControladorPasseioTuristico(ControladorSistema, self.controlador_local_viagem)
         self.__controlador_pacote = ControladorPacote(
         self.__controlador_passagem,            # para passagens
         self.__controlador_passeio,             # para passeios
