@@ -1,10 +1,12 @@
 from entidades.pessoa import Pessoa
 from view.tela_pessoa import TelaPessoa
 
+from DAO.pessoa_dao import PessoaDAO
+
 class ControladorPessoa:
 
     def __init__(self):
-        self.__pessoas = []
+        self.__pessoa_dao = PessoaDAO()
         self.__tela_pessoa = TelaPessoa()
 
     def inicia(self):
@@ -36,7 +38,7 @@ class ControladorPessoa:
                 return
             
             nova = Pessoa(**dados)
-            self.__pessoas.append(nova)
+            self.__pessoa_dao.add(nova)
             self.__tela_pessoa.mostra_mensagem("Pessoa cadastrada com sucesso.")
         
         except Exception as e:
@@ -44,7 +46,7 @@ class ControladorPessoa:
 
     def listar_pessoa(self):
         """Lista todas as pessoas cadastradas"""
-        if not self.__pessoas:
+        if not self.__pessoa_dao.get_all():
             self.__tela_pessoa.mostra_mensagem('Nenhuma pessoa cadastrada')
         else:
             self.__tela_pessoa.lista_pessoas(self.__pessoas)
@@ -56,7 +58,7 @@ class ControladorPessoa:
             pessoa = self.buscar_por_cpf(cpf)
             
             if pessoa:
-                self.__pessoas.remove(pessoa)
+                self.__pessoa_dao.remove(pessoa)
                 self.__tela_pessoa.mostra_mensagem(f"A pessoa {pessoa.nome} foi removida com sucesso.")
             else:
                 self.__tela_pessoa.mostra_mensagem("Essa pessoa não está cadastrada no sistema.")
@@ -68,7 +70,7 @@ class ControladorPessoa:
 
     def buscar_por_cpf(self, cpf):
         """Busca uma pessoa pelo CPF - usado pelo ControladorGrupo"""
-        for pessoa in self.__pessoas:
+        for pessoa in self.__pessoa_dao.get_all():
             if pessoa.cpf == cpf:
                 return pessoa
         return None
@@ -95,11 +97,11 @@ class ControladorPessoa:
 
     def listar_por_grupo(self, grupo_id):
         """Lista todas as pessoas de um grupo específico"""
-        return [p for p in self.__pessoas if hasattr(p, 'grupo_id') and p.grupo_id == grupo_id]
+        return [p for p in self.__pessoa_dao.get_all() if hasattr(p, 'grupo_id') and p.grupo_id == grupo_id]
 
     def listar_sem_grupo(self):
         """Lista pessoas que não estão em nenhum grupo"""
-        return [p for p in self.__pessoas if not hasattr(p, 'grupo_id') or p.grupo_id is None]
+        return [p for p in self.__pessoa_dao.get_all() if not hasattr(p, 'grupo_id') or p.grupo_id is None]
 
     def obter_todas_pessoas(self):
         """Retorna lista de todas as pessoas (para uso externo)"""

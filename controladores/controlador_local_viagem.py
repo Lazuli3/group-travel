@@ -1,9 +1,10 @@
 from entidades.local_viagem import LocalViagem
 from view.tela_local_viagem import TelaLocalViagem
+from DAO.local_viagem_dao import LocalDAO
 
 class ControladorLocalViagem:
     def __init__(self):
-        self.__locais_viagem = []
+        self.__locais_dao = LocalDAO()
         self.__tela_local_viagem = TelaLocalViagem()
 
     def inicia(self):

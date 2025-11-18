@@ -29,6 +29,8 @@ class ControladorPasseioTuristico:
                 break
 
     def busca_local(self, cidade: str, pais: str):
+        """Busca um local de viagem pelo nome da cidade e país"""
+        # CORREÇÃO: Usa o método obter_locais() ao invés de tentar acessar propriedade inexistente
         locais = self.__controlador_sistema.controlador_local_viagem.obter_locais()
 
         for local in locais:
@@ -38,7 +40,7 @@ class ControladorPasseioTuristico:
         return None
     
     def valida_local(self, cidade: str, pais: str):
-        ''' Valida se o local passado pelo usuário existe'''
+        """Valida se o local passado pelo usuário existe"""
         local = self.busca_local(cidade, pais)
         if local is None:
             self.__tela_passeio.mostra_mensagem(f"Local não encontrado: {cidade}, {pais}")
@@ -46,7 +48,7 @@ class ControladorPasseioTuristico:
         return local
     
     def valida_grupo(self, id_grupo):
-        '''Valida se o id (e o grupo) passado pelo usuário existe'''
+        """Valida se o id (e o grupo) passado pelo usuário existe"""
         try:
             id_int = int(id_grupo)
         except(ValueError, TypeError):
@@ -79,9 +81,10 @@ class ControladorPasseioTuristico:
             return None, None
 
     def valida_valor(self, valor_str):
+        """Valida e converte o valor para float"""
         try:
             valor = float(valor_str.replace(',', '.'))
-            #se o usuário passou um valor com vírgula, substitui por . (float)
+            # Se o usuário passou um valor com vírgula, substitui por . (float)
 
             if valor < 0:
                 self.__tela_passeio.mostra_mensagem("Valor não pode ser negativo!")
@@ -94,6 +97,7 @@ class ControladorPasseioTuristico:
             return None
    
     def incluir_passeio(self):
+        """Cadastra um novo passeio turístico"""
         while True:
             dados = self.__tela_passeio.pega_dados_passeio()
 
@@ -140,11 +144,11 @@ class ControladorPasseioTuristico:
                 self.__tela_passeio.mostra_mensagem(f"Erro ao criar passeio: {e}")
 
     def obter_passeios(self):
-        '''Retorna a lista de passeios, mas sem exibir'''
+        """Retorna a lista de passeios, mas sem exibir"""
         return self.__passeios
     
     def passeios_para_dict(self):
-        '''Converte passseios em uma lista de dicionários'''
+        """Converte passeios em uma lista de dicionários"""
         passeios_dict = []
         for passeio in self.__passeios:
             novo_dict = {
@@ -159,12 +163,14 @@ class ControladorPasseioTuristico:
         return passeios_dict
 
     def listar_passeios(self):
+        """Lista todos os passeios cadastrados"""
         if not self.__passeios:
             self.__tela_passeio.mostra_mensagem('Nenhum passeio turístico cadastrado.')
         else:
             self.__tela_passeio.lista_passeios_turisticos(self.passeios_para_dict())
 
     def excluir_passeio(self):
+        """Exclui um passeio turístico"""
         if not self.__passeios:
             return
         
@@ -176,10 +182,11 @@ class ControladorPasseioTuristico:
         passeio_excluido = self.__passeios[indice]
         del self.__passeios[indice]
         self.__tela_passeio.mostra_mensagem(
-            f'''Passeio para atração turística '{passeio_excluido.atracao_turistica}'
-            do grupo '{passeio_excluido.grupo_passeio.nome}' excluído com sucesso.'''
+            f"Passeio para atração turística '{passeio_excluido.atracao_turistica}' "
+            f"do grupo '{passeio_excluido.grupo_passeio.nome}' excluído com sucesso."
         )
         
     def sair(self):
+        """Sai do menu de passeios"""
         self.__tela_passeio.mostra_mensagem('Encerrando o cadastro.')
         return True

@@ -1,15 +1,25 @@
+
 from entidades.grupo import Grupo
 from view.tela_grupo import TelaGrupo
+from DAO.grupo_dao import GrupoDAO
 
 class ControladorGrupo:
     def __init__(self, controlador_pessoa):
-        self.__grupos = []
+        self.__grupo_dao = GrupoDAO() 
         self.__tela_grupo = TelaGrupo()
         self.controlador_pessoa = controlador_pessoa
-        self.__proximo_id = 1
+        self.__proximo_id = self.__gerar_proximo_id()
+
+    def __gerar_proximo_id(self):
+        """Gera o próximo ID disponível baseado nos grupos existentes"""
+        grupos = list(self.__grupo_dao.get_all())
+        if not grupos:
+            return 1
+        
+        max_id = max(grupo.id for grupo in grupos)
+        return max_id + 1
 
     def inicia(self):
-        """Menu principal do controlador de grupos"""
         opcoes = {
             1: self.criar_grupo,
             2: self.listar_grupos,
@@ -33,6 +43,7 @@ class ControladorGrupo:
     # ====== OPERAÇÕES COM GRUPOS ======
 
     def criar_grupo(self):
+        """Cria um novo grupo e persiste no arquivo"""
         try:
             dados_grupo = self.__tela_grupo.pega_dados_grupo()
             nome_grupo = dados_grupo['nome']
@@ -42,8 +53,11 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem(f"Já existe um grupo com o nome '{nome_grupo}'!")
                 return
 
+            # Cria o grupo com ID único
             grupo = Grupo(self.__proximo_id, nome_grupo, descricao)
-            self.__grupos.append(grupo)
+            
+            self.__grupo_dao.add(grupo)
+
             self.__proximo_id += 1
 
             self.__tela_grupo.mostra_mensagem(f"Grupo '{nome_grupo}' criado com sucesso!")
@@ -52,12 +66,14 @@ class ControladorGrupo:
             self.__tela_grupo.mostra_mensagem(f"Erro ao criar grupo: {str(e)}")
 
     def listar_grupos(self):
-        if not self.__grupos:
+        grupos = list(self.__grupo_dao.get_all())
+        
+        if not grupos:
             self.__tela_grupo.mostra_mensagem("Nenhum grupo cadastrado no sistema.")
             return
 
         dados_grupos = []
-        for grupo in self.__grupos:
+        for grupo in grupos:
             dados_grupos.append({
                 'id': grupo.id,
                 'nome': grupo.nome,
@@ -68,7 +84,9 @@ class ControladorGrupo:
         self.__tela_grupo.lista_grupos(dados_grupos)
 
     def excluir_grupo(self):
-        if not self.__grupos:
+        grupos = list(self.__grupo_dao.get_all())
+        
+        if not grupos:
             self.__tela_grupo.mostra_mensagem("Nenhum grupo cadastrado no sistema.")
             return
 
@@ -87,10 +105,12 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem("Exclusão cancelada.")
                 return
 
+            # Desvincula todos os membros
             for cpf in grupo.obter_lista_membros():
                 self.controlador_pessoa.desvincular_grupo(cpf)
 
-            self.__grupos.remove(grupo)
+            self.__grupo_dao.remove(id_grupo)
+            
             self.__tela_grupo.mostra_mensagem(f"Grupo '{grupo.nome}' excluído com sucesso!")
 
         except Exception as e:
@@ -99,7 +119,9 @@ class ControladorGrupo:
     # ====== OPERAÇÕES COM MEMBROS ======
 
     def incluir_pessoa_grupo(self):
-        if not self.__grupos:
+        grupos = list(self.__grupo_dao.get_all())
+        
+        if not grupos:
             self.__tela_grupo.mostra_mensagem("Nenhum grupo cadastrado. Crie um grupo primeiro!")
             return
 
@@ -125,8 +147,10 @@ class ControladorGrupo:
             if not grupo.adicionar_membro(cpf):
                 self.__tela_grupo.mostra_mensagem(f"{pessoa.nome} já é membro do grupo '{grupo.nome}'!")
                 return
-
+            
             self.controlador_pessoa.vincular_grupo(cpf, grupo.id)
+
+            self.__grupo_dao.update(grupo)
 
             self.__tela_grupo.mostra_mensagem(f"{pessoa.nome} adicionado(a) ao grupo '{grupo.nome}' com sucesso!")
 
@@ -134,7 +158,9 @@ class ControladorGrupo:
             self.__tela_grupo.mostra_mensagem(f"Erro ao incluir pessoa no grupo: {str(e)}")
 
     def listar_pessoas_grupo(self):
-        if not self.__grupos:
+        grupos = list(self.__grupo_dao.get_all())
+        
+        if not grupos:
             self.__tela_grupo.mostra_mensagem("Nenhum grupo cadastrado no sistema.")
             return
 
@@ -168,7 +194,10 @@ class ControladorGrupo:
             self.__tela_grupo.mostra_mensagem(f"Erro ao listar membros: {str(e)}")
 
     def excluir_pessoa_grupo(self):
-        if not self.__grupos:
+        """Remove uma pessoa de um grupo"""
+        grupos = list(self.__grupo_dao.get_all())
+        
+        if not grupos:
             self.__tela_grupo.mostra_mensagem("Nenhum grupo cadastrado no sistema.")
             return
 
@@ -196,9 +225,12 @@ class ControladorGrupo:
 
             pessoa = self.controlador_pessoa.buscar_por_cpf(cpf)
 
+            # Remove do grupo
             grupo.remover_membro(cpf)
 
             self.controlador_pessoa.desvincular_grupo(cpf)
+
+            self.__grupo_dao.update(grupo)
 
             nome_pessoa = pessoa.nome if pessoa else "Pessoa"
             self.__tela_grupo.mostra_mensagem(f"{nome_pessoa} removido(a) do grupo '{grupo.nome}' com sucesso!")
@@ -206,16 +238,14 @@ class ControladorGrupo:
         except Exception as e:
             self.__tela_grupo.mostra_mensagem(f"Erro ao remover pessoa do grupo: {str(e)}")
 
-    # métodos criados pra eu conseguir fazer as buscas e etc
+    # ====== MÉTODOS AUXILIARES ======
 
     def buscar_por_id(self, grupo_id):
-        for grupo in self.__grupos:
-            if grupo.id == grupo_id:
-                return grupo
-        return None
+        return self.__grupo_dao.get(grupo_id)
 
     def buscar_por_nome(self, nome_grupo):
-        for grupo in self.__grupos:
+        grupos = list(self.__grupo_dao.get_all())
+        for grupo in grupos:
             if grupo.nome.lower() == nome_grupo.lower():
                 return grupo
         return None
@@ -231,7 +261,12 @@ class ControladorGrupo:
             if pessoa:
                 membros.append(pessoa)
         return membros
+    
+    def obter_todos_grupos(self):
+        return list(self.__grupo_dao.get_all())
 
     def sair(self):
         self.__tela_grupo.mostra_mensagem('Encerrando o gerenciamento de grupos.')
         return True
+
+

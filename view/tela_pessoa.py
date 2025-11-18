@@ -1,18 +1,41 @@
+import FreeSimpleGUI as sg
 
 class TelaPessoa:
+    
+    def __init__(self):
+        self.__window = None
+        self.init_opcoes()
 
-    def mostra_opcoes(self):
-        print('============ Menu ============')
-        print("1 - Incluir pessoa")
-        print('2 - Listar pessoas')
-        print('3 - Excluir pessoa')
-        print('0 - Sair')
+    def tela_opcoes(self):
+        self.init_opcoes()
+        button, values = self.open()
+        if values['1']:
+            opcao = 1
+        if values['2']:
+            opcao = 2
+        if values['3']:
+            opcao = 3
+        # cobre os casos de Retornar, fechar janela, ou clicar cancelar
+        #Isso faz com que retornemos a tela do sistema caso qualquer uma dessas coisas aconteca
+        if values['0'] or button in (None, 'Cancelar'):
+            opcao = 0
+            self.close()
+        return opcao
 
-        try:
-            return int(input('Escolha uma das opções do menu: '))
-        
-        except ValueError:
-            self.mostra_mensagem("Escolha uma opção válida do menu, intervado de [0,1,2,3].")
+    def init_opcoes(self):
+        #sg.theme_previewer()
+        sg.ChangeLookAndFeel('DarkTeal4')
+        layout = [
+            [sg.Text('-------- PESSOAS ----------', font=("Comic Sans", 25))],
+            [sg.Text('Escolha sua opção', font=("Comic Sans", 15))],
+            [sg.Radio('Incluir Amigo', "RD1", key='1')],
+            [sg.Radio('Alterar Amigo', "RD1", key='2')],
+            [sg.Radio('Listar Amigos', "RD1", key='3')],
+            [sg.Radio('Excluir Amigo', "RD1", key='4')],
+            [sg.Radio('Retornar', "RD1", key='0')],
+            [sg.Button('Confirmar'), sg.Cancel('Cancelar')]
+        ]
+        self.__window = sg.Window('Cadastro de pessoa').Layout(layout)
 
     def pega_dados_pessoa(self):
         print('============ Cadastro ============')

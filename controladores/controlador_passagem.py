@@ -4,11 +4,14 @@ from entidades.passagem import Passagem
 from view.tela_passagem_geral import TelaPassagemGeral
 from datetime import datetime
 
+from DAO.empresa_dao import EmpresaDAO
+from DAO.transporte_dao import TransporteDAO
+
 class ControladorPassagem:
 
     def __init__(self, controlador_local_viagem):
-        self.__empresas = []
-        self.__transportes = []
+        self.__empresa_dao = EmpresaDAO()
+        self.__transporte_dao = TransporteDAO()
         self.__passagens = []
         self.controlador_local_viagem = controlador_local_viagem 
         self.__tela_passagem_geral = TelaPassagemGeral()
@@ -48,14 +51,14 @@ class ControladorPassagem:
                 return
             
             empresa = Empresa(**dados)
-            self.__empresas.append(empresa)
+            self.__empresa_dao.add(empresa)
             self.__tela_passagem_geral.mostra_mensagem("Empresa cadastrada com sucesso.")
         
         except Exception as e:
             self.__tela_passagem_geral.mostra_mensagem(f"Erro ao cadastrar empresa: {str(e)}")
     
     def listar_empresas(self):
-        if not self.__empresas:
+        if not self.__empresa_dao.get_all():
             self.__tela_passagem_geral.mostra_mensagem('Nenhuma empresa cadastrada.')
             return
         
@@ -75,7 +78,7 @@ class ControladorPassagem:
                     )
                     return
                 
-                self.__empresas.remove(empresa)
+                self.__empresa_dao.remove(empresa)
                 self.__tela_passagem_geral.mostra_mensagem(f"A empresa {empresa.nome} foi removida com sucesso.")
             else:
                 self.__tela_passagem_geral.mostra_mensagem("Essa empresa não está cadastrada no sistema.")
@@ -84,7 +87,7 @@ class ControladorPassagem:
             self.__tela_passagem_geral.mostra_mensagem(f"Erro ao excluir empresa: {str(e)}")
     
     def buscar_empresa_por_cnpj(self, cnpj):
-        for empresa in self.__empresas:
+        for empresa in self.__empresa_dao.get_all():
             if empresa.cnpj == cnpj:
                 return empresa
         return None
@@ -92,7 +95,7 @@ class ControladorPassagem:
     #TRANSPORTES
     
     def incluir_transporte(self):
-        if not self.__empresas:
+        if not self.__empresa_dao.get_all():
             self.__tela_passagem_geral.mostra_mensagem("Nenhuma empresa cadastrada. Cadastre uma empresa primeiro!")
             return
         
@@ -150,7 +153,7 @@ class ControladorPassagem:
     #PASSAGENS
     
     def incluir_passagem(self):
-        if not self.__transportes:
+        if not self.__transporte_dao.get_all():
             self.__tela_passagem_geral.mostra_mensagem("Nenhum transporte cadastrado. Cadastre um transporte primeiro!")
             return
         
@@ -168,11 +171,11 @@ class ControladorPassagem:
                 self.__tela_passagem_geral.mostra_mensagem("Cadastro de passagem cancelado.")
                 return
             
-            if dados['indice_transporte'] < 0 or dados['indice_transporte'] >= len(self.__transportes):
+            if dados['indice_transporte'] < 0 or dados['indice_transporte'] >= len(self.__transporte_dao.get_all()):
                 self.__tela_passagem_geral.mostra_mensagem("Transporte inválido!")
                 return
             
-            transporte = self.__transportes[dados['indice_transporte']]
+            transporte = self.__transporte_dao.get_all()[dados['indice_transporte']]
             
             local_origem = dados['local_origem']
             
