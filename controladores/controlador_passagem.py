@@ -15,6 +15,15 @@ class ControladorPassagem:
         self.__passagens = []
         self.controlador_local_viagem = controlador_local_viagem 
         self.__tela_passagem_geral = TelaPassagemGeral()
+        self.__proximo_id = self.__gerar_proximo_id()
+
+    def __gerar_proximo_id(self):
+        transportes = list(self.__transporte_dao.get_all())
+        if not transportes:
+            return 1
+        
+        max_id = max(transporte.id for transporte in transportes)
+        return max_id + 1
     
     def inicia(self):
         opcoes = {
