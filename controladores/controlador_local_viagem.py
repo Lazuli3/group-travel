@@ -1,6 +1,6 @@
 from entidades.local_viagem import LocalViagem
 from view.tela_local_viagem import TelaLocalViagem
-from DAOs.local_viagem_dao import LocalDAO
+from DAOs.locais_dao import LocalDAO
 
 class ControladorLocalViagem:
     def __init__(self):

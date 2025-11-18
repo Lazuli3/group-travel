@@ -1,4 +1,4 @@
-from DAO.DAO import DAO
+from DAOs.dao import DAO
 from entidades.transporte import Transporte
 
 #cada entidade terá uma classe dessa, implementação bem simples.

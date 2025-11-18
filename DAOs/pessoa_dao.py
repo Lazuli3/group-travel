@@ -1,4 +1,4 @@
-from DAO.DAO import DAO
+from DAOs.dao import DAO
 from entidades.pessoa import Pessoa
 
 #cada entidade terá uma classe dessa, implementação bem simples.
