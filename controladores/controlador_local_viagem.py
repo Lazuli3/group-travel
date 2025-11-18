@@ -1,11 +1,32 @@
 from entidades.local_viagem import LocalViagem
 from view.tela_local_viagem import TelaLocalViagem
-from DAOs.locais_dao import LocalDAO
+from DAOs.locais_dao import LocalViagemDAO
 
 class ControladorLocalViagem:
     def __init__(self):
-        self.__locais_dao = LocalDAO()
+        self.__locais_DAO = LocalViagemDAO()
         self.__tela_local_viagem = TelaLocalViagem()
+        self.__proximo_id = self.__gerar_proximo_id()
+
+    def __gerar_proximo_id(self):
+        """Gera o próximo ID disponível baseado nos locais existentes"""
+        locais = list(self.__locais_DAO.get_all())
+        if not locais:
+            return 1
+        
+        max_id = max(local.id for local in locais)
+        return max_id + 1
+
+    def buscar_por_id(self, local_id):
+        return self.__locais_DAO.get(local_id)
+
+    def __local_ja_existe(self, cidade, pais):
+        """Verifica se já existe um local com a mesma cidade e país"""
+        for local in self.__locais_DAO:
+            if (local.cidade.lower().strip() == cidade.lower().strip() and 
+                local.pais.lower().strip() == pais.lower().strip()):
+                return True
+        return False
 
     def inicia(self):
         switcher = {
@@ -29,48 +50,72 @@ class ControladorLocalViagem:
 
     def incluir_local_viagem(self):
         dados = self.__tela_local_viagem.pega_dados_local_viagem()
+
+        if self.__local_ja_existe(dados['cidade'], dados['pais']):
+            self.__tela_local_viagem.mostra_mensagem(
+                f"O local '{dados['cidade']}, {dados['pais']}' já está cadastrado!"
+            )
+            return
+
         novo = LocalViagem(**dados) #Desempacota o dicionário
-        self.__locais_viagem.append(novo)
+
+        self.__locais_DAO.add(novo)
+        
+        self.__proximo_id += 1
+
         self.__tela_local_viagem.mostra_mensagem('Local de viagem cadastrado.')
 
     def obter_locais(self):
         '''Retorna a lista de locais, mas sem exibir'''
-        return self.__locais_viagem
-    
-    def locais_para_dict(self):
-        """Converte locais_viagem para lista de dicionários"""
-        locais_dict = []
+        return list(self.__locais_DAO.get_all())
+
+    def listar_locais_viagem(self):
+        locais = list(self.__locais_DAO.get_all())
+        
+        if not locais:
+            self.__tela_local_viagem.mostra_mensagem('Nenhum local de viagem cadastrado.')
+            return
+
+        dados_locais = []
         for local in self.__locais_viagem:
-            locais_dict.append({
+            dados_locais.append({
                 'cidade': local.cidade,
                 'pais': local.pais
             })
-        return locais_dict
 
-    def listar_locais_viagem(self):
-        if not self.__locais_viagem:
-            self.__tela_local_viagem.mostra_mensagem('Nenhum local de viagem cadastrado.')
-        else:
-            self.__tela_local_viagem.lista_locais_viagem(self.locais_para_dict())
+        self.__tela_local_viagem.lista_locais_viagem(dados_locais)
 
     def excluir_local_viagem(self):
-        if not self.__locais_viagem:
+        locais = list(self.__locais_DAO.get_all())
+        
+        if not self.__locais_DAO:
+            self.__tela_local_viagem.mostra_mensagem("Nenhum local de viagem cadastrado.")
             return
         
-        indice = self.__tela_local_viagem.seleciona_local(self.locais_para_dict())
+        try:
+            self.listar_locais_viagem()
+            
+            id_local = self.__tela_local_viagem.seleciona_local()
+            local = self.buscar_por_id(id_local)
 
-        if indice is None:
-            return
+            if not local:
+                self.__tela_local_viagem.mostra_mensagem(f"Local com ID {id_local} não encontrado!")
+                return
 
-        # Vai direto para a exclusão pois a validação já está na tela
-        local_excluido = self.__locais_viagem[indice]
-        del self.__locais_viagem[indice]
-        self.__tela_local_viagem.mostra_mensagem(
-            f"Local '{local_excluido.cidade}, {local_excluido.pais}' excluído com sucesso!"
-        )
+            confirmacao = self.__tela_local_viagem.confirma_exclusao(local.cidade, local.pais)
+            if not confirmacao:
+                self.__tela_local_viagem.mostra_mensagem("Exclusão cancelada.")
+                return
+
+            self.__locais_DAO.remove(id_local)
+
+            self.__tela_local_viagem.mostra_mensagem(
+            f"Local '{local.cidade}, {local.pais}' excluído com sucesso!"
+            )
+        
+        except Exception as e:
+            self.__tela_local_viagem.mostra_mensagem(f"Erro ao excluir grupo: {str(e)}")
 
     def sair(self):
         self.__tela_local_viagem.mostra_mensagem('Encerrando o cadastro.')
         return True
-    
-    

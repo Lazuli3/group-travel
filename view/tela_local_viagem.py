@@ -33,26 +33,15 @@ class TelaLocalViagem:
         for i, local in enumerate(locais_dict, 1):
             print(f"{i}. Cidade: {local['cidade']} | País: {local['pais']}")
 
-    def seleciona_local(self, locais_dict: list):
-        if not locais_dict:
-            self.mostra_mensagem("Nenhum local disponível para seleção.")
+    def seleciona_local(self):
+        try:
+            id_local = int(input("\nDigite o ID do local: "))
+            return id_local
+        except ValueError:
+            self.mostra_mensagem("ID inválido!")
             return None
 
-        self.lista_locais_viagem(locais_dict)
-
-        while True:
-            try:
-                opcao = int(input("\nDigite o número do local ou 0 para cancelar: "))
-
-                if opcao == 0:
-                    return None
-
-                if 1 <= opcao <= len(locais_dict):
-                    return opcao - 1  #índice ajustado
-                else:
-                    self.mostra_mensagem(
-                        f"Digite um número entre 1 e {len(locais_dict)}."
-                    )
-
-            except ValueError:
-                self.mostra_mensagem("Digite um número válido.")
+    def confirma_exclusao(self, cidade_local, pais_local):
+        print(f"\nVocê confirma a exclusão do local de viagem: '{cidade_local}, {pais_local}'?")
+        resposta = input("Certeza que quer excluir? (S/N): ").strip().upper()
+        return resposta == 'S'
