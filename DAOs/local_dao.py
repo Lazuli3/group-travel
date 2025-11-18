@@ -6,10 +6,8 @@ class LocalViagemDAO(DAO):
         super().__init__('locais.pkl')
 
     def add (self, local: LocalViagem):
-        if ((local is not None) and isinstance(local, LocalViagem)):
-            novo_id = super().gerar_id()
-            local.id = novo_id
-            super().add(novo_id, local)
+        if ((local is not None) and isinstance(local, LocalViagem) and isinstance(local.id, int)):
+            super().add(local.id, local)
 
     def update(self, local: LocalViagem):
         if((local is not None) and isinstance(local, LocalViagem) and isinstance(local.id, int)):
@@ -19,6 +17,6 @@ class LocalViagemDAO(DAO):
         if isinstance(key, int):
             return super().get(key)
 
-    def remove(selfself, key:int):
+    def remove(self, key:int):
         if isinstance(key, int):
             return super().remove(key)
