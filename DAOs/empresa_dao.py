@@ -11,13 +11,13 @@ class EmpresaDAO(DAO):
             super().add(empresa.cnpj, empresa)
 
     def update(self, empresa: Empresa):
-        if((empresa is not None) and isinstance(empresa, Empresa) and isinstance(empresa.cnpj, int)):
+        if((empresa is not None) and isinstance(empresa, Empresa) and isinstance(empresa.cnpj, str)):
             super().update(empresa.cnpj, empresa)
 
-    def get(self, key:int):
-        if isinstance(key, int):
+    def get(self, key:str):
+        if isinstance(key, str):
             return super().get(key)
 
-    def remove(selfself, key:int):
-        if(isinstance(key, int)):
+    def remove(selfself, key:str):
+        if(isinstance(key, str)):
             return super().remove(key)
