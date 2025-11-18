@@ -32,13 +32,13 @@ class ControladorPessoa:
         try:
             dados = self.__tela_pessoa.pega_dados_pessoa()
             
-            # Verifica se CPF já existe
             if self.buscar_por_cpf(dados['cpf']):
                 self.__tela_pessoa.mostra_mensagem(f"Pessoa com CPF {dados['cpf']} já cadastrada!")
                 return
             
             nova = Pessoa(**dados)
             self.__pessoa_dao.add(nova)
+            
             self.__tela_pessoa.mostra_mensagem("Pessoa cadastrada com sucesso.")
         
         except Exception as e:
@@ -46,10 +46,12 @@ class ControladorPessoa:
 
     def listar_pessoa(self):
         """Lista todas as pessoas cadastradas"""
-        if not self.__pessoa_dao.get_all():
+        pessoas = list(self.__pessoa_dao.get_all())
+        
+        if not pessoas:
             self.__tela_pessoa.mostra_mensagem('Nenhuma pessoa cadastrada')
         else:
-            self.__tela_pessoa.lista_pessoas(self.__pessoas)
+            self.__tela_pessoa.lista_pessoas(pessoas)
 
     def excluir_pessoa(self):
         """Exclui uma pessoa do sistema"""
@@ -58,7 +60,7 @@ class ControladorPessoa:
             pessoa = self.buscar_por_cpf(cpf)
             
             if pessoa:
-                self.__pessoa_dao.remove(pessoa)
+                self.__pessoa_dao.remove(cpf)
                 self.__tela_pessoa.mostra_mensagem(f"A pessoa {pessoa.nome} foi removida com sucesso.")
             else:
                 self.__tela_pessoa.mostra_mensagem("Essa pessoa não está cadastrada no sistema.")
@@ -66,14 +68,11 @@ class ControladorPessoa:
         except Exception as e:
             self.__tela_pessoa.mostra_mensagem(f"Erro ao excluir pessoa: {str(e)}")
 
-    # ====== MÉTODOS PARA INTEGRAÇÃO COM CONTROLADOR DE GRUPO ======
+    # ====== MÉTODOS AUXILIARES ======
 
     def buscar_por_cpf(self, cpf):
-        """Busca uma pessoa pelo CPF - usado pelo ControladorGrupo"""
-        for pessoa in self.__pessoa_dao.get_all():
-            if pessoa.cpf == cpf:
-                return pessoa
-        return None
+        """Busca uma pessoa pelo CPF"""
+        return self.__pessoa_dao.get(cpf)
 
     def validar_existencia(self, cpf):
         """Valida se uma pessoa existe no sistema"""
@@ -84,6 +83,7 @@ class ControladorPessoa:
         pessoa = self.buscar_por_cpf(cpf)
         if pessoa:
             pessoa.grupo_id = grupo_id
+            self.__pessoa_dao.update(pessoa)
             return True
         return False
 
@@ -92,20 +92,23 @@ class ControladorPessoa:
         pessoa = self.buscar_por_cpf(cpf)
         if pessoa:
             pessoa.grupo_id = None
+            self.__pessoa_dao.update(pessoa)
             return True
         return False
 
     def listar_por_grupo(self, grupo_id):
         """Lista todas as pessoas de um grupo específico"""
-        return [p for p in self.__pessoa_dao.get_all() if hasattr(p, 'grupo_id') and p.grupo_id == grupo_id]
+        pessoas = list(self.__pessoa_dao.get_all())
+        return [p for p in pessoas if hasattr(p, 'grupo_id') and p.grupo_id == grupo_id]
 
     def listar_sem_grupo(self):
         """Lista pessoas que não estão em nenhum grupo"""
-        return [p for p in self.__pessoa_dao.get_all() if not hasattr(p, 'grupo_id') or p.grupo_id is None]
+        pessoas = list(self.__pessoa_dao.get_all())
+        return [p for p in pessoas if not hasattr(p, 'grupo_id') or p.grupo_id is None]
 
     def obter_todas_pessoas(self):
-        """Retorna lista de todas as pessoas (para uso externo)"""
-        return self.__pessoas.copy()
+        """Retorna lista de todas as pessoas"""
+        return list(self.__pessoa_dao.get_all())
 
     def sair(self):
         """Sai do menu de pessoas"""

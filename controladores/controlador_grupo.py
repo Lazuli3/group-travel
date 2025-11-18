@@ -11,7 +11,6 @@ class ControladorGrupo:
         self.__proximo_id = self.__gerar_proximo_id()
 
     def __gerar_proximo_id(self):
-        """Gera o próximo ID disponível baseado nos grupos existentes"""
         grupos = list(self.__grupo_dao.get_all())
         if not grupos:
             return 1
@@ -40,10 +39,7 @@ class ControladorGrupo:
             else:
                 self.__tela_grupo.mostra_mensagem('Opção inválida.')
 
-    # ====== OPERAÇÕES COM GRUPOS ======
-
     def criar_grupo(self):
-        """Cria um novo grupo e persiste no arquivo"""
         try:
             dados_grupo = self.__tela_grupo.pega_dados_grupo()
             nome_grupo = dados_grupo['nome']
@@ -53,7 +49,7 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem(f"Já existe um grupo com o nome '{nome_grupo}'!")
                 return
 
-            # Cria o grupo com ID único
+            #criando um id dentro do controlador
             grupo = Grupo(self.__proximo_id, nome_grupo, descricao)
             
             self.__grupo_dao.add(grupo)
@@ -105,7 +101,7 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem("Exclusão cancelada.")
                 return
 
-            # Desvincula todos os membros
+            #desvincula todos os membros do grupo (fazer ralatório aqui?)
             for cpf in grupo.obter_lista_membros():
                 self.controlador_pessoa.desvincular_grupo(cpf)
 
@@ -115,8 +111,6 @@ class ControladorGrupo:
 
         except Exception as e:
             self.__tela_grupo.mostra_mensagem(f"Erro ao excluir grupo: {str(e)}")
-
-    # ====== OPERAÇÕES COM MEMBROS ======
 
     def incluir_pessoa_grupo(self):
         grupos = list(self.__grupo_dao.get_all())
@@ -194,7 +188,6 @@ class ControladorGrupo:
             self.__tela_grupo.mostra_mensagem(f"Erro ao listar membros: {str(e)}")
 
     def excluir_pessoa_grupo(self):
-        """Remove uma pessoa de um grupo"""
         grupos = list(self.__grupo_dao.get_all())
         
         if not grupos:
@@ -225,7 +218,6 @@ class ControladorGrupo:
 
             pessoa = self.controlador_pessoa.buscar_por_cpf(cpf)
 
-            # Remove do grupo
             grupo.remover_membro(cpf)
 
             self.controlador_pessoa.desvincular_grupo(cpf)
@@ -238,7 +230,7 @@ class ControladorGrupo:
         except Exception as e:
             self.__tela_grupo.mostra_mensagem(f"Erro ao remover pessoa do grupo: {str(e)}")
 
-    # ====== MÉTODOS AUXILIARES ======
+    #metodos para integração com outras classes
 
     def buscar_por_id(self, grupo_id):
         return self.__grupo_dao.get(grupo_id)

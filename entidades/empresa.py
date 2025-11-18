@@ -8,7 +8,7 @@ class Empresa:
 
         if isinstance(nome, str):
             self.__nome = nome
-        if isinstance(cnpj, int):
+        if isinstance(cnpj, str):
             self.__cnpj= int
         if isinstance(telefone, int):
             self.__telefone = telefone
