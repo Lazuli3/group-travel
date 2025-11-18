@@ -4,8 +4,8 @@ from entidades.passagem import Passagem
 from view.tela_passagem_geral import TelaPassagemGeral
 from datetime import datetime
 
-from DAO.empresa_dao import EmpresaDAO
-from DAO.transporte_dao import TransporteDAO
+from DAOs.empresa_dao import EmpresaDAO
+from DAOs.transporte_dao import TransporteDAO
 
 class ControladorPassagem:
 

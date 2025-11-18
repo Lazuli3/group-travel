@@ -1,7 +1,7 @@
 
 from entidades.grupo import Grupo
 from view.tela_grupo import TelaGrupo
-from DAO.grupo_dao import GrupoDAO
+from DAOs.grupo_dao import GrupoDAO
 
 class ControladorGrupo:
     def __init__(self, controlador_pessoa):

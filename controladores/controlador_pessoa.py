@@ -1,7 +1,7 @@
 from entidades.pessoa import Pessoa
 from view.tela_pessoa import TelaPessoa
 
-from DAO.pessoa_dao import PessoaDAO
+from DAOs.pessoa_dao import PessoaDAO
 
 class ControladorPessoa:
 
