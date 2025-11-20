@@ -1,7 +1,7 @@
 
 class LocalViagem:
 
-    def __init__(self, id_local, cidade: str, pais: str):
+    def __init__(self, cidade: str, pais: str):
         if not isinstance(cidade, str):
             raise TypeError ("Cidade deve ser uma instância da classe str.")
         if not isinstance(pais, str):
@@ -19,7 +19,7 @@ class LocalViagem:
 
         self.__cidade = cidade
         self.__pais = pais
-        self.__id = id_local
+        self.__id = 0
 
     @property
     def cidade(self):
