@@ -57,7 +57,7 @@ class ControladorLocalViagem:
             )
             return
 
-        novo = LocalViagem(**dados) #Desempacota o dicionário
+        novo = LocalViagem(self.__proximo_id, dados['cidade'], dados['pais']) #Desempacota o dicionário
 
         self.__locais_DAO.add(novo)
         

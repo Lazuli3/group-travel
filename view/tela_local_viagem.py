@@ -31,7 +31,7 @@ class TelaLocalViagem:
     def lista_locais_viagem(self, locais_dict: list):
         print('============ Lista de locais ============')
         for i, local in enumerate(locais_dict, 1):
-            print(f"{i}. Cidade: {local['cidade']} | País: {local['pais']}")
+            print(f"{local['id']}. Cidade: {local['cidade']} | País: {local['pais']}")
 
     def seleciona_local(self):
         try:
