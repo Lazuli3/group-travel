@@ -5,35 +5,29 @@ class Grupo:
         self.__nome = nome
         self.__descricao = descricao
         self.__membros_cpf = []  # Lista de CPFs dos membros
-    
-    # ====== GETTERS ======
-    
+
     @property
     def id(self):
         return self.__id
     
     @property
-    def nome(self):
-        return self.__nome
-    
-    @property
-    def descricao(self):
-        return self.__descricao
-    
-    @property
     def membros_cpf(self):
         return self.__membros_cpf.copy()
     
-    # ====== SETTERS ======
-    
+    @property
+    def nome(self):
+        return self.__nome
     @nome.setter
     def nome(self, nome):
         self.__nome = nome
     
+    @property
+    def descricao(self):
+        return self.__descricao
     @descricao.setter
     def descricao(self, descricao):
         self.__descricao = descricao
-    
+  
     #MANIPULAÇÃO
     
     def adicionar_membro(self, cpf):
