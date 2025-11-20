@@ -70,8 +70,9 @@ class ControladorPassagem:
             
             empresa = Empresa(**dados)
             self.__empresa_dao.add(empresa)
-            
+            print(empresa.cnpj)
             self.__tela_passagem.mostra_mensagem("Empresa cadastrada com sucesso.")
+
         
         except Exception as e:
             self.__tela_passagem.mostra_mensagem(f"Erro ao cadastrar empresa: {str(e)}")
@@ -80,10 +81,9 @@ class ControladorPassagem:
         empresas = list(self.__empresa_dao.get_all())
         
         if not empresas:
-            self.__tela_passagem.mostra_mensagem('Nenhuma empresa cadastrada.')
-            return
-        
-        self.__tela_passagem.lista_empresas(empresas)
+            self.__tela_passagem.mostra_mensagem('Nenhuma empresa cadastrada')
+        else:
+            self.__tela_passagem.lista_empresas(empresas)
     
     def excluir_empresa(self):
         try:
@@ -117,17 +117,17 @@ class ControladorPassagem:
         empresas = list(self.__empresa_dao.get_all())
         
         if not empresas:
-            self.__tela_viagem.mostra_mensagem("Nenhuma empresa cadastrada. Cadastre uma empresa primeiro!")
+            self.__tela_passagem.mostra_mensagem("Nenhuma empresa cadastrada. Cadastre uma empresa primeiro!")
             return
         
         try:
             self.listar_empresas()
             
-            dados = self.__tela_viagem.pega_dados_transporte()
+            dados = self.__tela_passagem.pega_dados_transporte()
             
             empresa = self.buscar_empresa_por_cnpj(dados['cnpj_empresa'])
             if not empresa:
-                self.__tela_viagem.mostra_mensagem(f"Empresa com CNPJ {dados['cnpj_empresa']} não encontrada!")
+                self.__tela_passagem.mostra_mensagem(f"Empresa com CNPJ {dados['cnpj_empresa']} não encontrada!")
                 return
             
             #criando um id dentro do próprio controlador
@@ -136,30 +136,30 @@ class ControladorPassagem:
             self.__transporte_dao.add(transporte)
             self.__proximo_id_transporte += 1
             
-            self.__tela_viagem.mostra_mensagem("Transporte cadastrado com sucesso.")
+            self.__tela_passagem.mostra_mensagem("Transporte cadastrado com sucesso.")
         
         except Exception as e:
-            self.__tela_viagem.mostra_mensagem(f"Erro ao cadastrar transporte: {str(e)}")
+            self.__tela_passagem.mostra_mensagem(f"Erro ao cadastrar transporte: {str(e)}")
     
     def listar_transportes(self):
         transportes = list(self.__transporte_dao.get_all())
         
         if not transportes:
-            self.__tela_viagem.mostra_mensagem('Nenhum transporte cadastrado.')
+            self.__tela_passagem.mostra_mensagem('Nenhum transporte cadastrado.')
             return
         
-        self.__tela_viagem.lista_transportes(transportes)
+        self.__tela_passagem.lista_transportes(transportes)
     
     def excluir_transporte(self):
         transportes = list(self.__transporte_dao.get_all())
         
         if not transportes:
-            self.__tela_viagem.mostra_mensagem('Nenhum transporte cadastrado.')
+            self.__tela_passagem.mostra_mensagem('Nenhum transporte cadastrado.')
             return
         
         try:
             self.listar_transportes()
-            indice = self.__tela_viagem.seleciona_transporte()
+            indice = self.__tela_passagem.seleciona_transporte()
             
             transportes_lista = list(transportes)
             if 0 <= indice < len(transportes_lista):
@@ -169,42 +169,42 @@ class ControladorPassagem:
                 passagens_vinculadas = [p for p in passagens if p.transporte.id == transporte.id]
                 
                 if passagens_vinculadas:
-                    self.__tela_viagem.mostra_mensagem(
+                    self.__tela_passagem.mostra_mensagem(
                         f"Não é possível excluir! O transporte possui {len(passagens_vinculadas)} passagem(ns) vinculada(s)."
                     )
                     return
                 
                 self.__transporte_dao.remove(transporte.id)
-                self.__tela_viagem.mostra_mensagem(f"O transporte foi removido com sucesso.")
+                self.__tela_passagem.mostra_mensagem(f"O transporte foi removido com sucesso.")
             else:
-                self.__tela_viagem.mostra_mensagem("Índice inválido!")
+                self.__tela_passagem.mostra_mensagem("Índice inválido!")
         
         except Exception as e:
-            self.__tela_viagem.mostra_mensagem(f"Erro ao excluir transporte: {str(e)}")
+            self.__tela_passagem.mostra_mensagem(f"Erro ao excluir transporte: {str(e)}")
     
     #PASSAGENS
     
     def incluir_passagem(self):
         if not self.__transporte_dao.get_all():
-            self.__tela_passagem_geral.mostra_mensagem("Nenhum transporte cadastrado. Cadastre um transporte primeiro!")
+            self.__tela_passagem.mostra_mensagem("Nenhum transporte cadastrado. Cadastre um transporte primeiro!")
             return
         
         #precisa ter pelo menos 2 locais de viagem cadastrados, o local de origem e o de destino não podem ser os mesmos
-        if not self.controlador_local_viagem._ControladorLocalViagem__locais_viagem:
-            self.__tela_passagem_geral.mostra_mensagem("Nenhum local de viagem cadastrado. Cadastre locais primeiro!")
+        if not self.controlador_local_viagem.obter_locais():
+            self.__tela_passagem.mostra_mensagem("Nenhum local de viagem cadastrado. Cadastre locais primeiro!")
             return
         
         try:
             self.listar_transportes()
 
-            dados = self.__tela_passagem_geral.pega_dados_passagem(self.controlador_local_viagem)
+            dados = self.__tela_passagem.pega_dados_passagem(self.controlador_local_viagem)
 
             if dados is None:
-                self.__tela_passagem_geral.mostra_mensagem("Cadastro de passagem cancelado.")
+                self.__tela_passagem.mostra_mensagem("Cadastro de passagem cancelado.")
                 return
             
             if dados['indice_transporte'] < 0 or dados['indice_transporte'] >= len(self.__transporte_dao.get_all()):
-                self.__tela_passagem_geral.mostra_mensagem("Transporte inválido!")
+                self.__tela_passagem.mostra_mensagem("Transporte inválido!")
                 return
             
             transporte = self.__transporte_dao.get_all()[dados['indice_transporte']]
@@ -214,7 +214,7 @@ class ControladorPassagem:
             local_destino = dados['local_destino']
             
             if local_origem == local_destino:
-                self.__tela_passagem_geral.mostra_mensagem("Origem e destino não podem ser iguais!")
+                self.__tela_passagem.mostra_mensagem("Origem e destino não podem ser iguais!")
                 return
             
             #aqui ele cria a passagem
@@ -226,21 +226,21 @@ class ControladorPassagem:
                 transporte
             )
             
-            self.__passagens.append(passagem)
-            self.__tela_passagem_geral.mostra_mensagem("Passagem cadastrada com sucesso.")
+            self.__passagem_dao.add(passagem)
+            self.__tela_passagem.mostra_mensagem("Passagem cadastrada com sucesso.")
         
         except Exception as e:
-            self.__tela_passagem_geral.mostra_mensagem(f"Erro ao cadastrar passagem: {str(e)}")
+            self.__tela_passagem.mostra_mensagem(f"Erro ao cadastrar passagem: {str(e)}")
     
     def listar_passagens(self):
-        if not self.__passagens:
-            self.__tela_passagem_geral.mostra_mensagem('Nenhuma passagem cadastrada.')
+        if not self.__passagem_dao.get_all():
+            self.__tela_passagem.mostra_mensagem('Nenhuma passagem cadastrada.')
             return
         
-        self.__tela_passagem_geral.lista_passagens(self.__passagens)
+        self.__tela_passagem.lista_passagens(self.__passagens)
     
     def excluir_passagem(self):
-        if not self.__passagens:
+        if not self.__passagem_dao.get_all():
             self.__tela_passagem.mostra_mensagem('Nenhuma passagem cadastrada.')
             return
         
@@ -250,7 +250,7 @@ class ControladorPassagem:
             
             if 0 <= indice < len(self.__passagens):
                 passagem = self.__passagens[indice]
-                self.__passagens.remove(passagem)
+                self.__passagem_dao.remove(passagem)
                 self.__tela_passagem.mostra_mensagem("Passagem removida com sucesso.")
             else:
                 self.__tela_passagem.mostra_mensagem("Índice inválido!")

@@ -1,16 +1,16 @@
 
 class Empresa:
-    def __init__(self, nome:str, cnpj:int, telefone: int):
+    def __init__(self, nome:str, cnpj:str, telefone: str):
 
-        self.__nome = None
+        self.__nome = nome
         self.__cnpj = cnpj
         self.__telefone = telefone
 
         if isinstance(nome, str):
             self.__nome = nome
         if isinstance(cnpj, str):
-            self.__cnpj= int
-        if isinstance(telefone, int):
+            self.__cnpj= cnpj
+        if isinstance(telefone, str):
             self.__telefone = telefone
 
     @property

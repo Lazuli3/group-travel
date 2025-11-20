@@ -4,10 +4,10 @@ from entidades.empresa import Empresa
 #cada entidade terá uma classe dessa, implementação bem simples.
 class EmpresaDAO(DAO):
     def __init__(self):
-        super().__init__('grupo.pkl')
+        super().__init__('empresa.pkl')
 
     def add(self, empresa: Empresa):
-        if((empresa is not None) and isinstance(empresa, Empresa) and isinstance(empresa.cnpj, int)):
+        if((empresa is not None) and isinstance(empresa, Empresa) and isinstance(empresa.cnpj, str)):
             super().add(empresa.cnpj, empresa)
 
     def update(self, empresa: Empresa):
@@ -18,6 +18,6 @@ class EmpresaDAO(DAO):
         if isinstance(key, str):
             return super().get(key)
 
-    def remove(selfself, key:str):
+    def remove(self, key:str):
         if(isinstance(key, str)):
             return super().remove(key)

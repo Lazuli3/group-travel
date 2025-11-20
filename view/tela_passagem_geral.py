@@ -1,186 +1,258 @@
+import FreeSimpleGUI as sg
 from datetime import datetime
 
 class TelaPassagemGeral:
-    
+
+    # MENU PRINCIPAL
     def mostra_opcoes(self):
-        """Exibe o menu de opções e retorna a escolha do usuário"""
-        print("\n" + "="*60)
-        print("     GERENCIAMENTO DE VIAGENS")
-        print("="*60)
-        print("EMPRESAS:")
-        print("  1 - Cadastrar Empresa")
-        print("  2 - Listar Empresas")
-        print("  3 - Excluir Empresa")
-        print("\nTRANSPORTES:")
-        print("  4 - Cadastrar Transporte")
-        print("  5 - Listar Transportes")
-        print("  6 - Excluir Transporte")
-        print("\nPASSAGENS:")
-        print("  7 - Cadastrar Passagem")
-        print("  8 - Listar Passagens")
-        print("  9 - Excluir Passagem")
-        print("\n  0 - Voltar")
-        print("="*60)
-        
-        try:
-            opcao = int(input("Escolha uma opção: "))
-            return opcao
-        except ValueError:
-            return -1
-    
-    #EMPRESA
-    
+        layout = [
+            [sg.Text("GERENCIAMENTO DE VIAGENS", font=("Arial", 14, "bold"), justification="center")],
+            [sg.Text("EMPRESAS:", font=("Arial", 12, "bold"))],
+            [sg.Button("1 - Cadastrar Empresa")],
+            [sg.Button("2 - Listar Empresas")],
+            [sg.Button("3 - Excluir Empresa")],
+            [sg.Text("")],
+            [sg.Text("TRANSPORTES:", font=("Arial", 12, "bold"))],
+            [sg.Button("4 - Cadastrar Transporte")],
+            [sg.Button("5 - Listar Transportes")],
+            [sg.Button("6 - Excluir Transporte")],
+            [sg.Text("")],
+            [sg.Text("PASSAGENS:", font=("Arial", 12, "bold"))],
+            [sg.Button("7 - Cadastrar Passagem")],
+            [sg.Button("8 - Listar Passagens")],
+            [sg.Button("9 - Excluir Passagem")],
+            [sg.Text("")],
+            [sg.Button("0 - Voltar")]
+        ]
+
+        window = sg.Window("Menu Passagens", layout)
+
+        while True:
+            event, values = window.read()
+
+            if event in (sg.WIN_CLOSED, "0 - Voltar"):
+                window.close()
+                return 0
+
+            for i in range(1, 10):
+                if event.startswith(str(i)):
+                    window.close()
+                    return i
+
+    # EMPRESAS
     def pega_dados_empresa(self):
-        print("\n--- CADASTRO DE EMPRESA ---")
-        nome = input("Nome da empresa: ").strip()
-        cnpj = input("CNPJ: ").strip()
-        telefone = input("Telefone: ").strip()
-        
-        return {
-            'nome': nome,
-            'cnpj': cnpj,
-            'telefone': telefone
-        }
-    
+        layout = [
+            [sg.Text("Nome da empresa:"), sg.Input(key="nome")],
+            [sg.Text("CNPJ:"), sg.Input(key="cnpj")],
+            [sg.Text("Telefone:"), sg.Input(key="telefone")],
+            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Cadastro de Empresa", layout)
+
+        while True:
+            event, values = window.read()
+
+            if event in (sg.WIN_CLOSED, "Cancelar"):
+                window.close()
+                return None
+
+            if event == "Confirmar":
+                window.close()
+                return values
+
+
     def pega_cnpj(self):
-        cnpj = input("\nDigite o CNPJ da empresa: ").strip()
-        return cnpj
-    
+        layout = [
+            [sg.Text("Digite o CNPJ da empresa:")],
+            [sg.Input(key="cnpj")],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Excluir Empresa", layout)
+        event, values = window.read()
+        window.close()
+
+        if event == "OK":
+            return values["cnpj"]
+        return None
+
+
     def lista_empresas(self, empresas):
-        print("\n" + "="*80)
-        print("     EMPRESAS CADASTRADAS")
-        print("="*80)
-        print(f"{'Nome':<30} {'CNPJ':<20} {'Telefone':<15}")
-        print("-"*80)
-        
-        for empresa in empresas:
-            print(f"{empresa.nome:<30} {empresa.cnpj:<20} {empresa.telefone:<15}")
-        
-        print("="*80)
-    
-    #TRANSPORTE
-    
+        texto = f"{'Nome':<30} {'CNPJ':<20} {'Telefone':<15}\n"
+        texto += "-" * 70 + "\n"
+
+        for emp in empresas:
+            texto += f"{emp.nome:<30} {emp.cnpj:<20} {emp.telefone:<15}\n"
+
+        layout = [
+            [sg.Multiline(texto, size=(80, 20), disabled=True)],
+            [sg.Button("OK")]
+        ]
+
+        window = sg.Window("Empresas Cadastradas", layout)
+        window.read()
+        window.close()
+
+    # TRANSPORTES
     def pega_dados_transporte(self):
-        print("\n--- CADASTRO DE TRANSPORTE ---")
-        tipo = input("Tipo de transporte (Ônibus/Avião/Van/etc): ").strip()
-        cnpj_empresa = input("CNPJ da empresa: ").strip()
-        
-        return {
-            'tipo': tipo,
-            'cnpj_empresa': cnpj_empresa
-        }
-    
+        layout = [
+            [sg.Text("Tipo de transporte (Ônibus / Avião / Van / etc):")],
+            [sg.Input(key="tipo")],
+            [sg.Text("CNPJ da empresa:")],
+            [sg.Input(key="cnpj_empresa")],
+            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Cadastro de Transporte", layout)
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, "Cancelar"):
+                window.close()
+                return None
+
+            if event == "Confirmar":
+                window.close()
+                return values
+
+
     def seleciona_transporte(self):
-        try:
-            indice = int(input("\nDigite o número do transporte: "))
-            return indice
-        except ValueError:
-            self.mostra_mensagem("Número inválido!")
-            return -1
-    
+        layout = [
+            [sg.Text("Digite o número do transporte:")],
+            [sg.Input(key="indice")],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Selecionar Transporte", layout)
+        event, values = window.read()
+        window.close()
+
+        if event == "OK":
+            try:
+                return int(values["indice"])
+            except ValueError:
+                sg.popup("Número inválido!")
+                return -1
+        return -1
+
+
     def lista_transportes(self, transportes):
-        print("\n" + "="*80)
-        print("     TRANSPORTES CADASTRADOS")
-        print("="*80)
-        print(f"{'Nº':<5} {'Tipo':<20} {'Empresa':<30} {'CNPJ':<20}")
-        print("-"*80)
-        
-        for i, transporte in enumerate(transportes):
-            print(f"{i:<5} {transporte.tipo:<20} {transporte.empresa.nome:<30} {transporte.empresa.cnpj:<20}")
-        
-        print("="*80)
-    
-    #PASSAGEM
-    
+        texto = f"{'Nº':<5} {'Tipo':<20} {'Empresa':<30} {'CNPJ':<20}\n"
+        texto += "-" * 85 + "\n"
+
+        for i, t in enumerate(transportes):
+            texto += f"{i:<5} {t.tipo:<20} {t.empresa.nome:<30} {t.empresa.cnpj:<20}\n"
+
+        layout = [
+            [sg.Multiline(texto, size=(90, 25), disabled=True)],
+            [sg.Button("OK")]
+        ]
+
+        window = sg.Window("Transportes Cadastrados", layout)
+        window.read()
+        window.close()
+
+    # PASSAGENS
     def pega_dados_passagem(self, controlador_local_viagem):
-        """Pega os dados para cadastrar uma passagem"""
-        print("\n--- CADASTRO DE PASSAGEM ---")
-        
-        try:
-            # Seleciona transporte
-            indice_transporte = int(input("Digite o número do transporte: "))
-            
-            # Mostra locais disponíveis
-            print("\n--- LOCAIS DISPONÍVEIS ---")
-            locais = controlador_local_viagem._ControladorLocalViagem__locais_viagem
-            
-            if len(locais) < 2:
-                self.mostra_mensagem("É necessário ter pelo menos 2 locais cadastrados!")
-                return None
-            
-            # Lista os locais (agora corretamente acessando atributos do objeto)
-            for i, local in enumerate(locais):
-                print(f"{i}. Cidade: {local.cidade} | País: {local.pais}")
-            
-            # Seleciona origem
-            print("\n--- LOCAL DE ORIGEM ---")
-            indice_origem = int(input("Digite o número do local de origem: "))
-            
-            if indice_origem < 0 or indice_origem >= len(locais):
-                self.mostra_mensagem("Índice de origem inválido!")
-                return None
-            
-            # Seleciona destino
-            print("\n--- LOCAL DE DESTINO ---")
-            indice_destino = int(input("Digite o número do local de destino: "))
-            
-            if indice_destino < 0 or indice_destino >= len(locais):
-                self.mostra_mensagem("Índice de destino inválido!")
-                return None
-            
-            if indice_origem == indice_destino:
-                self.mostra_mensagem("Origem e destino não podem ser iguais!")
-                return None
-            
-            # Pega data e valor
-            data_str = input("Data da viagem (dd/mm/aaaa): ")
-            from datetime import datetime
-            data = datetime.strptime(data_str, "%d/%m/%Y")
-            
-            valor = float(input("Valor da passagem: R$ ").replace(',', '.'))
-            
-            # Retorna os dados com os objetos LocalViagem corretos
-            return {
-                'indice_transporte': indice_transporte,
-                'local_origem': locais[indice_origem],  # Retorna o objeto completo
-                'local_destino': locais[indice_destino],  # Retorna o objeto completo
-                'data': data,
-                'valor': valor
-            }
-        
-        except ValueError as e:
-            self.mostra_mensagem(f"Erro: Entrada inválida - {e}")
+        locais = controlador_local_viagem._ControladorLocalViagem__locais_viagem
+
+        if len(locais) < 2:
+            sg.popup("É necessário ter pelo menos 2 locais cadastrados!")
             return None
-        except Exception as e:
-            self.mostra_mensagem(f"Erro inesperado: {e}")
-            return None
-        
+
+        lista_locais = [
+            f"{i} - {loc.cidade}/{loc.pais}" for i, loc in enumerate(locais)
+        ]
+
+        layout = [
+            [sg.Text("Número do transporte:"), sg.Input(key="indice_transporte")],
+            [sg.Text("Origem:"), sg.Combo(lista_locais, key="origem")],
+            [sg.Text("Destino:"), sg.Combo(lista_locais, key="destino")],
+            [sg.Text("Data (dd/mm/aaaa):"), sg.Input(key="data")],
+            [sg.Text("Valor (R$):"), sg.Input(key="valor")],
+            [sg.Button("Confirmar"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Cadastro de Passagem", layout)
+
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, "Cancelar"):
+                window.close()
+                return None
+
+            if event == "Confirmar":
+
+                try:
+                    indice_transporte = int(values["indice_transporte"])
+                    indice_origem = int(values["origem"].split(" - ")[0])
+                    indice_destino = int(values["destino"].split(" - ")[0])
+
+                    if indice_origem == indice_destino:
+                        sg.popup("Origem e destino não podem ser iguais!")
+                        continue
+
+                    data = datetime.strptime(values["data"], "%d/%m/%Y")
+                    valor = float(values["valor"].replace(",", "."))
+
+                    window.close()
+                    return {
+                        "indice_transporte": indice_transporte,
+                        "local_origem": locais[indice_origem],
+                        "local_destino": locais[indice_destino],
+                        "data": data,
+                        "valor": valor
+                    }
+
+                except Exception as e:
+                    sg.popup(f"Erro: {e}")
+
+
     def seleciona_passagem(self):
-        try:
-            indice = int(input("\nDigite o número da passagem: "))
-            return indice
-        except ValueError:
-            self.mostra_mensagem("Número inválido!")
-            return -1
-    
+        layout = [
+            [sg.Text("Digite o número da passagem:")],
+            [sg.Input(key="indice")],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Selecionar Passagem", layout)
+        event, values = window.read()
+        window.close()
+
+        if event == "OK":
+            try:
+                return int(values["indice"])
+            except ValueError:
+                sg.popup("Número inválido!")
+                return -1
+        return -1
+
+
     def lista_passagens(self, passagens):
-        print("\n" + "="*100)
-        print("     PASSAGENS CADASTRADAS")
-        print("="*100)
-        print(f"{'Nº':<5} {'Data':<12} {'Origem':<25} {'Destino':<25} {'Transporte':<20} {'Valor':<10}")
-        print("-"*100)
-        
-        for i, passagem in enumerate(passagens):
-            data_formatada = passagem.data.strftime("%d/%m/%Y")
-            origem = f"{passagem.local_origem.cidade}/{passagem.local_origem.pais}"
-            destino = f"{passagem.local_destino.cidade}/{passagem.local_destino.pais}"
-            transporte = f"{passagem.transporte.tipo}"
-            valor = f"R$ {passagem.valor:.2f}"
-            
-            print(f"{i:<5} {data_formatada:<12} {origem:<25} {destino:<25} {transporte:<20} {valor:<10}")
-        
-        print("="*100)
-        
-    def mostra_mensagem(self, msg:str):
-        print(f"\n>>> {msg}")
-        input("Pressione ENTER para continuar.")
+        texto = (
+            f"{'Nº':<5} {'Data':<12} {'Origem':<25} {'Destino':<25} "
+            f"{'Transporte':<20} {'Valor':<10}\n"
+        )
+        texto += "-" * 110 + "\n"
+
+        for i, p in enumerate(passagens):
+            texto += (
+                f"{i:<5} "
+                f"{p.data.strftime('%d/%m/%Y'):<12} "
+                f"{p.local_origem.cidade}/{p.local_origem.pais:<25} "
+                f"{p.local_destino.cidade}/{p.local_destino.pais:<25} "
+                f"{p.transporte.tipo:<20} "
+                f"R$ {p.valor:.2f:<10}\n"
+            )
+
+        layout = [
+            [sg.Multiline(texto, size=(110, 25), disabled=True)],
+            [sg.Button("OK")]
+        ]
+
+        window = sg.Window("Passagens Cadastradas", layout)
+        window.read()
+        window.close()
+
+    def mostra_mensagem(self, msg: str):
+        sg.popup(msg)

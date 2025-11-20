@@ -4,7 +4,7 @@ from entidades.transporte import Transporte
 #cada entidade terá uma classe dessa, implementação bem simples.
 class TransporteDAO(DAO):
     def __init__(self):
-        super().__init__('grupo.pkl')
+        super().__init__('transporte.pkl')
 
     def add(self, transporte: Transporte):
         if((transporte is not None) and isinstance(transporte, Transporte) and isinstance(transporte.id, int)):

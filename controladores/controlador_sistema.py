@@ -11,13 +11,12 @@ from view.tela_sistema import TelaSistema
 class ControladorSistema():
     
     def __init__(self):
-        self.__controlador_sistema = ControladorSistema()
         self.__controlador_pessoa = ControladorPessoa()
         self.__controlador_grupo = ControladorGrupo(self.controlador_pessoa)
         self.__controlador_local_viagem = ControladorLocalViagem()
         self.__controlador_passagem = ControladorPassagem(self.controlador_local_viagem)
-        self.__controlador_pagamento = ControladorPagamento(self.controlador_sistema)
-        self.__controlador_passeio = ControladorPasseioTuristico(self.controlador_sistema, self.controlador_local_viagem)
+        self.__controlador_pagamento = ControladorPagamento(ControladorSistema)
+        self.__controlador_passeio = ControladorPasseioTuristico(self.controlador_local_viagem)
         self.__controlador_pacote = ControladorPacote(
         self.__controlador_passagem,            # para passagens
         self.__controlador_passeio,             # para passeios

@@ -1,8 +1,8 @@
 from entidades.empresa import Empresa
 
 class Transporte:
-    def __init__(self, tipo:str, empresa:Empresa):
-
+    def __init__(self, tipo:str, empresa:Empresa, id_transporte):
+        self.__id = id_transporte
         self.__tipo = None
         self.__empresa = None
 
@@ -10,7 +10,11 @@ class Transporte:
             self.__tipo = tipo
         if isinstance(empresa, Empresa):
             self.__empresa = empresa
-        
+
+    @property
+    def id(self):
+        return self.__id
+  
     @property
     def tipo(self):
         return self.__tipo

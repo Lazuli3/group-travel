@@ -1,66 +1,107 @@
 import FreeSimpleGUI as sg
 
 class TelaPessoa:
-    
-    def __init__(self):
-        self.__window = None
-        self.init_opcoes()
 
-    def tela_opcoes(self):
-        self.init_opcoes()
-        button, values = self.open()
-        if values['1']:
-            opcao = 1
-        if values['2']:
-            opcao = 2
-        if values['3']:
-            opcao = 3
-        # cobre os casos de Retornar, fechar janela, ou clicar cancelar
-        #Isso faz com que retornemos a tela do sistema caso qualquer uma dessas coisas aconteca
-        if values['0'] or button in (None, 'Cancelar'):
-            opcao = 0
-            self.close()
-        return opcao
-
-    def init_opcoes(self):
-        #sg.theme_previewer()
-        sg.ChangeLookAndFeel('DarkTeal4')
+    def mostra_opcoes(self):
         layout = [
-            [sg.Text('-------- PESSOAS ----------', font=("Comic Sans", 25))],
-            [sg.Text('Escolha sua opção', font=("Comic Sans", 15))],
-            [sg.Radio('Incluir Amigo', "RD1", key='1')],
-            [sg.Radio('Alterar Amigo', "RD1", key='2')],
-            [sg.Radio('Listar Amigos', "RD1", key='3')],
-            [sg.Radio('Excluir Amigo', "RD1", key='4')],
-            [sg.Radio('Retornar', "RD1", key='0')],
-            [sg.Button('Confirmar'), sg.Cancel('Cancelar')]
+            [sg.Text('============ Menu ============')],
+            [sg.Button('1 - Incluir pessoa')],
+            [sg.Button('2 - Listar pessoas')],
+            [sg.Button('3 - Excluir pessoa')],
+            [sg.Button('0 - Sair')]
         ]
-        self.__window = sg.Window('Cadastro de pessoa').Layout(layout)
+
+        window = sg.Window('Menu Pessoas', layout)
+
+        while True:
+            event, values = window.read()
+            if event == sg.WIN_CLOSED:
+                window.close()
+                return 0
+            
+            if event.startswith('1'):
+                window.close()
+                return 1
+            elif event.startswith('2'):
+                window.close()
+                return 2
+            elif event.startswith('3'):
+                window.close()
+                return 3
+            elif event.startswith('0'):
+                window.close()
+                return 0
+
 
     def pega_dados_pessoa(self):
-        print('============ Cadastro ============')
-        nome = str(input('Nome: '))
-        try:
-            idade = int(input('Idade: '))
-        except ValueError:
-            self.mostra_mensagem("A idade tem que ser um valor inteiro para ser válido.")
-            idade = 0
-        telefone = str(input('Telefone: '))
-        cpf = str(input('CPF: '))
-        return {
-            'nome': nome,
-            'idade': idade,
-            'telefone': telefone,
-            'cpf': cpf 
-        }
-    
-    def lista_pessoas(self, pessoas:list):
-        print('============ Lista de pessoas ============')
+        layout = [
+            [sg.Text('Nome:'), sg.Input(key='nome')],
+            [sg.Text('Idade:'), sg.Input(key='idade')],
+            [sg.Text('Telefone:'), sg.Input(key='telefone')],
+            [sg.Text('CPF:'), sg.Input(key='cpf')],
+            [sg.Button('Confirmar'), sg.Button('Cancelar')]
+        ]
+
+        window = sg.Window('Cadastro de Pessoa', layout)
+
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
+
+            if event == 'Confirmar':
+                try:
+                    idade = int(values['idade'])
+                except ValueError:
+                    self.mostra_mensagem('Idade deve ser um número inteiro')
+                    continue
+
+                dados = {
+                    'nome': values['nome'],
+                    'idade': idade,
+                    'telefone': values['telefone'],
+                    'cpf': values['cpf']
+                }
+                window.close()
+                return dados
+
+
+    def lista_pessoas(self, pessoas: list):
+        texto = '============ Lista de Pessoas ============\n\n'
         for p in pessoas:
-            print(f"Nome: {p.nome} | Idade: {p.idade} | Telefone: {p.telefone} | Cpf: {p.cpf}")
+            texto += f"Nome: {p.nome} | Idade: {p.idade} | Telefone: {p.telefone} | CPF: {p.cpf}\n"
+
+        layout = [
+            [sg.Multiline(texto, size=(60, 15), disabled=True)],
+            [sg.Button('OK')]
+        ]
+
+        window = sg.Window('Lista de Pessoas', layout)
+        window.read()
+        window.close()
+
 
     def pega_cpf(self):
-        return input('Digite o cpf da pessoa: ')
-    
-    def mostra_mensagem(self, msg:str):
-        print(msg)
+        layout = [
+            [sg.Text('Digite o CPF da pessoa:')],
+            [sg.Input(key='cpf')],
+            [sg.Button('Confirmar'), sg.Button('Cancelar')]
+        ]
+
+        window = sg.Window('Excluir Pessoa', layout)
+
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
+
+            if event == 'Confirmar':
+                cpf = values['cpf']
+                window.close()
+                return cpf
+
+
+    def mostra_mensagem(self, msg: str):
+        sg.popup(msg)

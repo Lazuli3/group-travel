@@ -2,7 +2,6 @@ from entidades.pacote import Pacote
 from view.tela_pacote import TelaPacote
 
 class ControladorPacote:
-    """Controlador para gerenciar pacotes de viagem"""
     
     def __init__(self, controlador_passagem_geral, controlador_passeio, 
                  controlador_grupo, controlador_pagamento):
@@ -16,7 +15,6 @@ class ControladorPacote:
         self.controlador_pagamento = controlador_pagamento
     
     def inicia(self):
-        """Menu principal do controlador de pacotes"""
         opcoes = {
             1: self.incluir_pacote,
             2: self.listar_pacotes,
@@ -36,7 +34,6 @@ class ControladorPacote:
                 self.__tela_pacote.mostra_mensagem('Opção inválida.')
     
     def incluir_pacote(self):
-        """Cria um novo pacote"""
         try:
             # Verifica se há grupos cadastrados
             if not self.controlador_grupo._ControladorGrupo__grupos:

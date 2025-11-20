@@ -22,7 +22,7 @@ class ControladorLocalViagem:
 
     def __local_ja_existe(self, cidade, pais):
         """Verifica se já existe um local com a mesma cidade e país"""
-        for local in self.__locais_DAO:
+        for local in self.__locais_DAO.get_all():
             if (local.cidade.lower().strip() == cidade.lower().strip() and 
                 local.pais.lower().strip() == pais.lower().strip()):
                 return True

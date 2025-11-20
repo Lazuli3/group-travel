@@ -1,75 +1,171 @@
+import FreeSimpleGUI as sg
+
 class TelaGrupo:
+
     def mostra_opcoes(self):
-        """Exibe o menu de opções e retorna a escolha do usuário"""
-        print("\n" + "="*50)
-        print("     GERENCIAMENTO DE GRUPOS")
-        print("="*50)
-        print("1 - Criar Grupo")
-        print("2 - Listar Grupos")
-        print("3 - Adicionar Pessoa ao Grupo")
-        print("4 - Listar Pessoas do Grupo")
-        print("5 - Remover Pessoa do Grupo")
-        print("6 - Excluir Grupo")
-        print("0 - Voltar")
-        print("="*50)
-        
-        try:
-            opcao = int(input("Escolha uma opção: "))
-            return opcao
-        except ValueError:
-            return -1
+        layout = [
+            [sg.Text('============ Menu ============')],
+            [sg.Button('1 - Criar grupo')],
+            [sg.Button('2 - Listar grupo')],
+            [sg.Button('3 - Adicionar membro ao grupo')],
+            [sg.Button('4 - Listar membros do grupo')],
+            [sg.Button('5 - Remover membros do grupo')],
+            [sg.Button('6 - Excluir grupo')],
+            [sg.Button('0 - Sair')]
+        ]
+
+        window = sg.Window('Menu Grupo', layout)
+
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, '0 - Sair'):
+                window.close()
+                return 0
+                
+            if event.startswith('1'):
+                window.close()
+                return 1
+            elif event.startswith('2'):
+                window.close()
+                return 2
+            elif event.startswith('3'):
+                window.close()
+                return 3
+            elif event.startswith('4'):
+                window.close()
+                return 4
+            elif event.startswith('5'):
+                window.close()
+                return 5
+            elif event.startswith('6'):
+                window.close()
+                return 6
+
 
     def pega_dados_grupo(self):
-        print("\n--- CADASTRO DE GRUPO ---")
-        nome = input("Nome do grupo: ").strip()
-        descricao = input("Descrição (opcional): ").strip()
+        layout = [
+            [sg.Text('Nome:'), sg.Input(key='nome')],
+            [sg.Text('Descrição:'), sg.Input(key='descricao')],
+            [sg.Button('Confirmar'), sg.Button('Cancelar')]
+        ]
         
-        return {
-            'nome': nome,
-            'descricao': descricao if descricao else ""
-        }
+        window = sg.Window('Cadastro de Grupo', layout)
+
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
+
+            if event == 'Confirmar':
+                dados = {
+                    'nome': values['nome'],
+                    'descricao': values['descricao']
+                }
+                window.close()
+                return dados
+
 
     def seleciona_grupo(self):
-        try:
-            id_grupo = int(input("\nDigite o ID do grupo: "))
-            return id_grupo
-        except ValueError:
-            self.mostra_mensagem("ID inválido!")
-            return None
+        layout = [
+            [sg.Text("Digite o ID do grupo:")],
+            [sg.Input(key='id')],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Selecionar Grupo", layout)
+
+        while True:
+            event, values = window.read()
+
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
+
+            if event == "OK":
+                try:
+                    valor = int(values['id'])
+                    window.close()
+                    return valor
+                except ValueError:
+                    sg.popup("ID inválido! Digite um número inteiro.")
+
 
     def pega_cpf_pessoa(self):
-        cpf = input("\nDigite o CPF da pessoa: ").strip()
-        return cpf
+        layout = [
+            [sg.Text("Digite o CPF da pessoa:")],
+            [sg.Input(key='cpf')],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Selecionar Pessoa", layout)
+
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, "Cancelar"):
+                window.close()
+                return None
+
+            if event == "OK":
+                cpf = values['cpf'].strip()
+                window.close()
+                return cpf
+
 
     def lista_grupos(self, grupos):
-        print("     GRUPOS CADASTRADOS")
-        print("="*70)
-        print(f"{'ID':<5} {'Nome':<25} {'Membros':<10} {'Descrição':<30}")
-        print("-"*70)
-        
-        for grupo in grupos:
-            print(f"{grupo['id']:<5} {grupo['nome']:<25} {grupo['total_membros']:<10} {grupo['descricao']:<30}")
-        
-        print("="*70)
+        texto = "ID   | Nome | Membros | Descrição\n"
+        texto += "="*75 + "\n"
+
+        for g in grupos:
+            texto += (
+                f"{g['id']:<5} {g['nome']:<25} "
+                f"{g['total_membros']:<10} {g['descricao']:<30}\n"
+            )
+
+        layout = [
+            [sg.Multiline(texto, size=(80, 20), disabled=True)],
+            [sg.Button("OK")]
+        ]
+
+        window = sg.Window("Grupos Cadastrados", layout)
+        window.read()
+        window.close()
+
 
     def lista_membros(self, nome_grupo, membros):
-        print("\n" + "="*80)
-        print(f"     MEMBROS DO GRUPO: {nome_grupo}")
-        print("="*80)
-        print(f"{'Nome':<30} {'CPF':<20} {'Telefone':<15}")
-        print("-"*80)
-        
-        for membro in membros:
-            print(f"{membro['nome']:<30} {membro['cpf']:<20} {membro['telefone']:<15}")
-        
-        print("="*80)
+        texto = f"MEMBROS DO GRUPO: {nome_grupo}\n" + "="*80 + "\n"
+        texto += f"{'Nome':<30} {'CPF':<20} {'Telefone':<15}\n"
+        texto += "-"*80 + "\n"
+
+        for m in membros:
+            texto += (
+                f"{m['nome']:<30} {m['cpf']:<20} {m['telefone']:<15}\n"
+            )
+
+        layout = [
+            [sg.Multiline(texto, size=(90, 25), disabled=True)],
+            [sg.Button("OK")]
+        ]
+
+        window = sg.Window("Lista de Membros", layout)
+        window.read()
+        window.close()
+
 
     def confirma_exclusao(self, nome_grupo):
-        print(f"\nVocê confirma a exclusão do grupo: '{nome_grupo}'")
-        print("Todos os membros serão desvinculados deste grupo.")
-        resposta = input("Certeza que quer excluir? (S/N): ").strip().upper()
-        return resposta == 'S'
+        layout = [
+            [sg.Text(f"Confirma a exclusão do grupo '{nome_grupo}'?")],
+            [sg.Text("Todos os membros serão removidos do grupo.")],
+            [sg.Button("Sim"), sg.Button("Não")]
+        ]
 
-    def mostra_mensagem(self, msg:str):
-        print(f"\n>>> {msg}")
-        input("Pressione a tecla ENTER para continuar.")
+        window = sg.Window("Confirmar Exclusão", layout)
+
+        event, values = window.read()
+        window.close()
+
+        return event == "Sim"
+
+
+    def mostra_mensagem(self, msg: str):
+        sg.popup(msg)
