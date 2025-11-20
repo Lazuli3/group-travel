@@ -28,9 +28,9 @@ class TelaLocalViagem:
             'pais': pais
         }
 
-    def lista_locais_viagem(self, locais_dict: list):
+    def lista_locais_viagem(self, locais: list):
         print('============ Lista de locais ============')
-        for i, local in enumerate(locais_dict, 1):
+        for local in locais:
             print(f"{local['id']}. Cidade: {local['cidade']} | País: {local['pais']}")
 
     def seleciona_local(self):

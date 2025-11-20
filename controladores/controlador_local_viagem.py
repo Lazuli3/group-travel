@@ -79,6 +79,7 @@ class ControladorLocalViagem:
         dados_locais = []
         for local in locais:
             dados_locais.append({
+                'id': local.id
                 'cidade': local.cidade,
                 'pais': local.pais
             })
