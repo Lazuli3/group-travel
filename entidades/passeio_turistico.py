@@ -4,7 +4,7 @@ from entidades.grupo import Grupo
 
 class PasseioTuristico:
 
-    def __init__(self, localizacao: LocalViagem, atracao_turistica: str, horario_inicio: datetime, horario_fim: datetime, valor: float, grupo_passeio: Grupo):
+    def __init__(self, id, localizacao: LocalViagem, atracao_turistica: str, horario_inicio: datetime, horario_fim: datetime, valor: float, grupo_passeio: Grupo):
 
         if not isinstance(localizacao, LocalViagem):
             raise TypeError ("Localizacão deve ser uma instância da classe LocalViagem.")
@@ -31,6 +31,7 @@ class PasseioTuristico:
         self.__horario_fim = horario_fim
         self.__valor = valor
         self.__grupo_passeio = grupo_passeio
+        self.__id = id
 
     @property
     def localizacao(self):
@@ -73,3 +74,11 @@ class PasseioTuristico:
     @grupo_passeio.setter
     def grupo_passeio(self, grupo_passeio):
         self.__grupo_passeio = grupo_passeio
+
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id (self, id):
+        self.__id = id

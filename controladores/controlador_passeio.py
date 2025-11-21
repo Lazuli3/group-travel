@@ -1,13 +1,24 @@
 from datetime import datetime
 from entidades.passeio_turistico import PasseioTuristico
 from view.tela_passeio import TelaPasseioTuristico
+from DAOs.passeio_dao import PasseioTuristicoDAO
 
 class ControladorPasseioTuristico:
     def __init__(self, controlador_sistema):
         self.__controlador_sistema = controlador_sistema
-        self.__passeios = []
+        self.__passeios_DAO = PasseioTuristicoDAO()
         self.__tela_passeio = TelaPasseioTuristico()
+        self.__proximo_id = self.__gerar_proximo_id()
 
+    def __gerar_proximo_id(self):
+        """Gera o próximo ID disponível baseado nos locais existentes"""
+        passeios = list(self.__passeios_DAO.get_all())
+        if not passeios:
+            return 1
+        
+        max_id = max(passeio.id for passeio in passeios)
+        return max_id + 1
+    
     def inicia(self):
         switcher = {
             1: self.incluir_passeio,
