@@ -154,7 +154,7 @@ class TelaPassagemGeral:
 
     # PASSAGENS
     def pega_dados_passagem(self, controlador_local_viagem):
-        locais = controlador_local_viagem._ControladorLocalViagem__locais_viagem
+        locais = controlador_local_viagem.obter_locais()
 
         if len(locais) < 2:
             sg.popup("É necessário ter pelo menos 2 locais cadastrados!")
@@ -242,7 +242,7 @@ class TelaPassagemGeral:
                 f"{p.local_origem.cidade}/{p.local_origem.pais:<25} "
                 f"{p.local_destino.cidade}/{p.local_destino.pais:<25} "
                 f"{p.transporte.tipo:<20} "
-                f"R$ {p.valor:.2f:<10}\n"
+                f"R$ {p.valor:<10}\n"
             )
 
         layout = [

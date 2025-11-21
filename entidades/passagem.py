@@ -3,12 +3,17 @@ from datetime import datetime
 class Passagem:
     """Classe que representa uma passagem de viagem"""
     
-    def __init__(self, data, valor, local_origem, local_destino, transporte):
+    def __init__(self, data, valor, local_origem, local_destino, transporte, id_passagem):
         self.__data = data  # datetime
         self.__valor = valor  # float
         self.__local_origem = local_origem  # LocalViagem
         self.__local_destino = local_destino  # LocalViagem
         self.__transporte = transporte  # Transporte
+        self.__id = id_passagem
+    
+    @property
+    def id(self):
+        return self.__id
     
     @property
     def data(self):

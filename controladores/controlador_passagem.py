@@ -185,79 +185,113 @@ class ControladorPassagem:
     #PASSAGENS
     
     def incluir_passagem(self):
-        if not self.__transporte_dao.get_all():
-            self.__tela_passagem.mostra_mensagem("Nenhum transporte cadastrado. Cadastre um transporte primeiro!")
-            return
-        
-        #precisa ter pelo menos 2 locais de viagem cadastrados, o local de origem e o de destino não podem ser os mesmos
-        if not self.controlador_local_viagem.obter_locais():
-            self.__tela_passagem.mostra_mensagem("Nenhum local de viagem cadastrado. Cadastre locais primeiro!")
-            return
-        
-        try:
-            self.listar_transportes()
+            """Cadastra uma nova passagem"""
+            transportes = list(self.__transporte_dao.get_all())
+            
+            if not transportes:
+                self.__tela_passagem.mostra_mensagem("Nenhum transporte cadastrado. Cadastre um transporte primeiro!")
+                return False
+            
+            locais = self.controlador_local_viagem.obter_locais()
+            if not locais or len(locais) < 2:
+                self.__tela_passagem.mostra_mensagem("É necessário ter pelo menos 2 locais cadastrados!")
+                return False
+            
+            try:
+                self.listar_transportes()
 
-            dados = self.__tela_passagem.pega_dados_passagem(self.controlador_local_viagem)
+                dados = self.__tela_passagem.pega_dados_passagem(self.controlador_local_viagem)
 
-            if dados is None:
-                self.__tela_passagem.mostra_mensagem("Cadastro de passagem cancelado.")
-                return
+                if dados is None:
+                    self.__tela_passagem.mostra_mensagem("Cadastro de passagem cancelado.")
+                    return False
+                
+                transportes_lista = list(transportes)
+                if dados['indice_transporte'] < 0 or dados['indice_transporte'] >= len(transportes_lista):
+                    self.__tela_passagem.mostra_mensagem("Transporte inválido!")
+                    return False
+                
+                transporte = transportes_lista[dados['indice_transporte']]
+                local_origem = dados['local_origem']
+                local_destino = dados['local_destino']
+                
+                if local_origem == local_destino:
+                    self.__tela_passagem.mostra_mensagem("Origem e destino não podem ser iguais!")
+                    return False
+                
+                #Cria passagem com ID
+                passagem = Passagem(
+                    dados['data'],
+                    dados['valor'],
+                    local_origem,
+                    local_destino,
+                    transporte,
+                    self.__proximo_id_passagem
+                )
+                
+                self.__passagem_dao.add(passagem)
+                self.__proximo_id_passagem += 1
+                
+                self.__tela_passagem.mostra_mensagem("Passagem cadastrada com sucesso.")
+                return True
             
-            if dados['indice_transporte'] < 0 or dados['indice_transporte'] >= len(self.__transporte_dao.get_all()):
-                self.__tela_passagem.mostra_mensagem("Transporte inválido!")
-                return
-            
-            transporte = self.__transporte_dao.get_all()[dados['indice_transporte']]
-            
-            local_origem = dados['local_origem']
-            
-            local_destino = dados['local_destino']
-            
-            if local_origem == local_destino:
-                self.__tela_passagem.mostra_mensagem("Origem e destino não podem ser iguais!")
-                return
-            
-            #aqui ele cria a passagem
-            passagem = Passagem(
-                dados['data'],
-                dados['valor'],
-                local_origem,
-                local_destino,
-                transporte
-            )
-            
-            self.__passagem_dao.add(passagem)
-            self.__tela_passagem.mostra_mensagem("Passagem cadastrada com sucesso.")
+            except Exception as e:
+                self.__tela_passagem.mostra_mensagem(f"Erro ao cadastrar passagem: {str(e)}")
+                import traceback
+                traceback.print_exc()
+                return False
         
-        except Exception as e:
-            self.__tela_passagem.mostra_mensagem(f"Erro ao cadastrar passagem: {str(e)}")
-    
     def listar_passagens(self):
-        if not self.__passagem_dao.get_all():
+        """Lista todas as passagens cadastradas"""
+        passagens = list(self.__passagem_dao.get_all())
+            
+        if not passagens:
             self.__tela_passagem.mostra_mensagem('Nenhuma passagem cadastrada.')
             return
+            
+        self.__tela_passagem.lista_passagens(passagens)
         
-        self.__tela_passagem.lista_passagens(self.__passagens)
-    
     def excluir_passagem(self):
-        if not self.__passagem_dao.get_all():
+        """Exclui uma passagem"""
+        passagens = list(self.__passagem_dao.get_all())
+            
+        if not passagens:
             self.__tela_passagem.mostra_mensagem('Nenhuma passagem cadastrada.')
-            return
-        
+            return False
+            
         try:
             self.listar_passagens()
             indice = self.__tela_passagem.seleciona_passagem()
-            
-            if 0 <= indice < len(self.__passagens):
-                passagem = self.__passagens[indice]
-                self.__passagem_dao.remove(passagem)
+                
+            passagens_lista = list(passagens)
+            if 0 <= indice < len(passagens_lista):
+                passagem = passagens_lista[indice]
+                self.__passagem_dao.remove(passagem.id)
                 self.__tela_passagem.mostra_mensagem("Passagem removida com sucesso.")
+                return True
             else:
                 self.__tela_passagem.mostra_mensagem("Índice inválido!")
-        
+                return False
+            
         except Exception as e:
             self.__tela_passagem.mostra_mensagem(f"Erro ao excluir passagem: {str(e)}")
-    
+            return False
+        
+        # ====== MÉTODOS PÚBLICOS ======
+        
+    def obter_todas_empresas(self):
+        """Retorna lista de todas as empresas"""
+        return list(self.__empresa_dao.get_all())
+        
+    def obter_todos_transportes(self):
+        """Retorna lista de todos os transportes"""
+        return list(self.__transporte_dao.get_all())
+        
+    def obter_todas_passagens(self):
+        """Retorna lista de todas as passagens"""
+        return list(self.__passagem_dao.get_all())
+        
     def sair(self):
+        """Sai do menu de passagens"""
         self.__tela_passagem.mostra_mensagem('Encerrando o gerenciamento de passagem.')
         return True
