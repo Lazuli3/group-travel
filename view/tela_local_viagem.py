@@ -43,5 +43,13 @@ class TelaLocalViagem:
 
     def confirma_exclusao(self, cidade_local, pais_local):
         print(f"\nVocê confirma a exclusão do local de viagem: '{cidade_local}, {pais_local}'?")
-        resposta = input("Certeza que quer excluir? (S/N): ").strip().upper()
-        return resposta == 'S'
+
+        while True:
+            confirmacao = input("Digite 'S' para confirmar ou 'N' para cancelar: ").strip().upper()
+            
+            if confirmacao == 'S':
+                return True
+            elif confirmacao == 'N':
+                return False
+            else:
+                print("Opção inválida! Digite 'S' para SIM ou 'N' para NÃO.")

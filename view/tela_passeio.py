@@ -42,34 +42,31 @@ class TelaPasseioTuristico:
 
     def lista_passeios_turisticos(self, passeios_dict: list):
         print('============ Lista de passeios ============')
-        for i, passeio in enumerate(passeios_dict, 1):
-            print(f'''{i}. Atração: {passeio['atracao']}
+        for passeio in passeios_dict:
+            print(f'''{passeio['id']}. Atração: {passeio['atracao']}
                    Localização: {passeio['localizacao']}
                    Horário de início: {passeio['horario_inicio']}
                    Horário de fim: {passeio['horario_fim']}
                    Valor: {passeio['valor']}
                    Grupo do passeio: {passeio['grupo']}''')
 
-    def seleciona_passeio(self, passeios_dict: list):
-        if not passeios_dict:
-            self.mostra_mensagem("Nenhum passeio disponível para seleção.")
+    def seleciona_passeio(self):
+        try:
+            id_passeio = int(input("\nDigite o ID do passeio: "))
+            return id_passeio
+        except ValueError:
+            self.mostra_mensagem("ID inválido!")
             return None
 
-        self.lista_passeios_turisticos(passeios_dict)
+    def confirma_exclusao(self, atracao_turistica, nome_grupo):
+        print(f"\nVocê confirma a exclusão do passeio turístico '{atracao_turistica}' do grupo '{nome_grupo}'?")
 
         while True:
-            try:
-                opcao = int(input('\nDigite o número do passeio ou 0 para cancelar.'))
-
-                if opcao == 0:
-                    return None
-
-                if 1 <= opcao <= len(passeios_dict):
-                    return opcao - 1 #índice real e ajustado
-                else:
-                    self.mostra_mensagem(
-                        f'Digite um número entre 1 e {len(passeios_dict)}.'
-                    )
-
-            except ValueError:
-                self.mostra_mensagem('Digite um número válido.')
+            confirmacao = input("Digite 'S' para confirmar ou 'N' para cancelar: ").strip().upper()
+            
+            if confirmacao == 'S':
+                return True
+            elif confirmacao == 'N':
+                return False
+            else:
+                print("Opção inválida! Digite 'S' para SIM ou 'N' para NÃO.")

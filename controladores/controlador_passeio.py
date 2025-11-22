@@ -19,6 +19,9 @@ class ControladorPasseioTuristico:
         max_id = max(passeio.id for passeio in passeios)
         return max_id + 1
     
+    def buscar_por_id(self, passeio_id):
+        return self.__passeios_DAO.get(passeio_id)
+    
     def inicia(self):
         switcher = {
             1: self.incluir_passeio,
@@ -139,6 +142,7 @@ class ControladorPasseioTuristico:
             # Criação do passeio
             try:
                 novo = PasseioTuristico(
+                    id=self.__proximo_id,
                     localizacao=local,
                     atracao_turistica=dados['atracao_turistica'],
                     horario_inicio=data_inicio,
@@ -146,7 +150,7 @@ class ControladorPasseioTuristico:
                     valor=valor,
                     grupo_passeio=grupo
                 )
-                self.__passeios.append(novo)
+                self.__passeios_DAO.add(novo)
                 self.__tela_passeio.mostra_mensagem('Passeio turístico cadastrado com sucesso!')
                 break
             
@@ -156,13 +160,16 @@ class ControladorPasseioTuristico:
 
     def obter_passeios(self):
         """Retorna a lista de passeios, mas sem exibir"""
-        return self.__passeios
+        return list(self.__passeios_DAO.get_all())
     
     def passeios_para_dict(self):
         """Converte passeios em uma lista de dicionários"""
         passeios_dict = []
-        for passeio in self.__passeios:
+        passeios = list(self.__passeios_DAO.get_all())
+
+        for passeio in passeios:
             novo_dict = {
+                'id': passeio.id,
                 'localizacao': f"{passeio.localizacao.cidade}, {passeio.localizacao.pais}",
                 'atracao': passeio.atracao_turistica,
                 'horario_inicio': passeio.horario_inicio.strftime("%d/%m/%Y %H:%M"),
@@ -175,27 +182,47 @@ class ControladorPasseioTuristico:
 
     def listar_passeios(self):
         """Lista todos os passeios cadastrados"""
-        if not self.__passeios:
+        passeios = list(self.__passeios_DAO.get_all())
+        
+        if not passeios:
             self.__tela_passeio.mostra_mensagem('Nenhum passeio turístico cadastrado.')
         else:
             self.__tela_passeio.lista_passeios_turisticos(self.passeios_para_dict())
 
     def excluir_passeio(self):
         """Exclui um passeio turístico"""
-        if not self.__passeios:
+        passeios = list(self.__passeios_DAO.get_all())
+        
+        if not passeios:
+            self.__tela_passeio.mostra_mensagem("Nenhum passeio cadastrado.")
             return
         
-        indice = self.__tela_passeio.seleciona_passeio(self.passeios_para_dict())
+        try:
+            self.listar_passeios()
+            
+            id_passeio = self.__tela_passeio.seleciona_passeio()
+            passeio = self.buscar_por_id(id_passeio)
 
-        if indice is None:
-            return
+            if not passeio:
+                self.__tela_passeio.mostra_mensagem(f"Passeio com ID {id_passeio} não encontrado!")
+                return
+
+            confirmacao = self.__tela_passeio.confirma_exclusao(
+                passeio.atracao_turistica, 
+                passeio.grupo_passeio.nome
+            )
+            if not confirmacao:
+                self.__tela_passeio.mostra_mensagem("Exclusão cancelada.")
+                return
+
+            self.__passeios_DAO.remove(id_passeio)
+
+            self.__tela_passeio.mostra_mensagem(
+                f"Passeio '{passeio.atracao_turistica}' do grupo '{passeio.grupo_passeio.nome}' excluído com sucesso!"
+            )
         
-        passeio_excluido = self.__passeios[indice]
-        del self.__passeios[indice]
-        self.__tela_passeio.mostra_mensagem(
-            f"Passeio para atração turística '{passeio_excluido.atracao_turistica}' "
-            f"do grupo '{passeio_excluido.grupo_passeio.nome}' excluído com sucesso."
-        )
+        except Exception as e:
+            self.__tela_passeio.mostra_mensagem(f"Erro ao excluir passeio: {str(e)}")
         
     def sair(self):
         """Sai do menu de passeios"""
