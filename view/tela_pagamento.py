@@ -1,112 +1,184 @@
+import FreeSimpleGUI as sg
 
 class TelaPagamento:
     def mostra_mensagem(self, msg: str):
-        print(msg)
+        sg.popup(msg)
 
     def mostra_opcoes(self):
-        while True:
-            print('''============ Forma de Pagamento ============
-                1 - Cartão de Crédito
-                2 - Pix
-                3 - Dinheiro
-                0 - Sair
-            ''')
+        layout = [
+            [sg.Button('1 - Cartão de Crédito')],
+            [sg.Button('2 - Pix')],
+            [sg.Button('3 - Dinheiro')],
+            [sg.Button('0 - Sair')]
+        ]
+        
+        window = sg.Window('Menu Pagamento', layout)
+        event, values = window.read()
+        window.close()
 
-            try:
-                return int(input('Escolha uma das opções do menu: '))
-
-            except ValueError:
-                self.mostra_mensagem('Escolha uma opção válida do menu..')
+        if event is None or event == "0 - Cancelar":
+            return 0
+        
+        return int(event[0])  # pega apenas o primeiro caractere da string "1 - ...."
 
     def pega_dados_cartao(self, valor: float):
-        print('\n============ Dados do Cartão ============')
-        num_cartao = input('Número do cartão: ')
-        bandeira = input('Bandeira do cartão: ')
-        parcelas = input('Número de parcelas: ')
+        layout = [
+            [sg.Text('Número do Cartão:'), sg.Input(key='numero')],
+            [sg.Text('Bandeira do Cartão:'), sg.Input(key='bandeira')],
+            [sg.Text('Número de Parcelas:'), sg.Input(key='parcelas')],
+            [sg.Button('Confirmar'), sg.Button('Cancelar')]
+        ]
+        
+        window = sg.Window('Dados do Cartão', layout)
+        
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
 
-        numero_limpo = num_cartao.replace(" ", "").replace("-", "")
+            if event == 'Confirmar':
+                numero_limpo = values['numero'].replace(" ", "").replace("-", "")
+                bandeira = values['bandeira'].strip()
 
-        return {
-            'num_cartao': numero_limpo,
-            'bandeira': bandeira,
-            'parcelas': parcelas,
-            'valor': valor
-        }
+                if not values['numero'] or not ['bandeira']:
+                    self.mostra_mensagem('Número e bandeira do cartão não podem estar vazios.')
+                    continue
+
+                dados = {
+                    'num_cartao': numero_limpo,
+                    'bandeira': bandeira,
+                    'parcelas': values['parcelas'],
+                    'valor': valor
+                }
+                window.close()
+                return dados
 
     def pega_dados_pix(self, valor: float):
-        print('\n============ Dados do Pix ============')
-        chave = input('Chave PIX: ')
-        banco = input('Banco: ')
+        layout = [
+            [sg.Text('Chave Pix:'), sg.Input(key='chave')],
+            [sg.Text('Banco:'), sg.Input(key='banco')],
+            [sg.Button('Confirmar'), sg.Button('Cancelar')]
+        ]
+        
+        window = sg.Window('Dados do Pix', layout)
+        
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
 
-        return {
-            'chave': chave,
-            'banco': banco,
-            'valor': valor
-        }
+            if event == 'Confirmar':
+
+                if not values['chave'] or not ['banco']:
+                    self.mostra_mensagem('Chave e banco não podem estar vazios.')
+                    continue
+
+                dados = {
+                    'chave': values['chave'],
+                    'banco': values['banco'],
+                    'valor': valor
+                }
+                window.close()
+                return dados
 
     def pega_dados_dinheiro(self, valor: float):
-        print('\n============ Pagamento em Dinheiro ============')
-        self.mostra_mensagem(f'Valor a pagar: R$ {valor:.2f}')
-        valor_entregue = input('Valor entregue: R$ ')
+        layout = [
+            [sg.Text(f'Valor a pagar: R$ {valor:.2f}')],
+            [sg.Text('Valor entregue: R$'), sg.Input(key='valor_entregue')],
+            [sg.Button('Confirmar'), sg.Button('Cancelar')]
+        ]
+        
+        window = sg.Window('Dados do Dinheiro', layout)
+        
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
 
-        return {
-            'valor_entregue': valor_entregue,
-            'valor': valor
-        }
+            if event == 'Confirmar':
+
+                if not values['valor_entregue']:
+                    self.mostra_mensagem('Valor entregue não pode estar vazio.')
+                    continue
+
+                dados = {
+                    'valor_entregue': values['valor_entregue'],
+                    'valor': valor
+                }
+                window.close()
+                return dados
 
     def status_pagamento(self) -> bool:
         """Pergunta ao usuário se o pagamento foi realizado"""
-        print('\n===== Status do Pagamento =====')
-        print('1 - Pagamento EFETUADO (Concluído)')
-        print('2 - Pagamento PENDENTE (Agendado ou a Confirmar)')
+        layout = [
+            [sg.Button("Pagamento EFETUADO (Concluído)")],
+            [sg.Button("Pagamento PENDENTE (Agendado ou a Confirmar)")],
+            [sg.Button("Cancelar")]
+        ]
         
-        while True:
-            try:
-                opcao = int(input('Selecione o status (1 ou 2): '))
-                if opcao == 1:
-                    return True  # Pagamento Efetuado
-                elif opcao == 2:
-                    return False # Pagamento Pendente
-                else:
-                    self.mostra_mensagem("Opção inválida. Digite 1 ou 2.")
-            except ValueError:
-                self.mostra_mensagem("Entrada inválida. Digite apenas o número 1 ou 2.")
-
-    def lista_pagamentos(self, pagamentos_dict: list):
-        if not pagamentos_dict:
-            self.mostra_mensagem("Nenhum pagamento registrado.")
-            return
-
-        print('\n============ Histórico de Pagamentos ============')
-        for pag in pagamentos_dict:
-            tipo = pag['tipo'] 
-            valor = pag['valor']
-            pagante = pag['pagante']
-            data = pag['data']
-            status = pag['status']
-
-            print(f"{pag['id']}. Pagante: {pagante} | Tipo: {tipo}")
-            print(f"   Valor: {valor}")
-            print(f"   Data: {data}")
-            print(f"   Status: {status}\n")
-
-    def seleciona_pagamento(self):
-        try:
-            id_pagamento = int(input("\nDigite o ID do pagamento: "))
-            return id_pagamento
-        except ValueError:
-            self.mostra_mensagem("ID inválido!")
+        window = sg.Window("Status do Pagamento", layout)
+        event, values = window.read()
+        window.close()
+        
+        if event == "Pagamento EFETUADO (Concluído)":
+            return True
+        elif event == "Pagamento PENDENTE (Agendado ou a Confirmar)":
+            return False
+        else:
             return None
 
-    def confirma_cancelamento(self, valor: float, pagante: str):
-        print(f"\nDeseja cancelar o pagamento de R$ {valor:.2f} do pagante '{pagante}'?")
-        
-        while True:
-            confirmacao = input("Confirmar cancelamento? (S/N): ").strip().upper()
+    def lista_pagamentos(self, pagamentos: list):
+        texto = ''
+        for pag in pagamentos:
+            texto += f'''{pag['id']}. Pagante: {pag['pagante']} | Tipo: {pag['tipo']}")
+                    Valor: {pag['valor']} | Data: {pag['data']} | Status: {pag['status']}\n'''
             
-            if confirmacao == 'S':
-                return True
-            elif confirmacao == 'N':
-                return False
-            else:
-                print("Opção inválida! Digite 'S' para SIM ou 'N' para NÃO.")
+        layout = [
+            [sg.Multiline(texto, size=(90,25), disabled=True)],
+            [sg.Button('OK')]
+        ]
+        
+        window = sg.Window('Lista de Pagamentos', layout)
+        window.read()
+        window.close()
+
+
+    def seleciona_pagamento(self):
+        layout = [
+            [sg.Text("Digite o ID do pagamento:")],
+            [sg.Input(key='id')],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Selecionar Pagamento", layout)
+
+        while True:
+            event, values = window.read()
+
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
+
+            if event == "OK":
+                try:
+                    valor = int(values['id'])
+                    window.close()
+                    return valor
+                except ValueError:
+                    sg.popup("ID inválido! Digite um número inteiro.")
+
+    def confirma_cancelamento(self, valor: float, pagante: str):
+        layout = [
+            [sg.Text(f"Deseja cancelar o pagamento de R$ {valor:.2f} do pagante '{pagante}'?")],
+            [sg.Button("Sim"), sg.Button("Não")]
+        ]
+
+        window = sg.Window("Confirmar Cancelamento", layout)
+
+        event, values = window.read()
+        window.close()
+
+        return event == "Sim"

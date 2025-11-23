@@ -2,8 +2,8 @@ from entidades.pagamento import Pagamento
 
 class CartaoCredito(Pagamento):
 
-    def __init__(self, pagante, valor, pagamento_efetuado, num_cartao:str, bandeira:str, parcelas:int):
-        super().__init__(pagante, valor, pagamento_efetuado)
+    def __init__(self, id, pagante, valor, pagamento_efetuado, num_cartao:str, bandeira:str, parcelas:int):
+        super().__init__(id, pagante, valor, pagamento_efetuado)
         self.__num_cartao = None
         self.__bandeira = None
         self.__parcelas = 0

@@ -31,6 +31,7 @@ class TelaPacote:
             [sg.Button("3 - Adicionar Passeio")],
             [sg.Button("4 - Remover Passeio")],
             [sg.Button("5 - Adicionar Pagamento")],
+            [sg.Button("6 - Cancelar Pagamento")],
             [sg.Button("0 - Cancelar")]
         ]
 
@@ -90,6 +91,25 @@ class TelaPacote:
         ]
 
         window = sg.Window("ID da Passagem", layout)
+        event, values = window.read()
+        window.close()
+
+        if event == "OK" and values["id"] != "":
+            try:
+                return int(values["id"])
+            except:
+                return None
+        return None
+    
+    def pega_id_pagamento(self):
+        """Pede o ID do pagamento"""
+        layout = [
+            [sg.Text("Digite o ID do pagamento:")],
+            [sg.Input(key="id")],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("ID do Pagamento", layout)
         event, values = window.read()
         window.close()
 
@@ -189,3 +209,72 @@ class TelaPacote:
 
     def mostra_mensagem(self, mensagem):
         sg.Popup(mensagem)
+        
+    #MOSTRAR ELEMENTOS DO PACOTE
+    def mostra_pagamentos_pacote(self, pagamentos):
+        """Mostra os pagamentos de um pacote específico"""
+        if not pagamentos:
+            self.mostra_mensagem("Não há pagamentos no pacote.")
+            return
+        
+        texto = ''
+        for pagamento in pagamentos:
+            status = "EFETUADO" if pagamento.pagamento_efetuado else "PENDENTE"
+            texto += f"{pagamento.id} | {pagamento.pagante.nome} | R$ {pagamento.valor:.2f} | {status}\n"
+        
+        layout = [
+            [sg.Multiline(texto, size=(60, 15), disabled=True)],
+            [sg.Button("OK")]
+        ]
+        
+        window = sg.Window("Pagamentos do Pacote", layout)
+        window.read()
+        window.close()
+    
+    def mostra_passagens_pacote(self, passagens):
+        """Mostra as passagens de um pacote específico"""
+        
+        texto = ''
+        for passagem in passagens:
+            texto += f"{passagem.id} | {passagem.local_origem.cidade} → {passagem.local_destino.cidade}\n"
+        
+        layout = [
+            [sg.Multiline(texto, size=(60, 15), disabled=True)],
+            [sg.Button("OK")]
+        ]
+        
+        window = sg.Window("Passagens do Pacote", layout)
+        window.read()
+        window.close()
+    
+    def mostra_passeios_pacote(self, passeios):
+        """Mostra os passeios de um pacote específico"""
+        
+        texto = ''
+        for passeio in passeios:
+            texto += f"{passeio.id} | {passeio.atracao_turistica}\n"
+        
+        layout = [
+            [sg.Multiline(texto, size=(60, 15), disabled=True)],
+            [sg.Button("OK")]
+        ]
+        
+        window = sg.Window("Passeios do Pacote", layout)
+        window.read()
+        window.close()
+    
+    def mostra_info_pagamento(self, valor_total, valor_pago, valor_restante):
+        """Mostra informações sobre os valores do pacote"""
+        texto = f"Valor total do pacote: R$ {valor_total:.2f}\n"
+        texto += f"Valor já pago: R$ {valor_pago:.2f}\n"
+        texto += f"Valor restante: R$ {valor_restante:.2f}\n"
+        
+        layout = [
+            [sg.Text("INFORMAÇÕES DO PACOTE", font=("Arial", 14))],
+            [sg.Multiline(texto, size=(50, 5), disabled=True)],
+            [sg.Button("OK")]
+        ]
+        
+        window = sg.Window("Informações de Pagamento", layout)
+        window.read()
+        window.close()

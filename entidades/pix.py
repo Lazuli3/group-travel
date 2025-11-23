@@ -2,8 +2,8 @@ from entidades.pagamento import Pagamento
 
 class Pix(Pagamento):
 
-    def __init__(self, pagante, valor, pagamento_efetuado, banco:str, chave:str):
-        super().__init__(pagante, valor, pagamento_efetuado)
+    def __init__(self, id, pagante, valor, pagamento_efetuado, banco:str, chave:str):
+        super().__init__(id, pagante, valor, pagamento_efetuado)
         self.__banco = None
         self.__chave = None
 

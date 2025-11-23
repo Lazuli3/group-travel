@@ -2,8 +2,8 @@ from entidades.pagamento import Pagamento
 
 class Dinheiro(Pagamento):
 
-    def __init__(self, pagante, valor, pagamento_efetuado, valor_entregue: float):
-        super().__init__(pagante, valor, pagamento_efetuado)
+    def __init__(self, id, pagante, valor, pagamento_efetuado, valor_entregue: float):
+        super().__init__(id, pagante, valor, pagamento_efetuado)
 
         if isinstance(valor_entregue, (int, float)):
             self.__valor_entregue = float(valor_entregue)

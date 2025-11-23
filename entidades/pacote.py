@@ -76,6 +76,11 @@ class Pacote:
         """Adiciona um pagamento ao pacote"""
         self.__pagamentos.append(pagamento)
     
+    def excluir_pagamento(self, pagamento):
+        """Remove um pagamento da lista de pagamentos"""
+        if pagamento in self.__pagamentos:
+            self.__pagamentos.remove(pagamento)
+    
     # ====== MÉTODOS DE CÁLCULO (conforme UML) ======
     
     def valor_total(self):

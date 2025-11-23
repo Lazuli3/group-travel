@@ -197,7 +197,22 @@ class ControladorPagamento:
             
     def obter_pagamentos(self):
         return list(self.__pagamentos_DAO.get_all())
-       
+
+    def confirmar_cancelamento_pagamento(self, pagamento):
+        """Confirma o cancelamento através da tela"""
+        return self.__tela_pagamento.confirma_cancelamento(
+            pagamento.valor,
+            pagamento.pagante.nome
+    )
+
+    def remover_pagamento_dao(self, id_pagamento):
+        """Remove um pagamento do DAO"""
+        try:
+            self.__pagamentos_DAO.remove(id_pagamento)
+            return True
+        except:
+            return False
+    
     def sair(self):
         self.__tela_pagamento.mostra_mensagem('Encerrando.')
         return None  # Retorna None ao invés de True

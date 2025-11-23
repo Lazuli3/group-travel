@@ -195,9 +195,7 @@ class ControladorPacote:
                     self.__tela_pacote.mostra_mensagem("Não há passagens no pacote.")
                     return
                 
-                print("\n--- PASSAGENS DO PACOTE ---")
-                for passagem in pacote.passagens:
-                    print(f"ID {passagem.id}: {passagem.local_origem.cidade} → {passagem.local_destino.cidade}\n")
+                self.__tela_pacote.mostra_passagens_pacote(pacote.passagens)
                 
                 id_passagem = self.__tela_pacote.pega_id_passagem()
                 if id_passagem is None:
@@ -245,9 +243,7 @@ class ControladorPacote:
                     self.__tela_pacote.mostra_mensagem("Não há passeios no pacote.")
                     return
                 
-                print("\n--- PASSEIOS DO PACOTE ---")
-                for passeio in pacote.passeios:
-                    print(f"ID {passeio.id}: {passeio.atracao_turistica}\n")
+                self.__tela_pacote.mostra_passeios_pacote(pacote.passeios)
                 
                 id_passeio = self.__tela_pacote.pega_id_passeio()
                 if id_passeio is None:
@@ -276,10 +272,12 @@ class ControladorPacote:
                     self.__tela_pacote.mostra_mensagem("O pacote já está totalmente pago!")
                     return
                 
-                print(f"\nValor total do pacote: R$ {pacote.valor_total():.2f}")
-                print(f"Valor já pago: R$ {pacote.calcular_valor_pago():.2f}")
-                print(f"Valor restante: R$ {valor_restante:.2f}")
-                
+                self.__tela_pacote.mostra_info_pagamento(
+                    pacote.valor_total(),
+                    pacote.calcular_valor_pago(),
+                    valor_restante
+                )
+
                 membros_cpf = pacote.grupo.membros_cpf
                 
                 if not membros_cpf:
@@ -323,6 +321,46 @@ class ControladorPacote:
                 except ValueError:
                     self.__tela_pacote.mostra_mensagem("Entrada inválida!")
             
+            elif opcao == 6:
+                # Cancelar Pagamento
+                if not pacote.pagamentos:
+                    self.__tela_pacote.mostra_mensagem("Não há pagamentos no pacote.")
+                    return
+
+                # Mostra os pagamentos do pacote
+                self.__tela_pacote.mostra_pagamentos_pacote(pacote.pagamentos)
+                
+                # Pede o ID do pagamento
+                id_pagamento = self.__tela_pacote.pega_id_pagamento()
+                
+                if id_pagamento is None:
+                    self.__tela_pacote.mostra_mensagem("Operação cancelada.")
+                    return
+                
+                pagamento_encontrado = None
+                for pag in pacote.pagamentos:
+                    if pag.id == id_pagamento:
+                        pagamento_encontrado = pag
+                        break
+                
+                if not pagamento_encontrado:
+                    self.__tela_pacote.mostra_mensagem("Pagamento não encontrado neste pacote!")
+                    return
+                
+                # Confirma o cancelamento
+                confirmacao = self.__controlador_sistema.controlador_pagamento.confirmar_cancelamento_pagamento(
+                    pagamento_encontrado
+                )
+                
+                if confirmacao:
+                    # Remove do DAO e do pacote
+                    self.__controlador_sistema.controlador_pagamento.remover_pagamento_dao(id_pagamento)
+                    pacote.excluir_pagamento(pagamento_encontrado)
+                    self.__pacotes_DAO.update(pacote)
+                    self.__tela_pacote.mostra_mensagem("Pagamento cancelado com sucesso!")
+                else:
+                    self.__tela_pacote.mostra_mensagem("Cancelamento abortado.")
+                        
             elif opcao == 0:
                 self.__tela_pacote.mostra_mensagem("Operação cancelada.")
             else:
