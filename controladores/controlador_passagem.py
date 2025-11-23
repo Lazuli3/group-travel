@@ -10,11 +10,11 @@ from DAOs.passagem_dao import PassagemDAO
 
 class ControladorPassagem:
 
-    def __init__(self, controlador_local_viagem):
+    def __init__(self, controlador_sistema):
         self.__empresa_dao = EmpresaDAO()
         self.__transporte_dao = TransporteDAO()
         self.__passagem_dao = PassagemDAO()
-        self.controlador_local_viagem = controlador_local_viagem
+        self.__controlador_sistema = controlador_sistema
         self.__tela_passagem = TelaPassagemGeral()
         
         self.__proximo_id_transporte = self.__gerar_proximo_id_transporte()
@@ -192,7 +192,7 @@ class ControladorPassagem:
                 self.__tela_passagem.mostra_mensagem("Nenhum transporte cadastrado. Cadastre um transporte primeiro!")
                 return False
             
-            locais = self.controlador_local_viagem.obter_locais()
+            locais = self.__controlador_sistema.controlador_local_viagem.obter_locais()
             if not locais or len(locais) < 2:
                 self.__tela_passagem.mostra_mensagem("É necessário ter pelo menos 2 locais cadastrados!")
                 return False
@@ -200,7 +200,7 @@ class ControladorPassagem:
             try:
                 self.listar_transportes()
 
-                dados = self.__tela_passagem.pega_dados_passagem(self.controlador_local_viagem)
+                dados = self.__tela_passagem.pega_dados_passagem(self.__controlador_sistema.controlador_local_viagem)
 
                 if dados is None:
                     self.__tela_passagem.mostra_mensagem("Cadastro de passagem cancelado.")
