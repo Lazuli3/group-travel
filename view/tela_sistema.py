@@ -1,20 +1,21 @@
 import FreeSimpleGUI as sg
+sg.set_options(font=("Arial", 11))
 
 class TelaSistema:
 
     def tela_opcoes(self):
         layout = [
-            [sg.Text('"-------- Viagem em Grupo ---------"')],
+            [sg.Text('Viagem em Grupo', font=("Arial", 14, "bold"), justification='center')],
             [sg.Button('1 - Pessoas')],
             [sg.Button('2 - Grupos')],
             [sg.Button('3 - Locais de Viagem')],
-            [sg.Button('4 - Passeio')],
+            [sg.Button('4 - Passeio Turístico')],
             [sg.Button('5 - Passagem')],
             [sg.Button('6 - Pacote')],
             [sg.Button('0 - Sair')]
         ]
 
-        window = sg.Window('Menu Pessoas', layout)
+        window = sg.Window('Menu Viagem', layout)
 
         while True:
             event, values = window.read()

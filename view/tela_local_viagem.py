@@ -7,7 +7,7 @@ class TelaLocalViagem:
 
     def mostra_opcoes(self):
         layout = [
-            [sg.Text('============ Menu ============')],
+            [sg.Text('Menu', font=("Arial", 14, "bold"))],
             [sg.Button('1 - Incluir local de viagem')],
             [sg.Button('2 - Listar locais de viagem')],
             [sg.Button('3 - Excluir local de viagem')],
@@ -37,6 +37,7 @@ class TelaLocalViagem:
 
     def pega_dados_local_viagem(self):
         layout = [
+            [sg.Text('Dados do Local', font=("Arial", 14, "bold"), justification='center')],
             [sg.Text('Cidade:'), sg.Input(key='cidade')],
             [sg.Text('País:'), sg.Input(key='pais')],
             [sg.Button('Confirmar'), sg.Button('Cancelar')]
@@ -70,16 +71,32 @@ class TelaLocalViagem:
                 return dados
 
     def lista_locais_viagem(self, locais: list):
-        texto = ''
-        for local in locais:
-            texto += f"{local['id']}. Cidade: {local['cidade']} | País: {local['pais']}\n"
-            
+        dados = [[local['id'], local['cidade'], local['pais']] for local in locais]
+    
+        headings = ['ID', 'Cidade', 'País']
+        
         layout = [
-            [sg.Multiline(texto, size=(90,25), disabled=True)],
-            [sg.Button('OK')]
+            [sg.Text('Lista de Locais', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=False,
+                col_widths=[5, 15, 15],  # largura das colunas
+                justification='left',
+                num_rows=min(15, len(dados)),  # Menos linhas visíveis
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
         ]
         
-        window = sg.Window('Lista de Locais', layout)
+        window = sg.Window('Lista de Locais', layout, size=(500, 450), element_justification='center')
         window.read()
         window.close()
 
