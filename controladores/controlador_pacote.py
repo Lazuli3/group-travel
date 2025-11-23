@@ -142,7 +142,7 @@ class ControladorPacote:
     def alterar_pacote(self):
         """Altera um pacote existente"""
         pacotes = list(self.__pacotes_DAO.get_all())
-        
+    
         if not pacotes:
             self.__tela_pacote.mostra_mensagem("Nenhum pacote cadastrado.")
             return
@@ -150,13 +150,17 @@ class ControladorPacote:
         try:
             self.listar_pacotes()
             id_pacote = self.__tela_pacote.seleciona_pacote()
+
+            if not id_pacote:
+                self.__tela_pacote.mostra_mensagem("Operação cancelada.")
+                return
             
             pacote = self.buscar_por_id(id_pacote)
-            
+
             if not pacote:
                 self.__tela_pacote.mostra_mensagem("Pacote não encontrado!")
                 return
-            
+
             # Menu de alterações
             opcao = self.__tela_pacote.mostra_menu_alteracao()
 
