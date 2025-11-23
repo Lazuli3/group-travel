@@ -152,23 +152,25 @@ class TelaPassagemGeral:
         window.read()
         window.close()
 
-    # PASSAGENS
-    def pega_dados_passagem(self, controlador_local_viagem):
-        locais = controlador_local_viagem.obter_locais()
+#PASSAGENS
 
-        if len(locais) < 2:
+    def pega_dados_passagem(self, locais_disponiveis):
+
+        # Verificação inicial
+        if len(locais_disponiveis) < 2:
             sg.popup("É necessário ter pelo menos 2 locais cadastrados!")
             return None
 
+        # Prepara lista amigável para exibir no Combo
         lista_locais = [
-            f"{i} - {loc.cidade}/{loc.pais}" for i, loc in enumerate(locais)
+            f"{i} - {loc.cidade}/{loc.pais}" for i, loc in enumerate(locais_disponiveis)
         ]
 
         layout = [
             [sg.Text("Número do transporte:"), sg.Input(key="indice_transporte")],
-            [sg.Text("Origem:"), sg.Combo(lista_locais, key="origem")],
-            [sg.Text("Destino:"), sg.Combo(lista_locais, key="destino")],
-            [sg.Text("Data (dd/mm/aaaa):"), sg.Input(key="data")],
+            [sg.Text("Local de Origem:"), sg.Combo(lista_locais, key="origem")],
+            [sg.Text("Local de Destino:"), sg.Combo(lista_locais, key="destino")],
+            [sg.Text("Data da viagem (dd/mm/aaaa):"), sg.Input(key="data")],
             [sg.Text("Valor (R$):"), sg.Input(key="valor")],
             [sg.Button("Confirmar"), sg.Button("Cancelar")]
         ]
@@ -177,14 +179,17 @@ class TelaPassagemGeral:
 
         while True:
             event, values = window.read()
+
             if event in (sg.WIN_CLOSED, "Cancelar"):
                 window.close()
                 return None
 
             if event == "Confirmar":
-
                 try:
+                    # Índice do transporte
                     indice_transporte = int(values["indice_transporte"])
+
+                    # Extrai índices dos combos
                     indice_origem = int(values["origem"].split(" - ")[0])
                     indice_destino = int(values["destino"].split(" - ")[0])
 
@@ -192,20 +197,26 @@ class TelaPassagemGeral:
                         sg.popup("Origem e destino não podem ser iguais!")
                         continue
 
+                    # Converte data
                     data = datetime.strptime(values["data"], "%d/%m/%Y")
+
+                    # Converte valor (aceita vírgula ou ponto)
                     valor = float(values["valor"].replace(",", "."))
 
                     window.close()
                     return {
                         "indice_transporte": indice_transporte,
-                        "local_origem": locais[indice_origem],
-                        "local_destino": locais[indice_destino],
+                        "local_origem": locais_disponiveis[indice_origem],
+                        "local_destino": locais_disponiveis[indice_destino],
                         "data": data,
                         "valor": valor
                     }
 
+                except ValueError as e:
+                    sg.popup(f"Erro: Entrada inválida.\n{e}")
                 except Exception as e:
-                    sg.popup(f"Erro: {e}")
+                    sg.popup(f"Erro inesperado:\n{e}")
+
 
 
     def seleciona_passagem(self):

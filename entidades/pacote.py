@@ -3,7 +3,7 @@
 class Pacote:
     """Classe que representa um pacote de viagem"""
     
-    def __init__(self, passeio, passagem, grupo):
+    def __init__(self, passeio, passagem, grupo, id_pacote):
         """
         Construtor do Pacote
         
@@ -16,8 +16,13 @@ class Pacote:
         self.__passagens = passagem if isinstance(passagem, list) else []
         self.__grupo = grupo
         self.__pagamentos = []
+        self.__id = id_pacote
     
     # ====== GETTERS (conforme UML) ======
+
+    @property
+    def id(self):
+        return self.__id
     
     def passeios(self):
         """Retorna a lista de passeios turísticos"""
