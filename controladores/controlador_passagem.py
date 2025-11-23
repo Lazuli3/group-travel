@@ -10,11 +10,12 @@ from DAOs.passagem_dao import PassagemDAO
 
 class ControladorPassagem:
 
-    def __init__(self, controlador_sistema):
+    def __init__(self, controlador_sistema, controlador_local_viagem):
         self.__empresa_dao = EmpresaDAO()
         self.__transporte_dao = TransporteDAO()
         self.__passagem_dao = PassagemDAO()
         self.__controlador_sistema = controlador_sistema
+        self.__controlador_local = controlador_local_viagem
         self.__tela_passagem = TelaPassagemGeral()
         
         self.__proximo_id_transporte = self.__gerar_proximo_id_transporte()
@@ -185,61 +186,70 @@ class ControladorPassagem:
     #PASSAGENS
     
     def incluir_passagem(self):
-            """Cadastra uma nova passagem"""
-            transportes = list(self.__transporte_dao.get_all())
-            
-            if not transportes:
-                self.__tela_passagem.mostra_mensagem("Nenhum transporte cadastrado. Cadastre um transporte primeiro!")
-                return False
-            
-            locais = self.__controlador_sistema.controlador_local_viagem.obter_locais()
-            if not locais or len(locais) < 2:
-                self.__tela_passagem.mostra_mensagem("É necessário ter pelo menos 2 locais cadastrados!")
-                return False
-            
-            try:
-                self.listar_transportes()
+        """Cadastra uma nova passagem"""
+        transportes = list(self.__transporte_dao.get_all())
+        
+        if not transportes:
+            self.__tela_passagem.mostra_mensagem(
+                "Nenhum transporte cadastrado. Cadastre um transporte primeiro!"
+            )
+            return False
+        
+        # ✅ Controlador obtém os dados
+        locais = self.__controlador_local.obter_locais()
+        
+        if not locais or len(locais) < 2:
+            self.__tela_passagem.mostra_mensagem(
+                "É necessário ter pelo menos 2 locais cadastrados!"
+            )
+            return False
+        
+        try:
+            self.listar_transportes()
 
-                dados = self.__tela_passagem.pega_dados_passagem(self.__controlador_sistema.controlador_local_viagem)
-
-                if dados is None:
-                    self.__tela_passagem.mostra_mensagem("Cadastro de passagem cancelado.")
-                    return False
-                
-                transportes_lista = list(transportes)
-                if dados['indice_transporte'] < 0 or dados['indice_transporte'] >= len(transportes_lista):
-                    self.__tela_passagem.mostra_mensagem("Transporte inválido!")
-                    return False
-                
-                transporte = transportes_lista[dados['indice_transporte']]
-                local_origem = dados['local_origem']
-                local_destino = dados['local_destino']
-                
-                if local_origem == local_destino:
-                    self.__tela_passagem.mostra_mensagem("Origem e destino não podem ser iguais!")
-                    return False
-                
-                #Cria passagem com ID
-                passagem = Passagem(
-                    dados['data'],
-                    dados['valor'],
-                    local_origem,
-                    local_destino,
-                    transporte,
-                    self.__proximo_id_passagem
-                )
-                
-                self.__passagem_dao.add(passagem)
-                self.__proximo_id_passagem += 1
-                
-                self.__tela_passagem.mostra_mensagem("Passagem cadastrada com sucesso.")
-                return True
+            # ✅ CORRETO: Passa apenas os DADOS para a View
+            dados = self.__tela_passagem.pega_dados_passagem(locais)
             
-            except Exception as e:
-                self.__tela_passagem.mostra_mensagem(f"Erro ao cadastrar passagem: {str(e)}")
-                import traceback
-                traceback.print_exc()
+            if dados is None:
+                self.__tela_passagem.mostra_mensagem("Cadastro de passagem cancelado.")
                 return False
+            
+            # Validações
+            transportes_lista = list(transportes)
+            if dados['indice_transporte'] < 0 or dados['indice_transporte'] >= len(transportes_lista):
+                self.__tela_passagem.mostra_mensagem("Transporte inválido!")
+                return False
+            
+            transporte = transportes_lista[dados['indice_transporte']]
+            local_origem = dados['local_origem']
+            local_destino = dados['local_destino']
+            
+            if local_origem == local_destino:
+                self.__tela_passagem.mostra_mensagem("Origem e destino não podem ser iguais!")
+                return False
+            
+            # Cria passagem
+            passagem = Passagem(
+                dados['data'],
+                dados['valor'],
+                local_origem,
+                local_destino,
+                transporte,
+                self.__proximo_id_passagem
+            )
+            
+            self.__passagem_dao.add(passagem)
+            self.__proximo_id_passagem += 1
+            
+            self.__tela_passagem.mostra_mensagem("Passagem cadastrada com sucesso.")
+            return True
+        
+        except Exception as e:
+            self.__tela_passagem.mostra_mensagem(f"Erro ao cadastrar passagem: {str(e)}")
+            import traceback
+            traceback.print_exc()
+            return False
+
         
     def listar_passagens(self):
         """Lista todas as passagens cadastradas"""

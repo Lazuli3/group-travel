@@ -6,8 +6,8 @@ class PacoteDAO(DAO):
         super().__init__('pacotes.pkl')
 
     def add (self, pacote: Pacote):
-        if ((pacote is not None) and isinstance(pacote, Pacote) and isinstance(pacote.id, int)):
-            super().add(pacote.id, pacote)
+        print(f"Adicionando pacote com ID: {pacote.id}, tipo: {type(pacote.id)}")
+        super().add(pacote.id, pacote)
 
     def update(self, pacote: Pacote):
         if ((pacote is not None) and isinstance(pacote, Pacote) and isinstance(pacote.id, int)):
