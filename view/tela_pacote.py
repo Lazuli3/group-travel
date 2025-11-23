@@ -59,8 +59,8 @@ class TelaPacote:
             try:
                 return int(values["id"])
             except:
-                return False
-        return False
+                return None
+        return None
 
     def pega_id_passeio(self):
         """Pede o ID do passeio"""
@@ -78,8 +78,8 @@ class TelaPacote:
             try:
                 return int(values["id"])
             except:
-                return False
-        return False
+                return None
+        return None
 
     def pega_id_passagem(self):
         """Pede o ID da passagem"""
@@ -97,8 +97,8 @@ class TelaPacote:
             try:
                 return int(values["id"])
             except:
-                return False
-        return False
+                return None
+        return None
 
     #CONFIRMA ADIÇÃO
     def confirma_adicao(self, tipo):
@@ -116,7 +116,7 @@ class TelaPacote:
     #SELECIONA PACOTE
     def seleciona_pacote(self):
         layout = [
-            [sg.Text("Digite o número do pacote:")],
+            [sg.Text("Digite o ID do pacote:")],
             [sg.Input(key="numero")],
             [sg.Button("OK"), sg.Button("Cancelar")]
         ]
@@ -125,13 +125,12 @@ class TelaPacote:
         event, values = window.read()
         window.close()
 
-        if event == "OK" and values["id"] != "":
+        if event == "OK" and values["numero"] != "":
             try:
-                return int(values["id"])
+                return int(values["numero"])
             except:
-                return False
-        return False
-
+                return None
+        return None
 
     def seleciona_membro(self, membros):
         """Mostra lista de membros e retorna o ID escolhido"""
@@ -155,8 +154,8 @@ class TelaPacote:
             try:
                 return int(values["id"])
             except:
-                return False
-        return False
+                return None
+        return None
 
     #LISTAR PACOTES
     def lista_pacotes(self, pacotes):
