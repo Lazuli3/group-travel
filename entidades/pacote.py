@@ -75,11 +75,12 @@ class Pacote:
         Calcula o valor total do pacote
         Soma: passagens + passeios
         """
-        total = 0.0
+        total = 0
         
         # Soma valor das passagens
         for passagem in self.__passagens:
-            total += passagem.valor
+            if hasattr(passagem, 'valor'):
+                total += passagem.valor
         
         # Soma valor dos passeios
         for passeio in self.__passeios:
