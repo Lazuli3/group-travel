@@ -4,12 +4,26 @@ from entidades.cartao_credito import CartaoCredito
 from entidades.pix import Pix
 from entidades.dinheiro import Dinheiro
 from view.tela_pagamento import TelaPagamento
+from DAOs.pagamento_dao import PagamentoDAO
 
 class ControladorPagamento:
     def __init__(self, controlador_sistema):
         self.__controlador_sistema = controlador_sistema
-        self.__pagamentos = []
+        self.__pagamentos_DAO = PagamentoDAO()
         self.__tela_pagamento = TelaPagamento()
+        self.__proximo_id = self.__gerar_proximo_id()
+        
+    def __gerar_proximo_id(self):
+        """Gera o próximo ID disponível baseado nos locais existentes"""
+        pagamentos = list(self.__pagamentos_DAO.get_all())
+        if not pagamentos:
+            return 1
+        
+        max_id = max(pagamento.id for pagamento in pagamentos)
+        return max_id + 1
+    
+    def buscar_por_id(self, pagamento_id):
+        return self.__pagamentos_DAO.get(pagamento_id)
 
     def inicia(self, valor: float, pessoa):
         """
@@ -45,9 +59,9 @@ class ControladorPagamento:
 
             # Validação do número de cartão
             num_cartao = dados['num_cartao']
-            if not num_cartao.isdigit() or not (13 <= len(num_cartao) <= 19):
+            if not num_cartao.isdigit():
                 self.__tela_pagamento.mostra_mensagem(
-                    "Erro: O número do cartão deve conter apenas dígitos (0-9) e ter entre 13 e 19 caracteres."
+                    "Erro: O número do cartão deve conter apenas dígitos (0-9)."
                 )
                 continue
             
@@ -66,6 +80,7 @@ class ControladorPagamento:
 
             try:
                 pagamento = CartaoCredito(
+                    id = self.__proximo_id,
                     pagante = pessoa,
                     valor = valor,
                     pagamento_efetuado = status_efetuado,
@@ -73,7 +88,8 @@ class ControladorPagamento:
                     bandeira = dados['bandeira'],
                     parcelas = parcelas
                 )
-                self.__pagamentos.append(pagamento)
+                self.__pagamentos_DAO.add(pagamento)
+                self.__proximo_id += 1
                 
                 valor_parcela = valor / parcelas
 
@@ -97,13 +113,15 @@ class ControladorPagamento:
             
             try:
                 pagamento = Pix(
+                    id = self.__proximo_id,
                     pagante = pessoa,
                     valor = valor,
                     pagamento_efetuado = status_efetuado,
                     chave = dados['chave'],
                     banco = dados['banco']
                 )
-                self.__pagamentos.append(pagamento)
+                self.__pagamentos_DAO.add(pagamento)
+                self.__proximo_id += 1
 
                 self.__tela_pagamento.mostra_mensagem(
                     f"Pagamento de R$ {valor:.2f} via PIX realizado!"
@@ -138,6 +156,7 @@ class ControladorPagamento:
                 
             try:
                 pagamento = Dinheiro(
+                    id = self.__proximo_id,
                     pagante = pessoa,
                     valor = valor,
                     pagamento_efetuado = status_efetuado,
@@ -145,7 +164,8 @@ class ControladorPagamento:
                 )
                 
                 troco = pagamento.calc_troco()
-                self.__pagamentos.append(pagamento)
+                self.__pagamentos_DAO.add(pagamento)
+                self.__proximo_id += 1
                 
                 self.__tela_pagamento.mostra_mensagem(
                     f"Pagamento de R$ {valor:.2f} realizado!"
@@ -160,20 +180,24 @@ class ControladorPagamento:
                 return None
 
     def pagamentos_para_dict(self):
+        pagamentos = list(self.__pagamentos_DAO.get_all())
         pagamentos_dict = []
-        for pag in self.__pagamentos:
-            pagamentos_dict.append(pag.conversao_dict())
+
+        for pagamento in pagamentos:
+            pagamentos_dict.append(pagamento.conversao_dict())
         return pagamentos_dict
     
     def listar_pagamentos(self):
-        if not self.__pagamentos:
+        pagamentos = list(self.__pagamentos_DAO.get_all())
+
+        if not pagamentos:
             self.__tela_pagamento.mostra_mensagem('Nenhum pagamento foi realizado.')
         else:
             self.__tela_pagamento.lista_pagamentos(self.pagamentos_para_dict())
             
     def obter_pagamentos(self):
-        return self.__pagamentos
-        
+        return list(self.__pagamentos_DAO.get_all())
+       
     def sair(self):
         self.__tela_pagamento.mostra_mensagem('Encerrando.')
         return None  # Retorna None ao invés de True

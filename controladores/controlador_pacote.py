@@ -1,18 +1,26 @@
 from entidades.pacote import Pacote
 from view.tela_pacote import TelaPacote
+from DAOs.pacote_dao import PacoteDAO
 
 class ControladorPacote:
     
-    def __init__(self, controlador_passagem_geral, controlador_passeio, 
-                 controlador_grupo, controlador_pagamento):
-        self.__pacotes = []
+    def __init__(self, controlador_sistema):
+        self.__pacotes_DAO = PacoteDAO()
         self.__tela_pacote = TelaPacote()
+        self.__controlador_sistema = controlador_sistema
+        self.__proximo_id = self.__gerar_proximo_id()
+
+    def __gerar_proximo_id(self):
+        """Gera o próximo ID disponível baseado nos locais existentes"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        if not pacotes:
+            return 1
         
-        # Referências aos outros controladores
-        self.controlador_passagem_geral = controlador_passagem_geral
-        self.controlador_passeio_turistico = controlador_passeio
-        self.controlador_grupo = controlador_grupo
-        self.controlador_pagamento = controlador_pagamento
+        max_id = max(pacote.id for pacote in pacotes)
+        return max_id + 1
+    
+    def buscar_por_id(self, pacote_id):
+        return self.__pacotes_DAO.get(pacote_id)
     
     def inicia(self):
         opcoes = {
@@ -36,62 +44,74 @@ class ControladorPacote:
     def incluir_pacote(self):
         try:
             # Verifica se há grupos cadastrados
-            if not self.controlador_grupo._ControladorGrupo__grupos:
+            if not self.__controlador_sistema.controlador_grupo.obter_todos_grupos():
                 self.__tela_pacote.mostra_mensagem("Nenhum grupo cadastrado. Cadastre um grupo primeiro!")
                 return
             
             # Mostra grupos disponíveis
             print("\n--- GRUPOS DISPONÍVEIS ---")
-            self.controlador_grupo.listar_grupos()
+            self.__controlador_sistema.controlador_grupo.listar_grupos()
             
             # Seleciona grupo
             id_grupo = self.__tela_pacote.pega_id_grupo()
-            grupo = self.controlador_grupo.buscar_por_id(id_grupo)
+            if not id_grupo:
+                return
+
+            grupo = self.__controlador_sistema.controlador_grupo.buscar_por_id(id_grupo)
             
             if not grupo:
                 self.__tela_pacote.mostra_mensagem(f"Grupo com ID {id_grupo} não encontrado!")
                 return
             
             # Cria pacote vazio para o grupo
-            pacote = Pacote([], [], grupo)
+            pacote = Pacote(self.__proximo_id, [], [], grupo)
             
             # Adiciona passagens (opcional)
-            if self.controlador_passagem_geral._ControladorPassagem__passagens:
+            if self.__controlador_sistema.controlador_passagem.obter_todas_passagens():
                 print("\n--- ADICIONAR PASSAGENS ---")
                 while True:
-                    self.controlador_passagem_geral.listar_passagens()
+                    self.__controlador_sistema.controlador_passagem.listar_passagens()
                     adicionar = self.__tela_pacote.confirma_adicao("passagem")
                     if not adicionar:
                         break
                     
-                    indice = self.__tela_pacote.pega_indice()
-                    passagens_lista = self.controlador_passagem_geral._ControladorPassagem__passagens
+                    id_passagem = self.__tela_pacote.pega_id_passagem()
+                    if not id_passagem:
+                        continue
                     
-                    if 0 <= indice < len(passagens_lista):
-                        pacote.adicionar_passagem(passagens_lista[indice])
+                    passagem = self.__controlador_sistema.controlador_passagem.buscar_por_id(id_passagem)
+                    
+                    if passagem:
+                        pacote.adicionar_passagem(passagem)
                         self.__tela_pacote.mostra_mensagem("Passagem adicionada!")
+
                     else:
-                        self.__tela_pacote.mostra_mensagem("Índice inválido!")
+                        self.__tela_pacote.mostra_mensagem("Passagem não encontrada!")
             
             # Adiciona passeios (opcional)
-            if self.controlador_passeio_turistico._ControladorPasseioTuristico__passeios:
+            if self.__controlador_sistema.controlador_passeio.obter_passeios():
                 print("\n--- ADICIONAR PASSEIOS ---")
                 while True:
-                    self.controlador_passeio_turistico.listar_passeios()
+                    self.__controlador_sistema.controlador_passeio.listar_passeios()
                     adicionar = self.__tela_pacote.confirma_adicao("passeio")
                     if not adicionar:
                         break
                     
-                    indice = self.__tela_pacote.pega_indice()
-                    passeios_lista = self.controlador_passeio_turistico._ControladorPasseioTuristico__passeios
+                    id_passeio = self.__tela_pacote.pega_id_passeio()
+                    if not id_passeio:
+                        continue
+
+                    passeio = self.__controlador_sistema.controlador_passeio.buscar_por_id(id_passeio)
                     
-                    if 0 <= indice < len(passeios_lista):
-                        pacote.adicionar_passeio(passeios_lista[indice])
+                    if passeio:
+                        pacote.adicionar_passeio(passeio)
                         self.__tela_pacote.mostra_mensagem("Passeio adicionado!")
                     else:
-                        self.__tela_pacote.mostra_mensagem("Índice inválido!")
+                        self.__tela_pacote.mostra_mensagem("Passeio não encontrado!")
             
-            self.__pacotes.append(pacote)
+            self.__pacotes_DAO.add(pacote)
+            self.__proximo_id += 1
+            
             self.__tela_pacote.mostra_mensagem(f"Pacote criado para o grupo '{grupo.nome}' com sucesso!")
         
         except Exception as e:
@@ -99,17 +119,19 @@ class ControladorPacote:
     
     def listar_pacotes(self):
         """Lista todos os pacotes cadastrados"""
-        if not self.__pacotes:
+        pacotes = list(self.__pacotes_DAO.get_all())
+        
+        if not pacotes:
             self.__tela_pacote.mostra_mensagem("Nenhum pacote cadastrado no sistema.")
             return
         
         dados_pacotes = []
-        for i, pacote in enumerate(self.__pacotes):
+        for pacote in pacotes:
             dados_pacotes.append({
-                'indice': i,
-                'grupo': pacote.grupo().nome,
-                'total_passagens': len(pacote.passagens()),
-                'total_passeios': len(pacote.passeios()),
+                'id': pacote.id,
+                'grupo': pacote.grupo.nome,
+                'total_passagens': len(pacote.passagens),
+                'total_passeios': len(pacote.passeios),
                 'valor_total': pacote.valor_total(),
                 'valor_pago': pacote.calcular_valor_pago(),
                 'valor_restante': pacote.calcular_valor_restante()
@@ -119,99 +141,121 @@ class ControladorPacote:
     
     def alterar_pacote(self):
         """Altera um pacote existente"""
-        if not self.__pacotes:
+        pacotes = list(self.__pacotes_DAO.get_all())
+        
+        if not pacotes:
             self.__tela_pacote.mostra_mensagem("Nenhum pacote cadastrado.")
             return
         
         try:
             self.listar_pacotes()
-            indice = self.__tela_pacote.seleciona_pacote()
+            id_pacote = self.__tela_pacote.seleciona_pacote()
             
-            if indice < 0 or indice >= len(self.__pacotes):
-                self.__tela_pacote.mostra_mensagem("Índice inválido!")
+            pacote = self.buscar_por_id(id_pacote)
+            
+            if not pacote:
+                self.__tela_pacote.mostra_mensagem("Pacote não encontrado!")
                 return
-            
-            pacote = self.__pacotes[indice]
             
             # Menu de alterações
-            print("\n--- MENU ---")
-            print("1 - Adicionar Passagem")
-            print("2 - Remover Passagem")
-            print("3 - Adicionar Passeio")
-            print("4 - Remover Passeio")
-            print("5 - Adicionar Pagamento")
-            print("0 - Cancelar")
-            
-            try:
-                opcao = int(input("Escolha: "))
-            except ValueError:
-                self.__tela_pacote.mostra_mensagem("Opção inválida!")
-                return
-            
+            opcao = self.__tela_pacote.mostra_menu_alteracao()
+
             if opcao == 1:
                 # Adicionar passagem
-                if not self.controlador_passagem_geral._ControladorPassagem__passagens:
+                if not self.__controlador_sistema.controlador_passagem.obter_todas_passagens():
                     self.__tela_pacote.mostra_mensagem("Nenhuma passagem cadastrada.")
                     return
                 
-                self.controlador_passagem_geral.listar_passagens()
-                idx = self.__tela_pacote.pega_indice()
-                passagens = self.controlador_passagem_geral._ControladorPassagem__passagens
+                self.__controlador_sistema.controlador_passagem.listar_passagens()
+                id_passagem = self.__tela_pacote.pega_id_passagem()
+                if not id_passagem:
+                    return
                 
-                if 0 <= idx < len(passagens):
-                    pacote.adicionar_passagem(passagens[idx])
+                passagem = self.__controlador_sistema.controlador_passagem.buscar_por_id(id_passagem)
+                
+                if passagem:
+                    pacote.adicionar_passagem(passagem)
+                    self.__pacotes_DAO.update(pacote)
                     self.__tela_pacote.mostra_mensagem("Passagem adicionada!")
+
                 else:
-                    self.__tela_pacote.mostra_mensagem("Índice inválido!")
+                    self.__tela_pacote.mostra_mensagem("Passagem não encontrada!")
             
             elif opcao == 2:
                 # Remover passagem
-                if not pacote.passagens():
+                if not pacote.passagens:
                     self.__tela_pacote.mostra_mensagem("Não há passagens no pacote.")
                     return
                 
                 print("\n--- PASSAGENS DO PACOTE ---")
-                for i, p in enumerate(pacote.passagens()):
-                    print(f"{i} - {p}")
+                for passagem in pacote.passagens:
+                    print(f"ID {passagem.id}: {passagem.origem} → {passagem.destino}\n")
                 
-                idx = self.__tela_pacote.pega_indice()
-                if 0 <= idx < len(pacote.passagens()):
-                    pacote.excluir_passagem(pacote.passagens()[idx])
+                id_passagem = self.__tela_pacote.pega_id_passagem()
+                if not id_passagem:
+                    return
+
+                passagem_encontrada = None
+                
+                for p in pacote.passagens:
+                    if p.id == id_passagem:
+                        passagem_encontrada = p
+                        break
+                
+                if passagem_encontrada:
+                    pacote.excluir_passagem(passagem_encontrada)
+                    self.__pacotes_DAO.update(pacote)
                     self.__tela_pacote.mostra_mensagem("Passagem removida!")
                 else:
-                    self.__tela_pacote.mostra_mensagem("Índice inválido!")
+                    self.__tela_pacote.mostra_mensagem("Passagem não encontrada!")
             
             elif opcao == 3:
-                if not self.controlador_passeio_turistico._ControladorPasseioTuristico__passeios:
+                # Adicionar passeio
+                if not self.__controlador_sistema.controlador_passeio.obter_passeios():
                     self.__tela_pacote.mostra_mensagem("Nenhum passeio cadastrado.")
                     return
                 
-                self.controlador_passeio_turistico.listar_passeios()
-                idx = self.__tela_pacote.pega_indice()
-                passeios = self.controlador_passeio_turistico._ControladorPasseioTuristico__passeios
+                self.__controlador_sistema.controlador_passeio.listar_passeios()
+                id_passeio = self.__tela_pacote.pega_id_passeio()
+                if not id_passeio:
+                    return
+
+                passeio = self.__controlador_sistema.controlador_passeio.buscar_por_id(id_passeio)
                 
-                if 0 <= idx < len(passeios):
-                    pacote.adicionar_passeio(passeios[idx])
+                if passeio:
+                    pacote.adicionar_passeio(passeio)
+                    self.__pacotes_DAO.update(pacote)
                     self.__tela_pacote.mostra_mensagem("Passeio adicionado!")
                 else:
-                    self.__tela_pacote.mostra_mensagem("Índice inválido!")
+                    self.__tela_pacote.mostra_mensagem("Passeio não encontrado!")
             
             elif opcao == 4:
                 # Remover passeio
-                if not pacote.passeios():
+                if not pacote.passeios:
                     self.__tela_pacote.mostra_mensagem("Não há passeios no pacote.")
                     return
                 
                 print("\n--- PASSEIOS DO PACOTE ---")
-                for i, p in enumerate(pacote.passeios()):
-                    print(f"{i} - {p.atracao_turistica}")
+                for passeio in pacote.passeios:
+                    print(f"ID {passeio.id}: {passeio.atracao_turistica}\n")
                 
-                idx = self.__tela_pacote.pega_indice()
-                if 0 <= idx < len(pacote.passeios()):
-                    pacote.excluir_passeio(pacote.passeios()[idx])
+                id_passeio = self.__tela_pacote.pega_id_passeio()
+                if not id_passeio:
+                    return
+
+                passeio_encontrado = None
+                
+                for p in pacote.passeios:
+                    if p.id == id_passeio:
+                        passeio_encontrado = p
+                        break
+                
+                if passeio_encontrado:
+                    pacote.excluir_passeio(passeio_encontrado)
+                    self.__pacotes_DAO.update(pacote)
                     self.__tela_pacote.mostra_mensagem("Passeio removido!")
                 else:
-                    self.__tela_pacote.mostra_mensagem("Índice inválido!")
+                    self.__tela_pacote.mostra_mensagem("Passeio não encontrado!")
             
             elif opcao == 5:
                 # Adicionar pagamento
@@ -225,30 +269,39 @@ class ControladorPacote:
                 print(f"Valor já pago: R$ {pacote.calcular_valor_pago():.2f}")
                 print(f"Valor restante: R$ {valor_restante:.2f}")
                 
-                # Pega os membros do grupo para escolher quem vai pagar
-                membros = self.controlador_grupo.obter_membros(pacote.grupo().id)
+                membros = pacote.grupo.membros
                 
                 if not membros:
                     self.__tela_pacote.mostra_mensagem("O grupo não possui membros!")
                     return
                 
                 print("\n--- MEMBROS DO GRUPO ---")
-                for i, membro in enumerate(membros):
-                    print(f"{i} - {membro.nome} (CPF: {membro.cpf})")
+                for membro in membros:
+                    print(f"{membro.id} - {membro.nome} (CPF: {membro.cpf})")
                 
                 try:
-                    idx_membro = int(input("\nEscolha o membro que fará o pagamento: "))
-                    if 0 <= idx_membro < len(membros):
-                        pessoa = membros[idx_membro]
-                        
-                        # Chama o controlador de pagamento
-                        pagamento = self.controlador_pagamento.inicia(valor_restante, pessoa)
-                        
-                        if pagamento:
-                            pacote.adicionar_pagamento(pagamento)
-                            self.__tela_pacote.mostra_mensagem("Pagamento registrado com sucesso!")
+                    id_membro = self.__tela_pacote.seleciona_membro(membros)
+                    pessoa = None
+                    
+                    for membro in membros:
+                        if membro.id == id_membro:
+                            pessoa = membro
+                            break
+
+                    if not pessoa:
+                        self.__tela_pacote.mostra_mensagem("Membro não encontrado!")
+                        return
+
+                    pagamento = self.__controlador_sistema.controlador_pagamento.inicia(valor_restante, pessoa)
+                    
+                    if pagamento:
+                        pacote.adicionar_pagamento(pagamento)
+                        self.__pacotes_DAO.update(pacote)
+                        self.__tela_pacote.mostra_mensagem("Pagamento registrado com sucesso!")
+
                     else:
-                        self.__tela_pacote.mostra_mensagem("Índice inválido!")
+                        self.__tela_pacote.mostra_mensagem("Pagamento cancelado.")
+
                 except ValueError:
                     self.__tela_pacote.mostra_mensagem("Entrada inválida!")
             
@@ -262,23 +315,26 @@ class ControladorPacote:
     
     def excluir_pacote(self):
         """Exclui um pacote"""
-        if not self.__pacotes:
+        pacotes = list(self.__pacotes_DAO.get_all())
+        
+        if not pacotes:
             self.__tela_pacote.mostra_mensagem("Nenhum pacote cadastrado.")
             return
         
         try:
             self.listar_pacotes()
-            indice = self.__tela_pacote.seleciona_pacote()
-            
-            if indice < 0 or indice >= len(self.__pacotes):
-                self.__tela_pacote.mostra_mensagem("Índice inválido!")
+            id_pacote = self.__tela_pacote.seleciona_pacote()
+
+            pacote = self.buscar_por_id(id_pacote)
+
+            if not pacote:
+                self.__tela_pacote.mostra_mensagem("Pacote não encontrado!")
                 return
-            
-            pacote = self.__pacotes[indice]
-            confirmacao = self.__tela_pacote.confirma_exclusao(pacote.grupo().nome)
+
+            confirmacao = self.__tela_pacote.confirma_exclusao(pacote.grupo.nome)
             
             if confirmacao:
-                self.__pacotes.remove(pacote)
+                self.__pacotes_DAO.remove(id_pacote)
                 self.__tela_pacote.mostra_mensagem("Pacote excluído com sucesso!")
             else:
                 self.__tela_pacote.mostra_mensagem("Exclusão cancelada.")

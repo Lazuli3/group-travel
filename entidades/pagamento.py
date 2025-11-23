@@ -4,19 +4,27 @@ from abc import ABC, abstractmethod
 
 class Pagamento(ABC):
 # Representa um registro de pagamento
-    def __init__(self, pagante: Pessoa, valor: float, pagamento_efetuado: bool = False):
+    def __init__(
+        self, id, pagante: Pessoa, valor: float, pagamento_efetuado: bool = False
+    ):
 
         if not isinstance(pagante, Pessoa):
             raise TypeError("Pagante deve ser uma instância da classe Pessoa.")
+
         if not isinstance(valor, (int, float)):
             raise TypeError("Valor deve ser um número (float ou int).")
+
         if valor < 0:
             raise ValueError("Valor deve ser positivo.")
-        
+
+        if not isinstance(pagamento_efetuado, bool):
+            raise TypeError("Pagamento efetuado deve ser um bool.")
+
         self.__pagante = pagante
         self.__valor = float(valor)
         self.__data = datetime.now()
         self.__pagamento_efetuado = pagamento_efetuado
+        self.__id = id
 
     @property
     def pagante(self):
@@ -33,20 +41,29 @@ class Pagamento(ABC):
     @property
     def data(self):
         return self.__data
-    
+
     @property    
     def pagamento_efetuado(self) -> bool:
         return self.__pagamento_efetuado
+
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id(self, id):
+        self.__id = id
     
     def conversao_dict(self):
         status = "[✓] Efetuado" if self.pagamento_efetuado else "[X] Pendente"
         data_formatada = self.data.strftime('%d/%m/%Y %H:%M')
         
         return {
+            'id': self.id,
             'pagante': self.pagante.nome,
             'valor': f"R$ {self.valor:.2f}",
             'data': data_formatada,
-            'status': status
+            'status': status,
         }
             
     def marcar_como_efetuado(self):

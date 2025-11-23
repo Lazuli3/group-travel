@@ -4,10 +4,10 @@ from view.tela_grupo import TelaGrupo
 from DAOs.grupo_dao import GrupoDAO
 
 class ControladorGrupo:
-    def __init__(self, controlador_pessoa):
+    def __init__(self, controlador_sistema):
+        self.__controlador_sistema = controlador_sistema
         self.__grupo_dao = GrupoDAO() 
         self.__tela_grupo = TelaGrupo()
-        self.controlador_pessoa = controlador_pessoa
         self.__proximo_id = self.__gerar_proximo_id()
 
     def __gerar_proximo_id(self):
@@ -103,7 +103,7 @@ class ControladorGrupo:
 
             #desvincula todos os membros do grupo (fazer ralatório aqui?)
             for cpf in grupo.obter_lista_membros():
-                self.controlador_pessoa.desvincular_grupo(cpf)
+                self.__controlador_sistema.controlador_pessoa.desvincular_grupo(cpf)
 
             self.__grupo_dao.remove(id_grupo)
             
@@ -129,11 +129,11 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem(f"Grupo com ID {id_grupo} não encontrado!")
                 return
 
-            self.controlador_pessoa.listar_pessoa()
+            self.__controlador_sistema.controlador_pessoa.listar_pessoa()
 
             cpf = self.__tela_grupo.pega_cpf_pessoa()
 
-            pessoa = self.controlador_pessoa.buscar_por_cpf(cpf)
+            pessoa = self.__controlador_sistema.controlador_pessoa.buscar_por_cpf(cpf)
             if not pessoa:
                 self.__tela_grupo.mostra_mensagem(f"Pessoa com CPF {cpf} não encontrada!")
                 return
@@ -142,7 +142,7 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem(f"{pessoa.nome} já é membro do grupo '{grupo.nome}'!")
                 return
             
-            self.controlador_pessoa.vincular_grupo(cpf, grupo.id)
+            self.__controlador_sistema.controlador_pessoa.vincular_grupo(cpf, grupo.id)
 
             self.__grupo_dao.update(grupo)
 
@@ -174,7 +174,7 @@ class ControladorGrupo:
 
             membros = []
             for cpf in grupo.obter_lista_membros():
-                pessoa = self.controlador_pessoa.buscar_por_cpf(cpf)
+                pessoa = self.__controlador_sistema.controlador_pessoa.buscar_por_cpf(cpf)
                 if pessoa:
                     membros.append({
                         'nome': pessoa.nome,
@@ -216,11 +216,11 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem(f"Pessoa com CPF {cpf} não é membro do grupo!")
                 return
 
-            pessoa = self.controlador_pessoa.buscar_por_cpf(cpf)
+            pessoa = self.__controlador_sistema.controlador_pessoa.buscar_por_cpf(cpf)
 
             grupo.remover_membro(cpf)
 
-            self.controlador_pessoa.desvincular_grupo(cpf)
+            self.__controlador_sistema.controlador_pessoa.desvincular_grupo(cpf)
 
             self.__grupo_dao.update(grupo)
 
@@ -249,7 +249,7 @@ class ControladorGrupo:
 
         membros = []
         for cpf in grupo.obter_lista_membros():
-            pessoa = self.controlador_pessoa.buscar_por_cpf(cpf)
+            pessoa = self.__controlador_sistema.controlador_pessoa.buscar_por_cpf(cpf)
             if pessoa:
                 membros.append(pessoa)
         return membros

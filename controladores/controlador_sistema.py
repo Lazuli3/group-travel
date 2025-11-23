@@ -12,17 +12,12 @@ class ControladorSistema():
     
     def __init__(self):
         self.__controlador_pessoa = ControladorPessoa()
-        self.__controlador_grupo = ControladorGrupo(self.controlador_pessoa)
+        self.__controlador_grupo = ControladorGrupo(self)
         self.__controlador_local_viagem = ControladorLocalViagem()
-        self.__controlador_passagem = ControladorPassagem(self.controlador_local_viagem)
-        self.__controlador_pagamento = ControladorPagamento(ControladorSistema)
-        self.__controlador_passeio = ControladorPasseioTuristico(self.controlador_local_viagem)
-        self.__controlador_pacote = ControladorPacote(
-        self.__controlador_passagem,            # para passagens
-        self.__controlador_passeio,             # para passeios
-        self.__controlador_grupo,               # para grupos
-        self.__controlador_pagamento            # para pagamentos
-)
+        self.__controlador_passagem = ControladorPassagem(self)
+        self.__controlador_pagamento = ControladorPagamento(self)
+        self.__controlador_passeio = ControladorPasseioTuristico(self)
+        self.__controlador_pacote = ControladorPacote(self)
         self.__tela_sistema = TelaSistema()
     
     @property
@@ -52,10 +47,6 @@ class ControladorSistema():
     @property
     def controlador_passeio(self):
         return self.__controlador_passeio
-    
-    @property
-    def controlador_sistema(self):
-        return self.__controlador_sistema
 
     def inicializa_sistema(self):
         self.abre_tela()

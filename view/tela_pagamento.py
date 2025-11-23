@@ -78,14 +78,35 @@ class TelaPagamento:
             return
 
         print('\n============ Histórico de Pagamentos ============')
-        for i, pag in enumerate(pagamentos_dict, 1):
+        for pag in pagamentos_dict:
             tipo = pag['tipo'] 
             valor = pag['valor']
             pagante = pag['pagante']
             data = pag['data']
             status = pag['status']
 
-            print(f"{i}. Pagante: {pagante} | Tipo: {tipo}")
+            print(f"{pag['id']}. Pagante: {pagante} | Tipo: {tipo}")
             print(f"   Valor: {valor}")
             print(f"   Data: {data}")
             print(f"   Status: {status}\n")
+
+    def seleciona_pagamento(self):
+        try:
+            id_pagamento = int(input("\nDigite o ID do pagamento: "))
+            return id_pagamento
+        except ValueError:
+            self.mostra_mensagem("ID inválido!")
+            return None
+
+    def confirma_cancelamento(self, valor: float, pagante: str):
+        print(f"\nDeseja cancelar o pagamento de R$ {valor:.2f} do pagante '{pagante}'?")
+        
+        while True:
+            confirmacao = input("Confirmar cancelamento? (S/N): ").strip().upper()
+            
+            if confirmacao == 'S':
+                return True
+            elif confirmacao == 'N':
+                return False
+            else:
+                print("Opção inválida! Digite 'S' para SIM ou 'N' para NÃO.")

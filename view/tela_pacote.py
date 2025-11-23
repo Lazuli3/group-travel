@@ -22,7 +22,28 @@ class TelaPacote:
             return 0
         return int(event[0])  # pega apenas o primeiro caractere da string "1 - ...."
 
-    #PEDIR ID DO GRUPO
+    def mostra_menu_alteracao(self):
+        """Menu de opções para alteração"""
+        layout = [
+            [sg.Text("MENU DE ALTERAÇÃO", font=("Arial", 14))],
+            [sg.Button("1 - Adicionar Passagem")],
+            [sg.Button("2 - Remover Passagem")],
+            [sg.Button("3 - Adicionar Passeio")],
+            [sg.Button("4 - Remover Passeio")],
+            [sg.Button("5 - Adicionar Pagamento")],
+            [sg.Button("0 - Cancelar")]
+        ]
+
+        window = sg.Window("Alteração de Pacote", layout)
+        event, values = window.read()
+        window.close()
+
+        if event is None or event == "0 - Cancelar":
+            return 0
+        
+        return int(event[0])
+    
+    #PEDIR ID
     def pega_id_grupo(self):
         layout = [
             [sg.Text("Digite o ID do grupo:")],
@@ -34,33 +55,50 @@ class TelaPacote:
         event, values = window.read()
         window.close()
 
-        if event == "Cancelar" or values["id"] == "":
-            return -1
-        
-        try:
-            return int(values["id"])
-        except:
-            return -1
+        if event == "OK" and values["id"] != "":
+            try:
+                return int(values["id"])
+            except:
+                return False
+        return False
 
-    #PEDIR ÍNDICE
-    def pega_indice(self):
+    def pega_id_passeio(self):
+        """Pede o ID do passeio"""
         layout = [
-            [sg.Text("Digite o número:")],
-            [sg.Input(key="indice")],
+            [sg.Text("Digite o ID do passeio:")],
+            [sg.Input(key="id")],
             [sg.Button("OK"), sg.Button("Cancelar")]
         ]
 
-        window = sg.Window("Selecionar Índice", layout)
+        window = sg.Window("ID do Passeio", layout)
         event, values = window.read()
         window.close()
 
-        if event == "Cancelar" or values["indice"] == "":
-            return -1
-        
-        try:
-            return int(values["indice"])
-        except:
-            return -1
+        if event == "OK" and values["id"] != "":
+            try:
+                return int(values["id"])
+            except:
+                return False
+        return False
+
+    def pega_id_passagem(self):
+        """Pede o ID da passagem"""
+        layout = [
+            [sg.Text("Digite o ID da passagem:")],
+            [sg.Input(key="id")],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("ID da Passagem", layout)
+        event, values = window.read()
+        window.close()
+
+        if event == "OK" and values["id"] != "":
+            try:
+                return int(values["id"])
+            except:
+                return False
+        return False
 
     #CONFIRMA ADIÇÃO
     def confirma_adicao(self, tipo):
@@ -87,13 +125,38 @@ class TelaPacote:
         event, values = window.read()
         window.close()
 
-        if event == "Cancelar" or values["numero"] == "":
-            return -1
+        if event == "OK" and values["id"] != "":
+            try:
+                return int(values["id"])
+            except:
+                return False
+        return False
+
+
+    def seleciona_membro(self, membros):
+        """Mostra lista de membros e retorna o ID escolhido"""
+        texto = "--- MEMBROS DO GRUPO ---\n\n"
         
-        try:
-            return int(values["numero"])
-        except:
-            return -1
+        for membro in membros:
+            texto += f"ID {membro.id}: {membro.nome} (CPF: {membro.cpf})\n"
+        
+        layout = [
+            [sg.Multiline(texto, size=(50, 10), disabled=True)],
+            [sg.Text("Digite o ID do membro:")],
+            [sg.Input(key="id")],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Selecionar Membro", layout)
+        event, values = window.read()
+        window.close()
+
+        if event == "OK" and values["id"] != "":
+            try:
+                return int(values["id"])
+            except:
+                return False
+        return False
 
     #LISTAR PACOTES
     def lista_pacotes(self, pacotes):
@@ -101,7 +164,7 @@ class TelaPacote:
         texto += "-"*90 + "\n"
 
         for p in pacotes:
-            texto += f"{p['indice']} | {p['grupo'][:18]} | {p['total_passagens']} | {p['total_passeios']} | R$ {p['valor_total']:.2f} | R$ {p['valor_pago']:.2f} | R$ {p['valor_restante']:.2f}\n"
+            texto += f"{p['id']} | {p['grupo'][:18]} | {p['total_passagens']} | {p['total_passeios']} | R$ {p['valor_total']:.2f} | R$ {p['valor_pago']:.2f} | R$ {p['valor_restante']:.2f}\n"
 
         layout = [
             [sg.Multiline(texto, size=(90, 20), disabled=True)],

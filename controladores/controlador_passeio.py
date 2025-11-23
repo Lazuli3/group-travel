@@ -151,6 +151,7 @@ class ControladorPasseioTuristico:
                     grupo_passeio=grupo
                 )
                 self.__passeios_DAO.add(novo)
+                self.__proximo_id += 1
                 self.__tela_passeio.mostra_mensagem('Passeio turístico cadastrado com sucesso!')
                 break
             
