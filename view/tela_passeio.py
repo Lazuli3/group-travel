@@ -122,6 +122,25 @@ class TelaPasseioTuristico:
                     return valor
                 except ValueError:
                     sg.popup("ID inválido! Digite um número inteiro.")
+                    
+    def lista_passeios_turisticos(self, passeios: list):
+        texto = ''
+        for passeio in passeios:
+            texto += f'''{passeio['id']}. Atração: {passeio['atracao']}
+                   Localização: {passeio['localizacao']}
+                   Horário de início: {passeio['horario_inicio']}
+                   Horário de fim: {passeio['horario_fim']}
+                   Valor: {passeio['valor']}
+                   Grupo do passeio: {passeio['grupo']}\n'''
+            
+        layout = [
+            [sg.Multiline(texto, size=(90,25), disabled=True)],
+            [sg.Button('OK')]
+        ]
+        
+        window = sg.Window('Lista de Passeios', layout)
+        window.read()
+        window.close()
 
     def confirma_exclusao(self, atracao_turistica, nome_grupo):
         layout = [

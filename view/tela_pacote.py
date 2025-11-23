@@ -136,13 +136,13 @@ class TelaPacote:
         """Mostra lista de membros e retorna o ID escolhido"""
         texto = "--- MEMBROS DO GRUPO ---\n\n"
         
-        for membro in membros:
-            texto += f"ID {membro.id}: {membro.nome} (CPF: {membro.cpf})\n"
+        for i,membro in enumerate(membros,1):
+            texto += f"{i}: {membro.nome} (CPF: {membro.cpf})\n"
         
         layout = [
             [sg.Multiline(texto, size=(50, 10), disabled=True)],
-            [sg.Text("Digite o ID do membro:")],
-            [sg.Input(key="id")],
+            [sg.Text("Digite o CPF do membro:")],
+            [sg.Input(key="cpf")],
             [sg.Button("OK"), sg.Button("Cancelar")]
         ]
 
@@ -150,9 +150,9 @@ class TelaPacote:
         event, values = window.read()
         window.close()
 
-        if event == "OK" and values["id"] != "":
+        if event == "OK" and values["cpf"] != "":
             try:
-                return int(values["id"])
+                return values["cpf"].strip()
             except:
                 return None
         return None

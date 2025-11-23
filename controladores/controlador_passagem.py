@@ -10,12 +10,11 @@ from DAOs.passagem_dao import PassagemDAO
 
 class ControladorPassagem:
 
-    def __init__(self, controlador_sistema, controlador_local_viagem):
+    def __init__(self, controlador_sistema):
         self.__empresa_dao = EmpresaDAO()
         self.__transporte_dao = TransporteDAO()
         self.__passagem_dao = PassagemDAO()
         self.__controlador_sistema = controlador_sistema
-        self.__controlador_local = controlador_local_viagem
         self.__tela_passagem = TelaPassagemGeral()
         
         self.__proximo_id_transporte = self.__gerar_proximo_id_transporte()
@@ -34,6 +33,10 @@ class ControladorPassagem:
             return 1
         max_id = max(p.id for p in passagens)
         return max_id + 1
+    
+    def buscar_por_id(self, passagem_id):
+        """Busca uma passagem pelo ID"""
+        return self.__passagem_dao.get(passagem_id)
     
     def inicia(self):
         opcoes = {
@@ -196,7 +199,7 @@ class ControladorPassagem:
             return False
         
         # ✅ Controlador obtém os dados
-        locais = self.__controlador_local.obter_locais()
+        locais = self.__controlador_sistema.controlador_local.obter_locais()
         
         if not locais or len(locais) < 2:
             self.__tela_passagem.mostra_mensagem(

@@ -197,7 +197,7 @@ class ControladorPacote:
                 
                 print("\n--- PASSAGENS DO PACOTE ---")
                 for passagem in pacote.passagens:
-                    print(f"ID {passagem.id}: {passagem.origem} → {passagem.destino}\n")
+                    print(f"ID {passagem.id}: {passagem.local_origem.cidade} → {passagem.local_destino.cidade}\n")
                 
                 id_passagem = self.__tela_pacote.pega_id_passagem()
                 if id_passagem is None:
@@ -280,22 +280,29 @@ class ControladorPacote:
                 print(f"Valor já pago: R$ {pacote.calcular_valor_pago():.2f}")
                 print(f"Valor restante: R$ {valor_restante:.2f}")
                 
-                membros = pacote.grupo.membros
+                membros_cpf = pacote.grupo.membros_cpf
                 
-                if not membros:
+                if not membros_cpf:
                     self.__tela_pacote.mostra_mensagem("O grupo não possui membros!")
                     return
                 
-                print("\n--- MEMBROS DO GRUPO ---")
-                for membro in membros:
-                    print(f"{membro.id} - {membro.nome} (CPF: {membro.cpf})")
+                membros = []
+                
+                for cpf in membros_cpf:
+                    pessoa = self.__controlador_sistema.controlador_pessoa.buscar_por_cpf(cpf)
+                    if pessoa:
+                        membros.append(pessoa)
+
+                if not membros:
+                    self.__tela_pacote.mostra_mensagem("Erro ao carregar membros do grupo!")
+                    return
                 
                 try:
-                    id_membro = self.__tela_pacote.seleciona_membro(membros)
+                    cpf_membro = self.__tela_pacote.seleciona_membro(membros)
                     pessoa = None
                     
                     for membro in membros:
-                        if membro.id == id_membro:
+                        if membro.cpf == cpf_membro:
                             pessoa = membro
                             break
 
