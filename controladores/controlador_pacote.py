@@ -278,7 +278,13 @@ class ControladorPacote:
                     valor_restante
                 )
 
-                membros_cpf = pacote.grupo.membros_cpf
+                grupo_atualizado = self.__controlador_sistema.controlador_grupo.buscar_por_id(pacote.grupo.id)
+    
+                if not grupo_atualizado:
+                    self.__tela_pacote.mostra_mensagem("Erro ao carregar o grupo!")
+                    return
+                
+                membros_cpf = grupo_atualizado.membros_cpf
                 
                 if not membros_cpf:
                     self.__tela_pacote.mostra_mensagem("O grupo não possui membros!")
