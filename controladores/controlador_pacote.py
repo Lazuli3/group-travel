@@ -108,7 +108,20 @@ class ControladorPacote:
                         self.__tela_pacote.mostra_mensagem("Passeio adicionado!")
                     else:
                         self.__tela_pacote.mostra_mensagem("Passeio não encontrado!")
-            
+
+            # Logo antes do add, adicione:
+            print(f"\n=== DEBUG ANTES DE SALVAR ===")
+            print(f"Pacote ID: {pacote.id}")
+            print(f"Total de passagens: {len(pacote.passagens)}")
+            print(f"Total de passeios: {len(pacote.passeios)}")
+            print(f"Valor total calculado: {pacote.valor_total()}")
+
+            for passagem in pacote.passagens:
+                print(f"  Passagem: {passagem.origem} -> {passagem.destino}, Valor: R$ {passagem.valor}")
+
+            for passeio in pacote.passeios:
+                print(f"  Passeio: {passeio.atracao_turistica}, Valor: R$ {passeio.valor if hasattr(passeio, 'valor') else 'SEM ATRIBUTO VALOR'}")
+                                    
             self.__pacotes_DAO.add(pacote)
             self.__proximo_id += 1
             

@@ -3,7 +3,7 @@
 class Pacote:
     """Classe que representa um pacote de viagem"""
     
-    def __init__(self, passeio, passagem, grupo, id_pacote):
+    def __init__(self, id_pacote, passeio, passagem, grupo):
         """
         Construtor do Pacote
         
@@ -23,19 +23,23 @@ class Pacote:
     @property
     def id(self):
         return self.__id
-    
+
+    @property
     def passeios(self):
         """Retorna a lista de passeios turísticos"""
         return self.__passeios
-    
+
+    @property
     def passagens(self):
         """Retorna a lista de passagens"""
         return self.__passagens
-    
+
+    @property
     def pagamentos(self):
         """Retorna a lista de pagamentos"""
         return self.__pagamentos
     
+    @property
     def grupo(self):
         """Retorna o grupo associado ao pacote"""
         return self.__grupo
