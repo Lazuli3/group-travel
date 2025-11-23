@@ -54,7 +54,7 @@ class ControladorPacote:
             
             # Seleciona grupo
             id_grupo = self.__tela_pacote.pega_id_grupo()
-            if not id_grupo:
+            if id_grupo is None:
                 return
 
             grupo = self.__controlador_sistema.controlador_grupo.buscar_por_id(id_grupo)
@@ -76,7 +76,8 @@ class ControladorPacote:
                         break
                     
                     id_passagem = self.__tela_pacote.pega_id_passagem()
-                    if not id_passagem:
+                    if id_passagem is None:
+                        self.__tela_pacote.mostra_mensagem("Operação cancelada.")
                         continue
                     
                     passagem = self.__controlador_sistema.controlador_passagem.buscar_por_id(id_passagem)
@@ -98,7 +99,8 @@ class ControladorPacote:
                         break
                     
                     id_passeio = self.__tela_pacote.pega_id_passeio()
-                    if not id_passeio:
+                    if id_passeio is None:
+                        self.__tela_pacote.mostra_mensagem("Operação cancelada.")
                         continue
 
                     passeio = self.__controlador_sistema.controlador_passeio.buscar_por_id(id_passeio)
@@ -143,7 +145,7 @@ class ControladorPacote:
     def alterar_pacote(self):
         """Altera um pacote existente"""
         pacotes = list(self.__pacotes_DAO.get_all())
-        
+    
         if not pacotes:
             self.__tela_pacote.mostra_mensagem("Nenhum pacote cadastrado.")
             return
@@ -151,13 +153,17 @@ class ControladorPacote:
         try:
             self.listar_pacotes()
             id_pacote = self.__tela_pacote.seleciona_pacote()
+
+            if id_pacote is None:
+                self.__tela_pacote.mostra_mensagem("Operação cancelada.")
+                return
             
             pacote = self.buscar_por_id(id_pacote)
-            
+
             if not pacote:
                 self.__tela_pacote.mostra_mensagem("Pacote não encontrado!")
                 return
-            
+
             # Menu de alterações
             opcao = self.__tela_pacote.mostra_menu_alteracao()
 
@@ -169,7 +175,8 @@ class ControladorPacote:
                 
                 self.__controlador_sistema.controlador_passagem.listar_passagens()
                 id_passagem = self.__tela_pacote.pega_id_passagem()
-                if not id_passagem:
+                if id_passagem is None:
+                    self.__tela_pacote.mostra_mensagem("Operação cancelada.")
                     return
                 
                 passagem = self.__controlador_sistema.controlador_passagem.buscar_por_id(id_passagem)
@@ -193,7 +200,8 @@ class ControladorPacote:
                     print(f"ID {passagem.id}: {passagem.origem} → {passagem.destino}\n")
                 
                 id_passagem = self.__tela_pacote.pega_id_passagem()
-                if not id_passagem:
+                if id_passagem is None:
+                    self.__tela_pacote.mostra_mensagem("Operação cancelada.")
                     return
 
                 passagem_encontrada = None
@@ -218,7 +226,8 @@ class ControladorPacote:
                 
                 self.__controlador_sistema.controlador_passeio.listar_passeios()
                 id_passeio = self.__tela_pacote.pega_id_passeio()
-                if not id_passeio:
+                if id_passeio is None:
+                    self.__tela_pacote.mostra_mensagem("Operação cancelada.")
                     return
 
                 passeio = self.__controlador_sistema.controlador_passeio.buscar_por_id(id_passeio)
@@ -241,7 +250,8 @@ class ControladorPacote:
                     print(f"ID {passeio.id}: {passeio.atracao_turistica}\n")
                 
                 id_passeio = self.__tela_pacote.pega_id_passeio()
-                if not id_passeio:
+                if id_passeio is None:
+                    self.__tela_pacote.mostra_mensagem("Operação cancelada.")
                     return
 
                 passeio_encontrado = None
@@ -325,6 +335,10 @@ class ControladorPacote:
         try:
             self.listar_pacotes()
             id_pacote = self.__tela_pacote.seleciona_pacote()
+            
+            if id_pacote is None:
+                self.__tela_pacote.mostra_mensagem("Operação cancelada.")
+                return
 
             pacote = self.buscar_por_id(id_pacote)
 

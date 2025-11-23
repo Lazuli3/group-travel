@@ -1,72 +1,137 @@
+import FreeSimpleGUI as sg
+from datetime import datetime
 
 class TelaPasseioTuristico:
     def mostra_mensagem(self, msg:str):
-        print(msg)
+        sg.popup(msg)
 
     def mostra_opcoes(self):
+        layout = [
+            [sg.Button('1 - Incluir passeio turístico')],
+            [sg.Button('2 - Listar passeios turísticos')],
+            [sg.Button('3 - Excluir passeio turístico')],
+            [sg.Button('0 - Sair')]
+        ]
+        
+        window = sg.Window('Menu Passeios Turísticos', layout)
+        
         while True:
-            print('''============ Menu ============
-                1 - Incluir passeio turístico
-                2 - Listar passeios turísticos
-                3 - Excluir passeio turístico
-                0 - Sair
-            ''')
-
-            try:
-                return int(input('Escolha uma das opções do menu: '))
+            event, values = window.read()
+            if event == sg.WIN_CLOSED:
+                window.close()
+                return 0
             
-            except ValueError:
-                self.mostra_mensagem('Escolha uma opção válida do menu.')
+            if event.startswith('1'):
+                window.close()
+                return 1
+            elif event.startswith('2'):
+                window.close()
+                return 2
+            elif event.startswith('3'):
+                window.close()
+                return 3
+            elif event.startswith('0'):
+                window.close()
+                return 0
 
     def pega_dados_passeio(self):
-        print('\n============ Cadastro ============')
-        atracao_turistica = input('Nome da atração turística: ')
-        cidade = input('Cidade: ')
-        pais = input('País: ')
-        dia = input('Digite o dia (DD/MM/YYYY): ')
-        horario_inicio = input('Digite o horário de início (HH:MM): ')
-        horario_fim = input('Digite o horário de fim (HH:MM): ')
-        valor = input('Digite o valor (R$): ')
-        id_grupo = input('Digite o ID do grupo: ')
-
-        return {
-            'atracao_turistica': atracao_turistica,
-            'cidade': cidade,
-            'pais': pais,
-            'dia': dia,
-            'horario_inicio': horario_inicio,
-            'horario_fim': horario_fim,
-            'valor': valor,
-            'id_grupo': id_grupo
-        }
-
-    def lista_passeios_turisticos(self, passeios_dict: list):
-        print('============ Lista de passeios ============')
-        for passeio in passeios_dict:
-            print(f'''{passeio['id']}. Atração: {passeio['atracao']}
-                   Localização: {passeio['localizacao']}
-                   Horário de início: {passeio['horario_inicio']}
-                   Horário de fim: {passeio['horario_fim']}
-                   Valor: {passeio['valor']}
-                   Grupo do passeio: {passeio['grupo']}''')
-
-    def seleciona_passeio(self):
-        try:
-            id_passeio = int(input("\nDigite o ID do passeio: "))
-            return id_passeio
-        except ValueError:
-            self.mostra_mensagem("ID inválido!")
-            return None
-
-    def confirma_exclusao(self, atracao_turistica, nome_grupo):
-        print(f"\nVocê confirma a exclusão do passeio turístico '{atracao_turistica}' do grupo '{nome_grupo}'?")
+        horas = [f'{i:02d}' for i in range(0, 24)]
+        minutos = [f'{i:02d}' for i in range(0, 60)]
+        
+        layout = [
+            [sg.Text('Atração turística:'), sg.Input(key='atracao')],
+            [sg.Text('Cidade:'), sg.Input(key='cidade')],
+            [sg.Text('País:'), sg.Input(key='pais')],
+            [sg.Text('Data:'), sg.Input(key='dia', disabled=True, size=(12,1)), 
+            sg.CalendarButton('Selecionar', target='dia', format='%d/%m/%Y')],
+            [sg.Text('Horário de início:'), 
+            sg.Combo(horas, default_value='09', key='hora_inicio', readonly=True, size=(5,1)),
+            sg.Text(':'),
+            sg.Combo(minutos, default_value='00', key='minuto_inicio', readonly=True, size=(5,1))],
+            [sg.Text('Horário de fim:'), 
+            sg.Combo(horas, default_value='18', key='hora_fim', readonly=True, size=(5,1)),
+            sg.Text(':'),
+            sg.Combo(minutos, default_value='00', key='minuto_fim', readonly=True, size=(5,1))],
+            [sg.Text('Valor (R$):'), sg.Input(key='valor')],
+            [sg.Text('ID do grupo:'), sg.Input(key='id_grupo')],
+            [sg.Button('Confirmar'), sg.Button('Cancelar')]
+        ]
+        
+        window = sg.Window('Cadastro de Passeio', layout)
 
         while True:
-            confirmacao = input("Digite 'S' para confirmar ou 'N' para cancelar: ").strip().upper()
+            event, values = window.read()
             
-            if confirmacao == 'S':
-                return True
-            elif confirmacao == 'N':
-                return False
-            else:
-                print("Opção inválida! Digite 'S' para SIM ou 'N' para NÃO.")
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
+
+            if event == 'Confirmar':
+                if not values['dia']:
+                    sg.popup('Por favor, selecione a data!')
+                    continue
+                
+                try:
+                    data_passeio = datetime.strptime(values['dia'], '%d/%m/%Y')
+                    data_hoje = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+                    
+                    if data_passeio < data_hoje:
+                        sg.popup('Erro: A data do passeio não pode ser no passado!')
+                        continue
+                except ValueError:
+                    sg.popup('Formato de data inválido!')
+                    continue
+                
+                # Monta os horários no formato HH:MM
+                horario_inicio = f"{values['hora_inicio']}:{values['minuto_inicio']}"
+                horario_fim = f"{values['hora_fim']}:{values['minuto_fim']}"
+                
+                dados = {
+                    'atracao_turistica': values['atracao'],
+                    'cidade': values['cidade'],
+                    'pais': values['pais'],
+                    'dia': values['dia'],
+                    'horario_inicio': horario_inicio,
+                    'horario_fim': horario_fim,
+                    'valor': values['valor'],
+                    'id_grupo': values['id_grupo']
+                }
+                window.close()
+                return dados
+
+    def seleciona_passeio(self):
+        layout = [
+            [sg.Text("Digite o ID do passeio:")],
+            [sg.Input(key='id')],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Selecionar Grupo", layout)
+
+        while True:
+            event, values = window.read()
+
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
+
+            if event == "OK":
+                try:
+                    valor = int(values['id'])
+                    window.close()
+                    return valor
+                except ValueError:
+                    sg.popup("ID inválido! Digite um número inteiro.")
+
+    def confirma_exclusao(self, atracao_turistica, nome_grupo):
+        layout = [
+            [sg.Text(f"Você confirma a exclusão do passeio turístico '{atracao_turistica}' do grupo '{nome_grupo}'?")],
+            [sg.Button("Sim"), sg.Button("Não")]
+        ]
+
+        window = sg.Window("Confirmar Exclusão", layout)
+
+        event, values = window.read()
+        window.close()
+
+        return event == "Sim"

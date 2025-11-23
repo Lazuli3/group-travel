@@ -1,55 +1,121 @@
+import FreeSimpleGUI as sg
 
 class TelaLocalViagem:
 
     def mostra_mensagem(self, msg: str):
-        print(msg)
+        sg.popup(msg)
 
     def mostra_opcoes(self):
-        print(''' ============ Menu ============
-            1 - Incluir local de viagem
-            2 - Listar local de viagem
-            3 - Excluir local de viagem
-            0 - Sair
-        ''')
-
-        try:
-            return int(input('Escolha uma das opções do menu: '))
+        layout = [
+            [sg.Text('============ Menu ============')],
+            [sg.Button('1 - Incluir local de viagem')],
+            [sg.Button('2 - Listar locais de viagem')],
+            [sg.Button('3 - Excluir local de viagem')],
+            [sg.Button('0 - Sair')]
+        ]
         
-        except ValueError:
-            self.mostra_mensagem("Escolha uma opção válida do menu.")
-            return self.mostra_opcoes()
+        window = sg.Window('Menu Locais de viagem', layout)
+        
+        while True:
+            event, values = window.read()
+            if event == sg.WIN_CLOSED:
+                window.close()
+                return 0
+            
+            if event.startswith('1'):
+                window.close()
+                return 1
+            elif event.startswith('2'):
+                window.close()
+                return 2
+            elif event.startswith('3'):
+                window.close()
+                return 3
+            elif event.startswith('0'):
+                window.close()
+                return 0
 
     def pega_dados_local_viagem(self):
-        print('============ Cadastro ============')
-        cidade = input('Nome da cidade: ')
-        pais = input('Nome do país: ')
-        return {
-            'cidade': cidade,
-            'pais': pais
-        }
+        layout = [
+            [sg.Text('Cidade:'), sg.Input(key='cidade')],
+            [sg.Text('País:'), sg.Input(key='pais')],
+            [sg.Button('Confirmar'), sg.Button('Cancelar')]
+        ]
+        
+        window = sg.Window('Cadastro de Local', layout)
+        
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
+
+            if event == 'Confirmar':
+                cidade = values['cidade'].strip()
+                pais = values['pais'].strip()
+
+                if not cidade or not pais:
+                    self.mostra_mensagem('Cidade e país não podem estar vazios.')
+                    continue
+
+                if pais.isdigit() or cidade.isdigit():
+                    self.mostra_mensagem('Cidade/país não devem conter apenas números.')
+                    continue
+
+                dados = {
+                    'cidade': cidade,
+                    'pais': pais
+                }
+                window.close()
+                return dados
 
     def lista_locais_viagem(self, locais: list):
-        print('============ Lista de locais ============')
+        texto = ''
         for local in locais:
-            print(f"{local['id']}. Cidade: {local['cidade']} | País: {local['pais']}")
+            texto += f"{local['id']}. Cidade: {local['cidade']} | País: {local['pais']}\n"
+            
+        layout = [
+            [sg.Multiline(texto, size=(90,25), disabled=True)],
+            [sg.Button('OK')]
+        ]
+        
+        window = sg.Window('Lista de Locais', layout)
+        window.read()
+        window.close()
 
     def seleciona_local(self):
-        try:
-            id_local = int(input("\nDigite o ID do local: "))
-            return id_local
-        except ValueError:
-            self.mostra_mensagem("ID inválido!")
-            return None
+        layout = [
+            [sg.Text("Digite o ID do local:")],
+            [sg.Input(key='id')],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+        
+        window = sg.Window("Selecionar Local", layout)
+        
+        while True:
+            event, values = window.read()
+
+            if event in (sg.WIN_CLOSED, 'Cancelar'):
+                window.close()
+                return None
+
+            if event == "OK":
+                try:
+                    valor = int(values['id'])
+                    window.close()
+                    return valor
+                except ValueError:
+                    sg.popup("ID inválido! Digite um número inteiro.")
 
     def confirma_exclusao(self, cidade_local, pais_local):
-        print(f"\nVocê confirma a exclusão do local de viagem: '{cidade_local}, {pais_local}'?")
+        layout = [
+            [sg.Text(f"Confirma a exclusão do local de viagem: '{cidade_local}, {pais_local}'?")],
+            [sg.Button("Sim"), sg.Button("Não")]
+        ]
 
-        while True:
-            confirmacao = input("Digite 'S' para confirmar ou 'N' para cancelar: ").strip().upper()
-            
-            if confirmacao == 'S':
-                return True
-            elif confirmacao == 'N':
-                return False
-            else:
-                print("Opção inválida! Digite 'S' para SIM ou 'N' para NÃO.")
+        window = sg.Window("Confirmar Exclusão", layout)
+
+        event, values = window.read()
+        window.close()
+
+        return event == "Sim"

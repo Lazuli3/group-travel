@@ -44,6 +44,14 @@ class Pacote:
         """Retorna o grupo associado ao pacote"""
         return self.__grupo
     
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id (self, id):
+        self.__id = id
+    
     # ====== MÉTODOS DE GERENCIAMENTO (conforme UML) ======
     
     def adicionar_passeio(self, passeio_turistico):
