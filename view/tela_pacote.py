@@ -183,6 +183,19 @@ class TelaPacote:
         window = sg.Window("Seleção de Membros", layout, size=(400, 450), element_justification='center')
         window.read()
         window.close()
+        
+        layout_cpf = [
+            [sg.Text("Digite o CPF do membro:")],
+            [sg.Input(key='cpf')],
+            [sg.Button("OK"), sg.Button("Cancelar")]
+        ]
+        window_cpf = sg.Window("CPF", layout_cpf)
+        event, values = window_cpf.read()
+        window_cpf.close()
+        
+        if event == "OK":
+            return values['cpf']
+        return None
 
     #LISTAR PACOTES
     def lista_pacotes(self, pacotes):
