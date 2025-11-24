@@ -11,7 +11,7 @@ from view.tela_sistema import TelaSistema
 class ControladorSistema():
     
     def __init__(self):
-        self.__controlador_pessoa = ControladorPessoa()
+        self.__controlador_pessoa = ControladorPessoa(self)
         self.__controlador_grupo = ControladorGrupo(self)
         self.__controlador_local_viagem = ControladorLocalViagem()
         self.__controlador_passagem = ControladorPassagem(self)

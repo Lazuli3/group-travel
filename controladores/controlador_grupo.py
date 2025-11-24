@@ -24,7 +24,7 @@ class ControladorGrupo:
             2: self.listar_grupos,
             3: self.incluir_pessoa_grupo,
             4: self.listar_pessoas_grupo,
-            5: self.excluir_pessoa_grupo,
+            5: self.remover_pessoa_de_grupo,
             6: self.excluir_grupo,
             0: self.sair
         }
@@ -96,12 +96,23 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem(f"Grupo com ID {id_grupo} não encontrado!")
                 return
 
+            # CORRETO: Usa método público do controlador de pacotes
+            if self.__controlador_sistema:
+                if self.__controlador_sistema.controlador_pacote.grupo_tem_pacotes(id_grupo):
+                    qtd = self.__controlador_sistema.controlador_pacote.contar_pacotes_do_grupo(id_grupo)
+                    self.__tela_grupo.mostra_mensagem(
+                        f"❌ Não é possível excluir!\n"
+                        f"O grupo possui {qtd} pacote(s) vinculado(s).\n"
+                        "Exclua os pacotes primeiro."
+                    )
+                    return
+
             confirmacao = self.__tela_grupo.confirma_exclusao(grupo.nome)
             if not confirmacao:
                 self.__tela_grupo.mostra_mensagem("Exclusão cancelada.")
                 return
 
-            #desvincula todos os membros do grupo (fazer ralatório aqui?)
+            # Desvincula todos os membros do grupo
             for cpf in grupo.obter_lista_membros():
                 self.__controlador_sistema.controlador_pessoa.desvincular_grupo(cpf)
 
@@ -187,7 +198,8 @@ class ControladorGrupo:
         except Exception as e:
             self.__tela_grupo.mostra_mensagem(f"Erro ao listar membros: {str(e)}")
 
-    def excluir_pessoa_grupo(self):
+
+    def excluir_grupo(self):
         grupos = list(self.__grupo_dao.get_all())
         
         if not grupos:
@@ -204,31 +216,42 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem(f"Grupo com ID {id_grupo} não encontrado!")
                 return
 
-            if grupo.total_membros() == 0:
-                self.__tela_grupo.mostra_mensagem(f"O grupo '{grupo.nome}' não possui membros.")
+            # VERIFICA INTEGRIDADE: Usa método público do controlador de pacotes
+            if self.__controlador_sistema:
+                if self.__controlador_sistema.controlador_pacote.grupo_tem_pacotes(id_grupo):
+                    qtd = self.__controlador_sistema.controlador_pacote.contar_pacotes_do_grupo(id_grupo)
+                    
+                    # Pergunta se quer excluir em cascata
+                    confirmacao_cascata = self.__tela_grupo.confirma_exclusao_cascata(
+                        grupo.nome, 
+                        qtd
+                    )
+                    
+                    if not confirmacao_cascata:
+                        self.__tela_grupo.mostra_mensagem("Exclusão cancelada.")
+                        return
+                    
+                    # Exclui os pacotes do grupo
+                    pacotes_excluidos = self.__controlador_sistema.controlador_pacote.excluir_pacotes_do_grupo(id_grupo)
+                    self.__tela_grupo.mostra_mensagem(
+                        f"{len(pacotes_excluidos)} pacote(s) excluído(s)."
+                    )
+
+            confirmacao = self.__tela_grupo.confirma_exclusao(grupo.nome)
+            if not confirmacao:
+                self.__tela_grupo.mostra_mensagem("Exclusão cancelada.")
                 return
 
-            self.listar_pessoas_grupo()
+            # Desvincula todos os membros do grupo
+            for cpf in grupo.obter_lista_membros():
+                self.__controlador_sistema.controlador_pessoa.desvincular_grupo(cpf)
 
-            cpf = self.__tela_grupo.pega_cpf_pessoa()
-
-            if not grupo.tem_membro(cpf):
-                self.__tela_grupo.mostra_mensagem(f"Pessoa com CPF {cpf} não é membro do grupo!")
-                return
-
-            pessoa = self.__controlador_sistema.controlador_pessoa.buscar_por_cpf(cpf)
-
-            grupo.remover_membro(cpf)
-
-            self.__controlador_sistema.controlador_pessoa.desvincular_grupo(cpf)
-
-            self.__grupo_dao.update(grupo)
-
-            nome_pessoa = pessoa.nome if pessoa else "Pessoa"
-            self.__tela_grupo.mostra_mensagem(f"{nome_pessoa} removido(a) do grupo '{grupo.nome}' com sucesso!")
+            self.__grupo_dao.remove(id_grupo)
+            
+            self.__tela_grupo.mostra_mensagem(f"✅ Grupo '{grupo.nome}' excluído com sucesso!")
 
         except Exception as e:
-            self.__tela_grupo.mostra_mensagem(f"Erro ao remover pessoa do grupo: {str(e)}")
+            self.__tela_grupo.mostra_mensagem(f"Erro ao excluir grupo: {str(e)}")
 
     #metodos para integração com outras classes
 
@@ -261,4 +284,20 @@ class ControladorGrupo:
         self.__tela_grupo.mostra_mensagem('Encerrando o gerenciamento de grupos.')
         return True
 
+    def pessoa_esta_em_grupo(self, cpf):
+            """Verifica se uma pessoa está em algum grupo e retorna o grupo"""
+            grupos = list(self.__grupo_dao.get_all())
+            for grupo in grupos:
+                if grupo.tem_membro(cpf):
+                    return grupo
+            return None
+    
+    def remover_pessoa_de_grupo(self, cpf):
+        """Remove uma pessoa de seu grupo (se estiver em algum)"""
+        grupo = self.pessoa_esta_em_grupo(cpf)
+        if grupo:
+            grupo.remover_membro(cpf)
+            self.__grupo_dao.update(grupo)
+            return True
+        return False
 

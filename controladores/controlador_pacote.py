@@ -407,8 +407,105 @@ class ControladorPacote:
         
         except Exception as e:
             self.__tela_pacote.mostra_mensagem(f"Erro ao excluir pacote: {str(e)}")
+
+    def grupo_tem_pacotes(self, grupo_id):
+        """Verifica se um grupo tem pacotes vinculados"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        for pacote in pacotes:
+            if pacote.grupo.id == grupo_id:
+                return True
+        return False
+    
+    def contar_pacotes_do_grupo(self, grupo_id):
+        """Retorna quantidade de pacotes de um grupo"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        return sum(1 for p in pacotes if p.grupo.id == grupo_id)
+    
+    def passagem_esta_em_pacote(self, passagem_id):
+        """Verifica se uma passagem está em algum pacote"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        for pacote in pacotes:
+            for passagem in pacote.passagens:
+                if passagem.id == passagem_id:
+                    return pacote
+        return None
     
     def sair(self):
         """Sai do menu de pacotes"""
         self.__tela_pacote.mostra_mensagem('Encerrando o gerenciamento de pacotes.')
         return True
+    
+    # metódos de integração com outras classes
+
+    def grupo_tem_pacotes(self, grupo_id):
+        """Verifica se um grupo tem pacotes vinculados"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        for pacote in pacotes:
+            if pacote.grupo.id == grupo_id:
+                return True
+        return False
+    
+    def contar_pacotes_do_grupo(self, grupo_id):
+        """Retorna quantidade de pacotes de um grupo"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        return sum(1 for p in pacotes if p.grupo.id == grupo_id)
+    
+    def passagem_esta_em_pacote(self, passagem_id):
+        """Verifica se uma passagem está em algum pacote e retorna o pacote"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        for pacote in pacotes:
+            for passagem in pacote.passagens:
+                if passagem.id == passagem_id:
+                    return pacote
+        return None
+    
+    def passeio_esta_em_pacote(self, passeio_id):
+        """Verifica se um passeio está em algum pacote e retorna o pacote"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        for pacote in pacotes:
+            for passeio in pacote.passeios:
+                if passeio.id == passeio_id:
+                    return pacote
+        return None
+    
+    def remover_passagem_de_todos_pacotes(self, passagem_id):
+        """Remove uma passagem de todos os pacotes que a contêm"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        removida_de = []
+        
+        for pacote in pacotes:
+            for passagem in pacote.passagens:
+                if passagem.id == passagem_id:
+                    pacote.excluir_passagem(passagem)
+                    self.__pacotes_DAO.update(pacote)
+                    removida_de.append(pacote.id)
+                    break
+        
+        return removida_de
+    
+    def remover_passeio_de_todos_pacotes(self, passeio_id):
+        """Remove um passeio de todos os pacotes que o contêm"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        removida_de = []
+        
+        for pacote in pacotes:
+            for passeio in pacote.passeios:
+                if passeio.id == passeio_id:
+                    pacote.excluir_passeio(passeio)
+                    self.__pacotes_DAO.update(pacote)
+                    removida_de.append(pacote.id)
+                    break
+        
+        return removida_de
+    
+    def excluir_pacotes_do_grupo(self, grupo_id):
+        """Exclui todos os pacotes de um grupo"""
+        pacotes = list(self.__pacotes_DAO.get_all())
+        excluidos = []
+        
+        for pacote in pacotes:
+            if pacote.grupo.id == grupo_id:
+                self.__pacotes_DAO.remove(pacote.id)
+                excluidos.append(pacote.id)
+        
+        return excluidos

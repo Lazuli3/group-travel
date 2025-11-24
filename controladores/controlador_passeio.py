@@ -190,8 +190,10 @@ class ControladorPasseioTuristico:
         else:
             self.__tela_passeio.lista_passeios_turisticos(self.passeios_para_dict())
 
+    # ========== controlador_passeio.py ==========
+
     def excluir_passeio(self):
-        """Exclui um passeio turístico"""
+        """Exclui um passeio turístico com verificação de integridade"""
         passeios = list(self.__passeios_DAO.get_all())
         
         if not passeios:
@@ -208,18 +210,38 @@ class ControladorPasseioTuristico:
                 self.__tela_passeio.mostra_mensagem(f"Passeio com ID {id_passeio} não encontrado!")
                 return
 
-            confirmacao = self.__tela_passeio.confirma_exclusao(
-                passeio.atracao_turistica, 
-                passeio.grupo_passeio.nome
-            )
-            if not confirmacao:
-                self.__tela_passeio.mostra_mensagem("Exclusão cancelada.")
-                return
+            # VERIFICA INTEGRIDADE: Usa método público do controlador de pacotes
+            if self.__controlador_sistema:
+                pacote = self.__controlador_sistema.controlador_pacote.passeio_esta_em_pacote(id_passeio)
+                
+                if pacote:
+                    confirmacao = self.__tela_passeio.confirma_exclusao_com_vinculo(
+                        passeio.atracao_turistica,
+                        f"pacote ID {pacote.id} do grupo '{pacote.grupo.nome}'"
+                    )
+                    
+                    if not confirmacao:
+                        self.__tela_passeio.mostra_mensagem("Exclusão cancelada.")
+                        return
+                    
+                    # Remove o passeio do pacote antes de excluir
+                    pacotes_afetados = self.__controlador_sistema.controlador_pacote.remover_passeio_de_todos_pacotes(id_passeio)
+                    self.__tela_passeio.mostra_mensagem(
+                        f"Passeio removido de {len(pacotes_afetados)} pacote(s)."
+                    )
+            else:
+                confirmacao = self.__tela_passeio.confirma_exclusao(
+                    passeio.atracao_turistica, 
+                    passeio.grupo_passeio.nome
+                )
+                if not confirmacao:
+                    self.__tela_passeio.mostra_mensagem("Exclusão cancelada.")
+                    return
 
             self.__passeios_DAO.remove(id_passeio)
 
             self.__tela_passeio.mostra_mensagem(
-                f"Passeio '{passeio.atracao_turistica}' do grupo '{passeio.grupo_passeio.nome}' excluído com sucesso!"
+                f"✅ Passeio '{passeio.atracao_turistica}' excluído com sucesso!"
             )
         
         except Exception as e:

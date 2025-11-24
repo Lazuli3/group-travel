@@ -267,3 +267,25 @@ class TelaPassagemGeral:
 
     def mostra_mensagem(self, msg: str):
         sg.popup(msg)
+
+    #métodos para integração com outras telas, uso para integração das exclusões
+
+    def confirma_remocao_com_vinculo(self, mensagem):
+        """
+        Pergunta ao usuário como proceder quando há vínculos
+        Retorna: 'remover', 'cancelar'
+        """
+        layout = [
+            [sg.Text("⚠️ ATENÇÃO", font=("Arial", 14, "bold"))],
+            [sg.Text(mensagem)],
+            [sg.Text("\nO que deseja fazer?")],
+            [sg.Button("Remover dos Pacotes e Excluir"), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Confirmação de Exclusão", layout)
+        event, _ = window.read()
+        window.close()
+
+        if event == "Remover dos Pacotes e Excluir":
+            return "remover"
+        return "cancelar"

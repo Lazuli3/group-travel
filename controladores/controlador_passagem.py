@@ -199,7 +199,7 @@ class ControladorPassagem:
             return False
         
         # ✅ Controlador obtém os dados
-        locais = self.__controlador_sistema.controlador_local.obter_locais()
+        locais = self.__controlador_sistema.controlador_local_viagem.obter_locais()
         
         if not locais or len(locais) < 2:
             self.__tela_passagem.mostra_mensagem(
@@ -265,7 +265,7 @@ class ControladorPassagem:
         self.__tela_passagem.lista_passagens(passagens)
         
     def excluir_passagem(self):
-        """Exclui uma passagem"""
+        """Exclui uma passagem com verificação de integridade"""
         passagens = list(self.__passagem_dao.get_all())
             
         if not passagens:
@@ -279,8 +279,31 @@ class ControladorPassagem:
             passagens_lista = list(passagens)
             if 0 <= indice < len(passagens_lista):
                 passagem = passagens_lista[indice]
+                
+                # VERIFICA INTEGRIDADE: Usa método público do controlador de pacotes
+                if self.__controlador_sistema:
+                    pacote = self.__controlador_sistema.controlador_pacote.passagem_esta_em_pacote(passagem.id)
+                    
+                    if pacote:
+                        # Pergunta ao usuário o que fazer
+                        resposta = self.__tela_passagem.confirma_remocao_com_vinculo(
+                            f"Esta passagem está no pacote ID {pacote.id} do grupo '{pacote.grupo.nome}'."
+                        )
+                        
+                        if resposta == "cancelar":
+                            self.__tela_passagem.mostra_mensagem("Exclusão cancelada.")
+                            return False
+                        
+                        elif resposta == "remover":
+                            # Remove a passagem do pacote antes de excluir
+                            pacotes_afetados = self.__controlador_sistema.controlador_pacote.remover_passagem_de_todos_pacotes(passagem.id)
+                            self.__tela_passagem.mostra_mensagem(
+                                f"Passagem removida de {len(pacotes_afetados)} pacote(s)."
+                            )
+                
+                # Exclui a passagem
                 self.__passagem_dao.remove(passagem.id)
-                self.__tela_passagem.mostra_mensagem("Passagem removida com sucesso.")
+                self.__tela_passagem.mostra_mensagem("✅ Passagem removida com sucesso.")
                 return True
             else:
                 self.__tela_passagem.mostra_mensagem("Índice inválido!")
@@ -289,8 +312,8 @@ class ControladorPassagem:
         except Exception as e:
             self.__tela_passagem.mostra_mensagem(f"Erro ao excluir passagem: {str(e)}")
             return False
-        
-        # ====== MÉTODOS PÚBLICOS ======
+    
+    #métodos para serem usados por outros controladores e pa
         
     def obter_todas_empresas(self):
         """Retorna lista de todas as empresas"""

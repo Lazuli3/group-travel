@@ -5,9 +5,10 @@ from DAOs.pessoa_dao import PessoaDAO
 
 class ControladorPessoa:
 
-    def __init__(self):
+    def __init__(self, controlador_sistema):
         self.__pessoa_dao = PessoaDAO()
         self.__tela_pessoa = TelaPessoa()
+        self.__controlador_sistema = controlador_sistema
 
     def inicia(self):
         opcoes = {
@@ -59,11 +60,23 @@ class ControladorPessoa:
             cpf = self.__tela_pessoa.pega_cpf()
             pessoa = self.buscar_por_cpf(cpf)
             
-            if pessoa:
-                self.__pessoa_dao.remove(cpf)
-                self.__tela_pessoa.mostra_mensagem(f"A pessoa {pessoa.nome} foi removida com sucesso.")
-            else:
+            if not pessoa:
                 self.__tela_pessoa.mostra_mensagem("Essa pessoa não está cadastrada no sistema.")
+                return
+            
+            if self.__controlador_sistema:
+                grupo = self.__controlador_sistema.controlador_grupo.pessoa_esta_em_grupo(cpf)
+                
+                if grupo:
+                    self.__tela_pessoa.mostra_mensagem(
+                        f"⚠️ {pessoa.nome} está no grupo '{grupo.nome}'.\n"
+                        "A pessoa será removida do grupo automaticamente."
+                    )
+                    #correção: aqui estava furando o MVC arrumei delegando pro correto
+                    self.__controlador_sistema.controlador_grupo.remover_pessoa_de_grupo(cpf)
+            
+            self.__pessoa_dao.remove(cpf)
+            self.__tela_pessoa.mostra_mensagem(f"✅ {pessoa.nome} foi removida com sucesso.")
         
         except Exception as e:
             self.__tela_pessoa.mostra_mensagem(f"Erro ao excluir pessoa: {str(e)}")

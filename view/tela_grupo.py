@@ -165,6 +165,22 @@ class TelaGrupo:
         window.close()
 
         return event == "Sim"
+    
+    def confirma_exclusao_cascata(self, nome_grupo, quantidade_pacotes):
+        """Confirma exclusão em cascata de grupo com pacotes"""
+        layout = [
+            [sg.Text("⚠️ ATENÇÃO", font=("Arial", 14, "bold"))],
+            [sg.Text(f"O grupo '{nome_grupo}' possui {quantidade_pacotes} pacote(s) vinculado(s).")],
+            [sg.Text("\nSe excluir o grupo, TODOS os pacotes também serão excluídos!")],
+            [sg.Text("Esta ação não pode ser desfeita.", font=("Arial", 10, "italic"))],
+            [sg.Button("Excluir Tudo", button_color=("white", "blue")), sg.Button("Cancelar")]
+        ]
+
+        window = sg.Window("Confirmar Exclusão em Cascata", layout)
+        event, _ = window.read()
+        window.close()
+
+        return event == "Excluir Tudo"
 
 
     def mostra_mensagem(self, msg: str):

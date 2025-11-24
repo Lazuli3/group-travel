@@ -154,3 +154,19 @@ class TelaPasseioTuristico:
         window.close()
 
         return event == "Sim"
+    
+    #adicionando método para vinculo com exclusão
+
+    def confirma_exclusao_com_vinculo(self, atracao, vinculo_info):
+        """Confirma exclusão quando há vínculos"""
+        layout = [
+            [sg.Text(f"⚠️ O passeio '{atracao}' está vinculado ao {vinculo_info}.")],
+            [sg.Text("Deseja remover do pacote e excluir?")],
+            [sg.Button("Sim"), sg.Button("Não")],
+        ]
+
+        window = sg.Window("Confirmar Exclusão", layout)
+        event, _ = window.read()
+        window.close()
+
+        return event == "Sim"
