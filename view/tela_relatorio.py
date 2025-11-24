@@ -28,38 +28,70 @@ class TelaRelatorio:
                 continue
 
     def mostra_relatorio_financeiro(self, dados: dict):
-        """aqui ele vai mostrar todas as informações de pacotes e blablabla"""
-        resumo = (
-            f"Total de pacotes: {dados.get('total_pacotes',0)}\n"
-            f"Receita esperada: R$ {dados.get('receita_esperada',0):.2f}\n"
-            f"Receita recebida: R$ {dados.get('receita_recebida',0):.2f}\n"
-            f"Receita pendente: R$ {dados.get('receita_pendente',0):.2f}\n"
-            f"Percentual recebido: {dados.get('percentual_recebido',0):.2f}%\n\n"
-            f"Pacotes totalmente pagos: {dados.get('pacotes_pagos',0)}\n"
-            f"Pacotes parcialmente pagos: {dados.get('pacotes_parciais',0)}\n"
-            f"Pacotes não pagos: {dados.get('pacotes_nao_pagos',0)}\n"
-        )
-
-        detalhes = "ID | Grupo | Valor Total | Valor Pago | Valor Restante | Status\n"
-        detalhes += "-"*80 + "\n"
+        """Exibe o relatório financeiro com layout melhorado"""
+        
+        detalhes_tabela = []
         for p in dados.get('detalhes_pacotes', []):
-            detalhes += (
-                f"{p.get('id')} | {p.get('grupo')[:18]:18} | "
-                f"R$ {p.get('valor_total',0):8.2f} | R$ {p.get('valor_pago',0):8.2f} | "
-                f"R$ {p.get('valor_restante',0):8.2f} | {p.get('status')}\n"
-            )
-
+            detalhes_tabela.append([
+                p.get('id'),
+                p.get('grupo', '')[:20],
+                f"R$ {p.get('valor_total', 0):.2f}",
+                f"R$ {p.get('valor_pago', 0):.2f}",
+                f"R$ {p.get('valor_restante', 0):.2f}",
+                p.get('status', '')
+            ])
+        
         layout = [
-            [sg.Text("RELATÓRIO FINANCEIRO", font=("Arial", 14, "bold"))],
-            [sg.Text("Resumo:", font=("Arial", 11, "bold"))],
-            [sg.Multiline(resumo, size=(80, 8), disabled=True)],
-            [sg.Text("Detalhes por pacote:", font=("Arial", 11, "bold"))],
-            [sg.Multiline(detalhes, size=(100, 20), disabled=True)],
-            [sg.Button("Fechar")]
+            [sg.Text("Relatório Financeiro", font=("Arial", 14, "bold"), justification='center', expand_x=True)],
+            
+            [sg.Frame('Resumo Geral', [
+                [sg.Text(f"Total de pacotes:", size=(25, 1)), 
+                sg.Text(f"{dados.get('total_pacotes', 0)}")],
+                [sg.Text(f"Receita esperada:", size=(25, 1)), 
+                sg.Text(f"R$ {dados.get('receita_esperada', 0):.2f}")],
+                [sg.Text(f"Receita recebida:", size=(25, 1)), 
+                sg.Text(f"R$ {dados.get('receita_recebida', 0):.2f}")],
+                [sg.Text(f"Receita pendente:", size=(25, 1)), 
+                sg.Text(f"R$ {dados.get('receita_pendente', 0):.2f}")],
+                [sg.Text(f"Percentual recebido:", size=(25, 1)), 
+                sg.Text(f"{dados.get('percentual_recebido', 0):.2f}%")],
+                [sg.HorizontalSeparator()],
+                [sg.Text(f"Pacotes totalmente pagos:", size=(25, 1)), 
+                sg.Text(f"{dados.get('pacotes_pagos', 0)}")],
+                [sg.Text(f"Pacotes parcialmente pagos:", size=(25, 1)), 
+                sg.Text(f"{dados.get('pacotes_parciais', 0)}")],
+                [sg.Text(f"Pacotes não pagos:", size=(25, 1)), 
+                sg.Text(f"{dados.get('pacotes_nao_pagos', 0)}")],
+            ], font=("Arial", 10), expand_x=True)],
+            
+            [sg.Table(
+                values=detalhes_tabela,
+                headings=['ID', 'Grupo', 'Valor Total', 'Valor Pago', 'Valor Restante', 'Status'],
+                auto_size_columns=True,
+                #col_widths=[5, 20, 12, 12, 14, 15],
+                justification='left',
+                num_rows=min(10, len(detalhes_tabela)) if detalhes_tabela else 1,
+                key='-TABELA-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black',
+                expand_x=True
+            )],
+            
+            [sg.Button("OK", size=(10, 1))]
         ]
-
-        window = sg.Window("Relatório Financeiro", layout, modal=True)
-        window.read()
+        
+        window = sg.Window("Relatório Financeiro", layout, size=(1000, 450), element_justification='center')
+        
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, 'OK'):
+                break
+        
         window.close()
     
     def mostra_relatorio(self, dados):
