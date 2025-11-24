@@ -5,6 +5,7 @@ from controladores.controlador_pessoa import ControladorPessoa
 from controladores.controlador_grupo import ControladorGrupo
 from controladores.controlador_passagem import ControladorPassagem
 from controladores.controlador_local_viagem import ControladorLocalViagem
+from collections import Counter
 
 from view.tela_sistema import TelaSistema
 
@@ -81,7 +82,11 @@ class ControladorSistema():
         exit(0)
 
     def abre_tela(self):
-        lista_opcoes = {1: self.pessoa, 2: self.grupo, 3:self.local_viagem, 4:self.passeio, 5:self.passagem, 6:self.pacote, 0: self.encerra_sistema}
+        lista_opcoes = {
+            1: self.pessoa, 2: self.grupo, 3:self.local_viagem,
+            4:self.passeio, 5:self.passagem, 6:self.pacote,
+            7: self.gerar_relatorio, 0: self.encerra_sistema
+        }
 
         while True:
             opcao_escolhida = self.__tela_sistema.tela_opcoes()
