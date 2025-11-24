@@ -1,4 +1,3 @@
-# ========== controladores/controlador_relatorio.py ==========
 from datetime import datetime
 from view.tela_relatorio import TelaRelatorio
 
@@ -24,7 +23,8 @@ class ControladorRelatorio:
                 self.__tela_relatorio.mostra_mensagem('Opção inválida.')
     
     def relatorio_financeiro_pacotes(self):
-        """Relatório financeiro completo dos pacotes"""
+        """relatório financeiro completo dos pacotes"""
+        '''adicionei o método obter_pacotes no controlador_pacote para não furar o mvc'''
         pacotes = self.__controlador_sistema.controlador_pacote.obter_pacotes()
         
         if not pacotes:

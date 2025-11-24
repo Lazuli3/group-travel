@@ -1,4 +1,3 @@
-# view/tela_relatorio.py
 import FreeSimpleGUI as sg
 from datetime import datetime
 
