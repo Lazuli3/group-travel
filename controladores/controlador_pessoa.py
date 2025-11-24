@@ -69,7 +69,7 @@ class ControladorPessoa:
                 
                 if grupo:
                     self.__tela_pessoa.mostra_mensagem(
-                        f"⚠️ {pessoa.nome} está no grupo '{grupo.nome}'.\n"
+                        f"{pessoa.nome} está no grupo '{grupo.nome}'.\n"
                         "A pessoa será removida do grupo automaticamente."
                     )
                     #correção: aqui estava furando o MVC arrumei delegando pro correto
@@ -81,7 +81,7 @@ class ControladorPessoa:
         except Exception as e:
             self.__tela_pessoa.mostra_mensagem(f"Erro ao excluir pessoa: {str(e)}")
 
-    # ====== MÉTODOS AUXILIARES ======
+    #métodos de integração
 
     def buscar_por_cpf(self, cpf):
         """Busca uma pessoa pelo CPF"""

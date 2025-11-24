@@ -198,7 +198,6 @@ class ControladorPassagem:
             )
             return False
         
-        # ✅ Controlador obtém os dados
         locais = self.__controlador_sistema.controlador_local_viagem.obter_locais()
         
         if not locais or len(locais) < 2:
@@ -210,7 +209,6 @@ class ControladorPassagem:
         try:
             self.listar_transportes()
 
-            # ✅ CORRETO: Passa apenas os DADOS para a View
             dados = self.__tela_passagem.pega_dados_passagem(locais)
             
             if dados is None:
@@ -280,12 +278,11 @@ class ControladorPassagem:
             if 0 <= indice < len(passagens_lista):
                 passagem = passagens_lista[indice]
                 
-                # VERIFICA INTEGRIDADE: Usa método público do controlador de pacotes
+                #verifica integridade
                 if self.__controlador_sistema:
                     pacote = self.__controlador_sistema.controlador_pacote.passagem_esta_em_pacote(passagem.id)
                     
                     if pacote:
-                        # Pergunta ao usuário o que fazer
                         resposta = self.__tela_passagem.confirma_remocao_com_vinculo(
                             f"Esta passagem está no pacote ID {pacote.id} do grupo '{pacote.grupo.nome}'."
                         )
@@ -295,13 +292,12 @@ class ControladorPassagem:
                             return False
                         
                         elif resposta == "remover":
-                            # Remove a passagem do pacote antes de excluir
+                            #remove a passagem do pacote antes de excluir
                             pacotes_afetados = self.__controlador_sistema.controlador_pacote.remover_passagem_de_todos_pacotes(passagem.id)
                             self.__tela_passagem.mostra_mensagem(
                                 f"Passagem removida de {len(pacotes_afetados)} pacote(s)."
                             )
-                
-                # Exclui a passagem
+
                 self.__passagem_dao.remove(passagem.id)
                 self.__tela_passagem.mostra_mensagem("✅ Passagem removida com sucesso.")
                 return True

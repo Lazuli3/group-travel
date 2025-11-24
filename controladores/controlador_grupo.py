@@ -96,7 +96,7 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem(f"Grupo com ID {id_grupo} não encontrado!")
                 return
 
-            # CORRETO: Usa método público do controlador de pacotes
+            # usando métodos públicos do controlador de pacotes, pra respeitar o mvc
             if self.__controlador_sistema:
                 if self.__controlador_sistema.controlador_pacote.grupo_tem_pacotes(id_grupo):
                     qtd = self.__controlador_sistema.controlador_pacote.contar_pacotes_do_grupo(id_grupo)
@@ -216,12 +216,11 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem(f"Grupo com ID {id_grupo} não encontrado!")
                 return
 
-            # VERIFICA INTEGRIDADE: Usa método público do controlador de pacotes
+            #protege a integridade
             if self.__controlador_sistema:
                 if self.__controlador_sistema.controlador_pacote.grupo_tem_pacotes(id_grupo):
                     qtd = self.__controlador_sistema.controlador_pacote.contar_pacotes_do_grupo(id_grupo)
                     
-                    # Pergunta se quer excluir em cascata
                     confirmacao_cascata = self.__tela_grupo.confirma_exclusao_cascata(
                         grupo.nome, 
                         qtd
@@ -231,7 +230,7 @@ class ControladorGrupo:
                         self.__tela_grupo.mostra_mensagem("Exclusão cancelada.")
                         return
                     
-                    # Exclui os pacotes do grupo
+                    #exclui os pacotes
                     pacotes_excluidos = self.__controlador_sistema.controlador_pacote.excluir_pacotes_do_grupo(id_grupo)
                     self.__tela_grupo.mostra_mensagem(
                         f"{len(pacotes_excluidos)} pacote(s) excluído(s)."
@@ -242,7 +241,6 @@ class ControladorGrupo:
                 self.__tela_grupo.mostra_mensagem("Exclusão cancelada.")
                 return
 
-            # Desvincula todos os membros do grupo
             for cpf in grupo.obter_lista_membros():
                 self.__controlador_sistema.controlador_pessoa.desvincular_grupo(cpf)
 

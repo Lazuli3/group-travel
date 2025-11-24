@@ -190,8 +190,6 @@ class ControladorPasseioTuristico:
         else:
             self.__tela_passeio.lista_passeios_turisticos(self.passeios_para_dict())
 
-    # ========== controlador_passeio.py ==========
-
     def excluir_passeio(self):
         """Exclui um passeio turístico com verificação de integridade"""
         passeios = list(self.__passeios_DAO.get_all())
@@ -210,7 +208,7 @@ class ControladorPasseioTuristico:
                 self.__tela_passeio.mostra_mensagem(f"Passeio com ID {id_passeio} não encontrado!")
                 return
 
-            # VERIFICA INTEGRIDADE: Usa método público do controlador de pacotes
+            #verifica integridade das exclusões
             if self.__controlador_sistema:
                 pacote = self.__controlador_sistema.controlador_pacote.passeio_esta_em_pacote(id_passeio)
                 
@@ -224,7 +222,7 @@ class ControladorPasseioTuristico:
                         self.__tela_passeio.mostra_mensagem("Exclusão cancelada.")
                         return
                     
-                    # Remove o passeio do pacote antes de excluir
+                    #remove o passeio do pacote antes de excluir
                     pacotes_afetados = self.__controlador_sistema.controlador_pacote.remover_passeio_de_todos_pacotes(id_passeio)
                     self.__tela_passeio.mostra_mensagem(
                         f"Passeio removido de {len(pacotes_afetados)} pacote(s)."

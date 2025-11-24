@@ -168,7 +168,6 @@ class ControladorPacote:
             opcao = self.__tela_pacote.mostra_menu_alteracao()
 
             if opcao == 1:
-                # Adicionar passagem
                 if not self.__controlador_sistema.controlador_passagem.obter_todas_passagens():
                     self.__tela_pacote.mostra_mensagem("Nenhuma passagem cadastrada.")
                     return
@@ -190,7 +189,6 @@ class ControladorPacote:
                     self.__tela_pacote.mostra_mensagem("Passagem não encontrada!")
             
             elif opcao == 2:
-                # Remover passagem
                 if not pacote.passagens:
                     self.__tela_pacote.mostra_mensagem("Não há passagens no pacote.")
                     return
@@ -217,7 +215,6 @@ class ControladorPacote:
                     self.__tela_pacote.mostra_mensagem("Passagem não encontrada!")
             
             elif opcao == 3:
-                # Adicionar passeio
                 if not self.__controlador_sistema.controlador_passeio.obter_passeios():
                     self.__tela_pacote.mostra_mensagem("Nenhum passeio cadastrado.")
                     return
@@ -238,7 +235,6 @@ class ControladorPacote:
                     self.__tela_pacote.mostra_mensagem("Passeio não encontrado!")
             
             elif opcao == 4:
-                # Remover passeio
                 if not pacote.passeios:
                     self.__tela_pacote.mostra_mensagem("Não há passeios no pacote.")
                     return
@@ -328,15 +324,14 @@ class ControladorPacote:
                     self.__tela_pacote.mostra_mensagem("Entrada inválida!")
             
             elif opcao == 6:
-                # Cancelar Pagamento
+                #cancelar Pagamento
                 if not pacote.pagamentos:
                     self.__tela_pacote.mostra_mensagem("Não há pagamentos no pacote.")
                     return
 
-                # Mostra os pagamentos do pacote
+                #mostra os pagamentos do pacote
                 self.__tela_pacote.mostra_pagamentos_pacote(pacote.pagamentos)
                 
-                # Pede o ID do pagamento
                 id_pagamento = self.__tela_pacote.pega_id_pagamento()
                 
                 if id_pagamento is None:
@@ -352,14 +347,13 @@ class ControladorPacote:
                 if not pagamento_encontrado:
                     self.__tela_pacote.mostra_mensagem("Pagamento não encontrado neste pacote!")
                     return
-                
-                # Confirma o cancelamento
+
                 confirmacao = self.__controlador_sistema.controlador_pagamento.confirmar_cancelamento_pagamento(
                     pagamento_encontrado
                 )
                 
                 if confirmacao:
-                    # Remove do DAO e do pacote
+                    #remove do DAO e do pacote
                     self.__controlador_sistema.controlador_pagamento.remover_pagamento_dao(id_pagamento)
                     pacote.excluir_pagamento(pagamento_encontrado)
                     self.__pacotes_DAO.update(pacote)
@@ -376,7 +370,7 @@ class ControladorPacote:
             self.__tela_pacote.mostra_mensagem(f"Erro ao alterar pacote: {str(e)}")
     
     def excluir_pacote(self):
-        """Exclui um pacote"""
+        """exclui um pacote"""
         pacotes = list(self.__pacotes_DAO.get_all())
         
         if not pacotes:
@@ -409,7 +403,7 @@ class ControladorPacote:
             self.__tela_pacote.mostra_mensagem(f"Erro ao excluir pacote: {str(e)}")
 
     def grupo_tem_pacotes(self, grupo_id):
-        """Verifica se um grupo tem pacotes vinculados"""
+        """ve se um grupo tem pacotes vinculados"""
         pacotes = list(self.__pacotes_DAO.get_all())
         for pacote in pacotes:
             if pacote.grupo.id == grupo_id:
@@ -417,12 +411,12 @@ class ControladorPacote:
         return False
     
     def contar_pacotes_do_grupo(self, grupo_id):
-        """Retorna quantidade de pacotes de um grupo"""
+        """retorna quantidade de pacotes de um grupo"""
         pacotes = list(self.__pacotes_DAO.get_all())
         return sum(1 for p in pacotes if p.grupo.id == grupo_id)
     
     def passagem_esta_em_pacote(self, passagem_id):
-        """Verifica se uma passagem está em algum pacote"""
+        """ve se uma passagem está em algum pacote"""
         pacotes = list(self.__pacotes_DAO.get_all())
         for pacote in pacotes:
             for passagem in pacote.passagens:
@@ -438,7 +432,6 @@ class ControladorPacote:
     # metódos de integração com outras classes
 
     def grupo_tem_pacotes(self, grupo_id):
-        """Verifica se um grupo tem pacotes vinculados"""
         pacotes = list(self.__pacotes_DAO.get_all())
         for pacote in pacotes:
             if pacote.grupo.id == grupo_id:
@@ -446,12 +439,12 @@ class ControladorPacote:
         return False
     
     def contar_pacotes_do_grupo(self, grupo_id):
-        """Retorna quantidade de pacotes de um grupo"""
+        '''verifica a quantidade de pacotes que estão relacionados ao grupo'''
         pacotes = list(self.__pacotes_DAO.get_all())
         return sum(1 for p in pacotes if p.grupo.id == grupo_id)
     
     def passagem_esta_em_pacote(self, passagem_id):
-        """Verifica se uma passagem está em algum pacote e retorna o pacote"""
+        """ve se uma passagem está em algum pacote e retorna o pacote"""
         pacotes = list(self.__pacotes_DAO.get_all())
         for pacote in pacotes:
             for passagem in pacote.passagens:
@@ -460,7 +453,7 @@ class ControladorPacote:
         return None
     
     def passeio_esta_em_pacote(self, passeio_id):
-        """Verifica se um passeio está em algum pacote e retorna o pacote"""
+        """ve se um passeio está em algum pacote e retorna o pacote"""
         pacotes = list(self.__pacotes_DAO.get_all())
         for pacote in pacotes:
             for passeio in pacote.passeios:
@@ -469,7 +462,7 @@ class ControladorPacote:
         return None
     
     def remover_passagem_de_todos_pacotes(self, passagem_id):
-        """Remove uma passagem de todos os pacotes que a contêm"""
+        """remove uma passagem de todos os pacotes que a contêm"""
         pacotes = list(self.__pacotes_DAO.get_all())
         removida_de = []
         
@@ -484,7 +477,7 @@ class ControladorPacote:
         return removida_de
     
     def remover_passeio_de_todos_pacotes(self, passeio_id):
-        """Remove um passeio de todos os pacotes que o contêm"""
+        """remove um passeio de todos os pacotes"""
         pacotes = list(self.__pacotes_DAO.get_all())
         removida_de = []
         
@@ -499,7 +492,7 @@ class ControladorPacote:
         return removida_de
     
     def excluir_pacotes_do_grupo(self, grupo_id):
-        """Exclui todos os pacotes de um grupo"""
+        """exclui todos os pacotes de um grupo"""
         pacotes = list(self.__pacotes_DAO.get_all())
         excluidos = []
         
