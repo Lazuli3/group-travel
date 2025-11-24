@@ -20,23 +20,6 @@ class ControladorPassagem:
         self.__proximo_id_transporte = self.__gerar_proximo_id_transporte()
         self.__proximo_id_passagem = self.__gerar_proximo_id_passagem()
     
-    def __gerar_proximo_id_transporte(self):
-        transportes = list(self.__transporte_dao.get_all())
-        if not transportes:
-            return 1
-        max_id = max(t.id for t in transportes)
-        return max_id + 1
-    
-    def __gerar_proximo_id_passagem(self):
-        passagens = list(self.__passagem_dao.get_all())
-        if not passagens:
-            return 1
-        max_id = max(p.id for p in passagens)
-        return max_id + 1
-    
-    def buscar_por_id(self, passagem_id):
-        """Busca uma passagem pelo ID"""
-        return self.__passagem_dao.get(passagem_id)
     
     def inicia(self):
         opcoes = {
@@ -163,25 +146,30 @@ class ControladorPassagem:
         
         try:
             self.listar_transportes()
-            indice = self.__tela_passagem.seleciona_transporte()
+
+            id_transporte = self.__tela_passagem.seleciona_transporte()
             
-            transportes_lista = list(transportes)
-            if 0 <= indice < len(transportes_lista):
-                transporte = transportes_lista[indice]
+            if not id_transporte:
+                self.__tela_passagem.mostra_mensagem("Seleção cancelada.")
+                return
+            
+            transporte = self.buscar_transporte_por_id(id_transporte)
+        
+            if not transporte:
+                self.__tela_passagem.mostra_mensagem(f"Transporte com ID {id_transporte} não encontrado!")
+                return
                 
-                passagens = list(self.__passagem_dao.get_all())
-                passagens_vinculadas = [p for p in passagens if p.transporte.id == transporte.id]
+            passagens = list(self.__passagem_dao.get_all())
+            passagens_vinculadas = [p for p in passagens if p.transporte.id == transporte.id]
                 
-                if passagens_vinculadas:
-                    self.__tela_passagem.mostra_mensagem(
+            if passagens_vinculadas:
+                self.__tela_passagem.mostra_mensagem(
                         f"Não é possível excluir! O transporte possui {len(passagens_vinculadas)} passagem(ns) vinculada(s)."
                     )
-                    return
+                return
                 
-                self.__transporte_dao.remove(transporte.id)
-                self.__tela_passagem.mostra_mensagem(f"O transporte foi removido com sucesso.")
-            else:
-                self.__tela_passagem.mostra_mensagem("Índice inválido!")
+            self.__transporte_dao.remove(transporte.id)
+            self.__tela_passagem.mostra_mensagem(f"O transporte foi removido com sucesso.")
         
         except Exception as e:
             self.__tela_passagem.mostra_mensagem(f"Erro ao excluir transporte: {str(e)}")
@@ -209,19 +197,14 @@ class ControladorPassagem:
         try:
             self.listar_transportes()
 
-            dados = self.__tela_passagem.pega_dados_passagem(locais)
+            dados = self.__tela_passagem.pega_dados_passagem(locais, transportes)
             
             if dados is None:
                 self.__tela_passagem.mostra_mensagem("Cadastro de passagem cancelado.")
                 return False
             
-            # Validações
-            transportes_lista = list(transportes)
-            if dados['indice_transporte'] < 0 or dados['indice_transporte'] >= len(transportes_lista):
-                self.__tela_passagem.mostra_mensagem("Transporte inválido!")
-                return False
-            
-            transporte = transportes_lista[dados['indice_transporte']]
+
+            transporte = dados['transporte']
             local_origem = dados['local_origem']
             local_destino = dados['local_destino']
             
@@ -272,14 +255,20 @@ class ControladorPassagem:
             
         try:
             self.listar_passagens()
-            indice = self.__tela_passagem.seleciona_passagem()
+            id_passagem = self.__tela_passagem.seleciona_passagem()
                 
-            passagens_lista = list(passagens)
-            if 0 <= indice < len(passagens_lista):
-                passagem = passagens_lista[indice]
+            if not id_passagem:
+                self.__tela_passagem.mostra_mensagem("Seleção cancelada.")
+                return False
+            
+            passagem = self.buscar_por_id(id_passagem)
+            
+            if not passagem:
+                self.__tela_passagem.mostra_mensagem(f"Passagem com ID {id_passagem} não encontrada!")
+                return False
                 
-                #verifica integridade
-                if self.__controlador_sistema:
+            #verifica integridade
+            if self.__controlador_sistema:
                     pacote = self.__controlador_sistema.controlador_pacote.passagem_esta_em_pacote(passagem.id)
                     
                     if pacote:
@@ -298,12 +287,9 @@ class ControladorPassagem:
                                 f"Passagem removida de {len(pacotes_afetados)} pacote(s)."
                             )
 
-                self.__passagem_dao.remove(passagem.id)
-                self.__tela_passagem.mostra_mensagem("✅ Passagem removida com sucesso.")
-                return True
-            else:
-                self.__tela_passagem.mostra_mensagem("Índice inválido!")
-                return False
+            self.__passagem_dao.remove(passagem.id)
+            self.__tela_passagem.mostra_mensagem(" Passagem removida com sucesso.")
+            return True
             
         except Exception as e:
             self.__tela_passagem.mostra_mensagem(f"Erro ao excluir passagem: {str(e)}")
@@ -327,3 +313,25 @@ class ControladorPassagem:
         """Sai do menu de passagens"""
         self.__tela_passagem.mostra_mensagem('Encerrando o gerenciamento de passagem.')
         return True
+    
+    def __gerar_proximo_id_transporte(self):
+        transportes = list(self.__transporte_dao.get_all())
+        if not transportes:
+            return 1
+        max_id = max(t.id for t in transportes)
+        return max_id + 1
+    
+    def __gerar_proximo_id_passagem(self):
+        passagens = list(self.__passagem_dao.get_all())
+        if not passagens:
+            return 1
+        max_id = max(p.id for p in passagens)
+        return max_id + 1
+    
+    def buscar_por_id(self, passagem_id):
+        """Busca uma passagem pelo ID"""
+        return self.__passagem_dao.get(passagem_id)
+    
+    def buscar_transporte_por_id(self, transporte_id):
+        """Busca um transporte pelo ID"""
+        return self.__transporte_dao.get(transporte_id)

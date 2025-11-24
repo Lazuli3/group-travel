@@ -119,7 +119,7 @@ class TelaPassagemGeral:
     def seleciona_transporte(self):
         layout = [
             [sg.Text("Digite o número do transporte:")],
-            [sg.Input(key="indice")],
+            [sg.Input(key="id")],
             [sg.Button("OK"), sg.Button("Cancelar")]
         ]
 
@@ -127,21 +127,21 @@ class TelaPassagemGeral:
         event, values = window.read()
         window.close()
 
-        if event == "OK":
+        if event == "OK" and values['id'] != '':
             try:
-                return int(values["indice"])
+                return int(values["id"])
             except ValueError:
                 sg.popup("Número inválido!")
-                return -1
-        return -1
+                return None
+        return None
 
 
     def lista_transportes(self, transportes):
         texto = f"{'Nº':<5} {'Tipo':<20} {'Empresa':<30} {'CNPJ':<20}\n"
         texto += "-" * 85 + "\n"
 
-        for i, t in enumerate(transportes):
-            texto += f"{i:<5} {t.tipo:<20} {t.empresa.nome:<30} {t.empresa.cnpj:<20}\n"
+        for t in transportes:
+            texto += f"{t.id:<5} {t.tipo:<20} {t.empresa.nome:<30} {t.empresa.cnpj:<20}\n"
 
         layout = [
             [sg.Multiline(texto, size=(90, 25), disabled=True)],
@@ -154,20 +154,28 @@ class TelaPassagemGeral:
 
 #PASSAGENS
 
-    def pega_dados_passagem(self, locais_disponiveis):
+    def pega_dados_passagem(self, locais_disponiveis, transportes_disponiveis):
 
         # Verificação inicial
         if len(locais_disponiveis) < 2:
             sg.popup("É necessário ter pelo menos 2 locais cadastrados!")
             return None
+        
+        if not transportes_disponiveis:
+            sg.popup("É necessário ter pelo menos 1 transporte cadastrado!")
+            return None
 
         # Prepara lista amigável para exibir no Combo
         lista_locais = [
-            f"{i} - {loc.cidade}/{loc.pais}" for i, loc in enumerate(locais_disponiveis)
+            f"{loc.id} - {loc.cidade}/{loc.pais}" for  loc in locais_disponiveis
+        ]
+
+        lista_transportes = [
+            f"{t.id} - {t.tipo} ({t.empresa.nome})" for t in transportes_disponiveis
         ]
 
         layout = [
-            [sg.Text("Número do transporte:"), sg.Input(key="indice_transporte")],
+            [sg.Text("Transporte:"), sg.Combo(lista_transportes, key="transporte")],
             [sg.Text("Local de Origem:"), sg.Combo(lista_locais, key="origem")],
             [sg.Text("Local de Destino:"), sg.Combo(lista_locais, key="destino")],
             [sg.Text("Data da viagem (dd/mm/aaaa):"), sg.Input(key="data")],
@@ -186,15 +194,52 @@ class TelaPassagemGeral:
 
             if event == "Confirmar":
                 try:
-                    # Índice do transporte
-                    indice_transporte = int(values["indice_transporte"])
+
+                    if not values["transporte"]:
+                        sg.popup("Selecione um transporte!")
+                        continue
+                
+                    if not values["origem"]:
+                        sg.popup("Selecione o local de origem!")
+                        continue
+                
+                    if not values["destino"]:
+                        sg.popup("Selecione o local de destino!")
+                        continue
+                    
+                    #extrai o id do transporte
+                    id_transporte = int(values["transporte"].split(" - ")[0])
+
+                    #busca o transporte pelo id
+                    transporte = None
+                    for t in transportes_disponiveis:
+                        if t.id == id_transporte:
+                            transporte = t
+                            break
+                
+                    if not transporte:
+                        sg.popup("Transporte não encontrado!")
+                        continue
 
                     # Extrai índices dos combos
-                    indice_origem = int(values["origem"].split(" - ")[0])
-                    indice_destino = int(values["destino"].split(" - ")[0])
+                    id_origem = int(values["origem"].split(" - ")[0])
+                    id_destino = int(values["destino"].split(" - ")[0])
 
-                    if indice_origem == indice_destino:
+                    if id_origem == id_destino:
                         sg.popup("Origem e destino não podem ser iguais!")
+                        continue
+
+                    local_origem = None
+                    local_destino = None
+                
+                    for loc in locais_disponiveis:
+                        if loc.id == id_origem:
+                            local_origem = loc
+                        if loc.id == id_destino:
+                            local_destino = loc
+                
+                    if not local_origem or not local_destino:
+                        sg.popup("Local não encontrado!")
                         continue
 
                     # Converte data
@@ -205,9 +250,9 @@ class TelaPassagemGeral:
 
                     window.close()
                     return {
-                        "indice_transporte": indice_transporte,
-                        "local_origem": locais_disponiveis[indice_origem],
-                        "local_destino": locais_disponiveis[indice_destino],
+                        "transporte": transporte,  # Agora retorna o objeto
+                        "local_origem": local_origem,
+                        "local_destino": local_destino,
                         "data": data,
                         "valor": valor
                     }
@@ -222,7 +267,7 @@ class TelaPassagemGeral:
     def seleciona_passagem(self):
         layout = [
             [sg.Text("Digite o número da passagem:")],
-            [sg.Input(key="indice")],
+            [sg.Input(key="id")],
             [sg.Button("OK"), sg.Button("Cancelar")]
         ]
 
@@ -230,13 +275,13 @@ class TelaPassagemGeral:
         event, values = window.read()
         window.close()
 
-        if event == "OK":
+        if event == "OK" and values['id'] != '':
             try:
-                return int(values["indice"])
+                return int(values["id"])
             except ValueError:
                 sg.popup("Número inválido!")
-                return -1
-        return -1
+                return None
+        return None
 
 
     def lista_passagens(self, passagens):
@@ -246,9 +291,9 @@ class TelaPassagemGeral:
         )
         texto += "-" * 110 + "\n"
 
-        for i, p in enumerate(passagens):
+        for p in passagens:
             texto += (
-                f"{i:<5} "
+                f"{p.id} "
                 f"{p.data.strftime('%d/%m/%Y'):<12} "
                 f"{p.local_origem.cidade}/{p.local_origem.pais:<25} "
                 f"{p.local_destino.cidade}/{p.local_destino.pais:<25} "
