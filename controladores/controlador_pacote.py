@@ -41,6 +41,10 @@ class ControladorPacote:
             else:
                 self.__tela_pacote.mostra_mensagem('Opção inválida.')
     
+    def obter_pacotes(self):
+        '''Retorna a lista de pacotes, mas sem exibir'''
+        return list(self.__pacotes_DAO.get_all())
+    
     def incluir_pacote(self):
         try:
             # Verifica se há grupos cadastrados
