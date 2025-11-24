@@ -49,3 +49,33 @@ class TelaSistema:
                 window.close()
                 return 0
     
+    def mostrar_relatorio(self, dados):
+        destino_popular, destino_caro, destino_barato, passeio_popular, passeio_caro, passeio_barato = dados
+        
+        layout = [
+            [sg.Text('RELATÓRIO DO SISTEMA', font=("Arial", 14, "bold"), justification='center')],
+            [sg.HorizontalSeparator()],
+            
+            [sg.Text('DESTINOS', font=("Arial", 12, "bold"))],
+            [sg.Text(f"Mais Popular: {destino_popular['nome']} ({destino_popular['visitas']} visitas)")],
+            [sg.Text(f"Mais Caro: {destino_caro['nome']} (R$ {destino_caro['valor']:.2f})")],
+            [sg.Text(f"Mais Barato: {destino_barato['nome']} (R$ {destino_barato['valor']:.2f})")],
+            
+            [sg.HorizontalSeparator()],
+            
+            [sg.Text('PASSEIOS', font=("Arial", 12, "bold"))],
+            [sg.Text(f"Mais Popular: {passeio_popular['nome']} ({passeio_popular['quantidade']} pacotes)")],
+            [sg.Text(f"Mais Caro: {passeio_caro['nome']} (R$ {passeio_caro['valor']:.2f})")],
+            [sg.Text(f"Mais Barato: {passeio_barato['nome']} (R$ {passeio_barato['valor']:.2f})")],
+            
+            [sg.HorizontalSeparator()],
+            [sg.Button('Fechar')]
+        ]
+        
+        window = sg.Window('Relatório', layout, modal=True)
+        
+        while True:
+            event, values = window.read()
+            if event in (sg.WIN_CLOSED, 'Fechar'):
+                window.close()
+                break
