@@ -6,7 +6,7 @@ class TelaPacote:
     # ===================== MENU PRINCIPAL ======================
     def mostra_opcoes(self):
         layout = [
-            [sg.Text("GERENCIAMENTO DE PACOTES", justification='center', font=("Arial", 16))],
+            [sg.Text("Gerenciamento de Pacotes", justification='center', font=("Arial", 14))],
             [sg.Button("1 - Incluir Pacote")],
             [sg.Button("2 - Listar Pacotes")],
             [sg.Button("3 - Alterar Pacote")],
@@ -25,7 +25,7 @@ class TelaPacote:
     def mostra_menu_alteracao(self):
         """Menu de opções para alteração"""
         layout = [
-            [sg.Text("MENU DE ALTERAÇÃO", font=("Arial", 14))],
+            [sg.Text("Menu", justification='center', font=("Arial", 14))],
             [sg.Button("1 - Adicionar Passagem")],
             [sg.Button("2 - Remover Passagem")],
             [sg.Button("3 - Adicionar Passeio")],
@@ -153,44 +153,67 @@ class TelaPacote:
         return None
 
     def seleciona_membro(self, membros):
-        """Mostra lista de membros e retorna o ID escolhido"""
-        texto = "--- MEMBROS DO GRUPO ---\n\n"
+        """Mostra lista de membros e retorna o CPF escolhido"""
+        dados = [
+            [i, membro.nome, membro.cpf] for i, membro in enumerate(membros, 1)
+        ]
         
-        for i,membro in enumerate(membros,1):
-            texto += f"{i}: {membro.nome} (CPF: {membro.cpf})\n"
+        headings = ['Nº', 'Nome', 'CPF']
         
         layout = [
-            [sg.Multiline(texto, size=(50, 10), disabled=True)],
-            [sg.Text("Digite o CPF do membro:")],
-            [sg.Input(key="cpf")],
-            [sg.Button("OK"), sg.Button("Cancelar")]
+            [sg.Text('Selecionar Membro', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
         ]
 
-        window = sg.Window("Selecionar Membro", layout)
-        event, values = window.read()
+        window = sg.Window("Seleção de Membros", layout, size=(400, 450), element_justification='center')
+        window.read()
         window.close()
-
-        if event == "OK" and values["cpf"] != "":
-            try:
-                return values["cpf"].strip()
-            except:
-                return None
-        return None
 
     #LISTAR PACOTES
     def lista_pacotes(self, pacotes):
-        texto = "Nº | Grupo | Passagens | Passeios | Total | Pago | Restante\n"
-        texto += "-"*90 + "\n"
-
-        for p in pacotes:
-            texto += f"{p['id']} | {p['grupo'][:18]} | {p['total_passagens']} | {p['total_passeios']} | R$ {p['valor_total']:.2f} | R$ {p['valor_pago']:.2f} | R$ {p['valor_restante']:.2f}\n"
-
+        dados = [
+            [p['id'], p['grupo'], p['total_passagens'], p['total_passeios'], f'R$ {p['valor_total']:.2f}',
+            f'R$ {p['valor_pago']:.2f}', f'R$ {p['valor_restante']:.2f}'] for p in pacotes
+        ]
+        
+        headings = ['ID', 'Grupo', 'Passagens', 'Passeios', 'Total', 'Pago', 'Restante']
+        
         layout = [
-            [sg.Multiline(texto, size=(90, 20), disabled=True)],
-            [sg.Button("OK")]
+            [sg.Text('Lista de Pacotes', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
         ]
 
-        window = sg.Window("Lista de Pacotes", layout)
+        window = sg.Window("Lista de Pacotes", layout, size=(800, 450), element_justification='center')
         window.read()
         window.close()
 
@@ -216,65 +239,130 @@ class TelaPacote:
         if not pagamentos:
             self.mostra_mensagem("Não há pagamentos no pacote.")
             return
-        
-        texto = ''
-        for pagamento in pagamentos:
-            status = "EFETUADO" if pagamento.pagamento_efetuado else "PENDENTE"
-            texto += f"{pagamento.id} | {pagamento.pagante.nome} | R$ {pagamento.valor:.2f} | {status}\n"
-        
-        layout = [
-            [sg.Multiline(texto, size=(60, 15), disabled=True)],
-            [sg.Button("OK")]
+
+        dados = [
+            [pagamento.id, pagamento.pagante.nome, pagamento.valor,
+            "Efetuado" if pagamento.pagamento_efetuado else "Pendente"]
+            for pagamento in pagamentos
         ]
         
-        window = sg.Window("Pagamentos do Pacote", layout)
+        headings = ['ID', 'Pagante', 'Valor', 'Status']
+        
+        layout = [
+            [sg.Text('Pagamentos do Pacote', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Pagamentos do Pacote', layout, size=(400, 450), element_justification='center')
         window.read()
         window.close()
     
     def mostra_passagens_pacote(self, passagens):
         """Mostra as passagens de um pacote específico"""
-        
-        texto = ''
-        for passagem in passagens:
-            texto += f"{passagem.id} | {passagem.local_origem.cidade} → {passagem.local_destino.cidade}\n"
-        
-        layout = [
-            [sg.Multiline(texto, size=(60, 15), disabled=True)],
-            [sg.Button("OK")]
+        dados = [
+            [passagem.id, passagem.local_origem.cidade, passagem.local_destino.cidade] for passagem in passagens
         ]
         
-        window = sg.Window("Passagens do Pacote", layout)
+        headings = ['ID', 'Local de Origem', 'Local de Destino']
+        
+        layout = [
+            [sg.Text('Passagens do Pacote', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Passagens do Pacote', layout, size=(350, 450), element_justification='center')
         window.read()
         window.close()
     
     def mostra_passeios_pacote(self, passeios):
         """Mostra os passeios de um pacote específico"""
-        
-        texto = ''
-        for passeio in passeios:
-            texto += f"{passeio.id} | {passeio.atracao_turistica}\n"
-        
-        layout = [
-            [sg.Multiline(texto, size=(60, 15), disabled=True)],
-            [sg.Button("OK")]
+        dados = [
+            [passeios.id, passeios.atracao_turistica] for passeio in passeios
         ]
         
-        window = sg.Window("Passeios do Pacote", layout)
+        headings = ['ID', 'Atração']
+        
+        layout = [
+            [sg.Text('Passeios do Pacote', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Passeios do Pacote', layout, size=(300, 450), element_justification='center')
         window.read()
         window.close()
     
     def mostra_info_pagamento(self, valor_total, valor_pago, valor_restante):
-        """Mostra informações sobre os valores do pacote"""
-        texto = f"Valor total do pacote: R$ {valor_total:.2f}\n"
-        texto += f"Valor já pago: R$ {valor_pago:.2f}\n"
-        texto += f"Valor restante: R$ {valor_restante:.2f}\n"
+        dados = [[valor_total, valor_pago, valor_restante]]
         
-        layout = [
-            [sg.Text("INFORMAÇÕES DO PACOTE", font=("Arial", 14))],
-            [sg.Multiline(texto, size=(50, 5), disabled=True)],
-            [sg.Button("OK")]
+        headings = [
+            'Total', 'Valor pago', 'Valor restante'
         ]
         
-        window = sg.Window("Informações de Pagamento", layout)
+        layout = [
+            [sg.Text('Informações do Pagamento', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Informações do Pagamento', layout, size=(400, 450), element_justification='center')
         window.read()
         window.close()
