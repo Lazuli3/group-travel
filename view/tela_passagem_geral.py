@@ -6,18 +6,18 @@ class TelaPassagemGeral:
     # MENU PRINCIPAL
     def mostra_opcoes(self):
         layout = [
-            [sg.Text("GERENCIAMENTO DE VIAGENS", font=("Arial", 14, "bold"), justification="center")],
-            [sg.Text("EMPRESAS:", font=("Arial", 12, "bold"))],
+            [sg.Text("Gerenciamento de Viagens", font=("Arial", 14, "bold"), justification="center")],
+            [sg.Text("Empresas", font=("Arial", 12, "bold"))],
             [sg.Button("1 - Cadastrar Empresa")],
             [sg.Button("2 - Listar Empresas")],
             [sg.Button("3 - Excluir Empresa")],
             [sg.Text("")],
-            [sg.Text("TRANSPORTES:", font=("Arial", 12, "bold"))],
+            [sg.Text("Transportes", font=("Arial", 12, "bold"))],
             [sg.Button("4 - Cadastrar Transporte")],
             [sg.Button("5 - Listar Transportes")],
             [sg.Button("6 - Excluir Transporte")],
             [sg.Text("")],
-            [sg.Text("PASSAGENS:", font=("Arial", 12, "bold"))],
+            [sg.Text("Passagens", font=("Arial", 12, "bold"))],
             [sg.Button("7 - Cadastrar Passagem")],
             [sg.Button("8 - Listar Passagens")],
             [sg.Button("9 - Excluir Passagem")],
@@ -79,18 +79,33 @@ class TelaPassagemGeral:
 
 
     def lista_empresas(self, empresas):
-        texto = f"{'Nome':<30} {'CNPJ':<20} {'Telefone':<15}\n"
-        texto += "-" * 70 + "\n"
-
-        for emp in empresas:
-            texto += f"{emp.nome:<30} {emp.cnpj:<20} {emp.telefone:<15}\n"
-
-        layout = [
-            [sg.Multiline(texto, size=(80, 20), disabled=True)],
-            [sg.Button("OK")]
+        dados = [
+            [emp.nome, emp.cnpj, emp.telefone] for emp in empresas
         ]
-
-        window = sg.Window("Empresas Cadastradas", layout)
+        
+        headings = ['Nome', 'CNPJ', 'Telefone']
+        
+        layout = [
+            [sg.Text('Empresas Cadastradas', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Empresas Cadastradas', layout, size=(400, 450), element_justification='center')
         window.read()
         window.close()
 
@@ -137,18 +152,33 @@ class TelaPassagemGeral:
 
 
     def lista_transportes(self, transportes):
-        texto = f"{'Nº':<5} {'Tipo':<20} {'Empresa':<30} {'CNPJ':<20}\n"
-        texto += "-" * 85 + "\n"
-
-        for t in transportes:
-            texto += f"{t.id:<5} {t.tipo:<20} {t.empresa.nome:<30} {t.empresa.cnpj:<20}\n"
-
-        layout = [
-            [sg.Multiline(texto, size=(90, 25), disabled=True)],
-            [sg.Button("OK")]
+        dados = [
+            [t.id, t.tipo, t.empresa.nome, t.empresa.cnpj] for t in transportes
         ]
-
-        window = sg.Window("Transportes Cadastrados", layout)
+        
+        headings = ['ID', 'Tipo', 'Empresa', 'CNPJ']
+        
+        layout = [
+            [sg.Text('Transportes Cadastrados', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Transportes Cadastrados', layout, size=(450, 450), element_justification='center')
         window.read()
         window.close()
 
@@ -165,6 +195,7 @@ class TelaPassagemGeral:
             sg.popup("É necessário ter pelo menos 1 transporte cadastrado!")
             return None
 
+        
         # Prepara lista amigável para exibir no Combo
         lista_locais = [
             f"{loc.id} - {loc.cidade}/{loc.pais}" for  loc in locais_disponiveis
@@ -178,7 +209,8 @@ class TelaPassagemGeral:
             [sg.Text("Transporte:"), sg.Combo(lista_transportes, key="transporte")],
             [sg.Text("Local de Origem:"), sg.Combo(lista_locais, key="origem")],
             [sg.Text("Local de Destino:"), sg.Combo(lista_locais, key="destino")],
-            [sg.Text("Data da viagem (dd/mm/aaaa):"), sg.Input(key="data")],
+            [sg.Text('Data:'), sg.Input(key='data', disabled=True, size=(12,1)), 
+            sg.CalendarButton('Selecionar', target='data', format='%d/%m/%Y')],
             [sg.Text("Valor (R$):"), sg.Input(key="valor")],
             [sg.Button("Confirmar"), sg.Button("Cancelar")]
         ]
@@ -205,6 +237,13 @@ class TelaPassagemGeral:
                 
                     if not values["destino"]:
                         sg.popup("Selecione o local de destino!")
+                        continue
+                    
+                    data = datetime.strptime(values['data'], '%d/%m/%Y')
+                    data_hoje = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+                    
+                    if data < data_hoje:
+                        sg.popup('Erro: A data do passagem não pode ser no passado!')
                         continue
                     
                     #extrai o id do transporte
@@ -242,9 +281,6 @@ class TelaPassagemGeral:
                         sg.popup("Local não encontrado!")
                         continue
 
-                    # Converte data
-                    data = datetime.strptime(values["data"], "%d/%m/%Y")
-
                     # Converte valor (aceita vírgula ou ponto)
                     valor = float(values["valor"].replace(",", "."))
 
@@ -261,8 +297,6 @@ class TelaPassagemGeral:
                     sg.popup(f"Erro: Entrada inválida.\n{e}")
                 except Exception as e:
                     sg.popup(f"Erro inesperado:\n{e}")
-
-
 
     def seleciona_passagem(self):
         layout = [
@@ -285,28 +319,37 @@ class TelaPassagemGeral:
 
 
     def lista_passagens(self, passagens):
-        texto = (
-            f"{'Nº':<5} {'Data':<12} {'Origem':<25} {'Destino':<25} "
-            f"{'Transporte':<20} {'Valor':<10}\n"
-        )
-        texto += "-" * 110 + "\n"
-
-        for p in passagens:
-            texto += (
-                f"{p.id} "
-                f"{p.data.strftime('%d/%m/%Y'):<12} "
-                f"{p.local_origem.cidade}/{p.local_origem.pais:<25} "
-                f"{p.local_destino.cidade}/{p.local_destino.pais:<25} "
-                f"{p.transporte.tipo:<20} "
-                f"R$ {p.valor:<10}\n"
-            )
-
+        dados = [
+            [p.id, f"{p.data.strftime('%d/%m/%Y'):<12}",
+            f"{p.local_origem.cidade}, {p.local_origem.pais}",
+            f"{p.local_destino.cidade}, {p.local_destino.pais}",
+            p.transporte.tipo,
+            f'R$ {p.valor:.2f}'] for p in passagens
+        ]
+        
+        headings = ['ID', 'Data', 'Origem', 'Destino', 'Transporte', 'Valor']
+        
         layout = [
-            [sg.Multiline(texto, size=(110, 25), disabled=True)],
-            [sg.Button("OK")]
+            [sg.Text('Lista de Passagens', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
         ]
 
-        window = sg.Window("Passagens Cadastradas", layout)
+        window = sg.Window("Lista de Passagens", layout, size=(800, 450), element_justification='center')
         window.read()
         window.close()
 
@@ -321,7 +364,7 @@ class TelaPassagemGeral:
         Retorna: 'remover', 'cancelar'
         """
         layout = [
-            [sg.Text("⚠️ ATENÇÃO", font=("Arial", 14, "bold"))],
+            [sg.Text("ATENÇÃO!", font=("Arial", 14, "bold"))],
             [sg.Text(mensagem)],
             [sg.Text("\nO que deseja fazer?")],
             [sg.Button("Remover dos Pacotes e Excluir"), sg.Button("Cancelar")]
