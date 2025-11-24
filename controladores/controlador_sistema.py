@@ -5,6 +5,7 @@ from controladores.controlador_pessoa import ControladorPessoa
 from controladores.controlador_grupo import ControladorGrupo
 from controladores.controlador_passagem import ControladorPassagem
 from controladores.controlador_local_viagem import ControladorLocalViagem
+from controladores.contolador_ralatorio import ControladorRelatorio
 
 from view.tela_sistema import TelaSistema
 
@@ -19,6 +20,7 @@ class ControladorSistema():
         self.__controlador_passeio = ControladorPasseioTuristico(self)
         self.__controlador_pacote = ControladorPacote(self)
         self.__tela_sistema = TelaSistema()
+        self.__controlador_relatorio = ControladorRelatorio(self)
     
     @property
     def controlador_pessoa(self):
@@ -47,6 +49,10 @@ class ControladorSistema():
     @property
     def controlador_passeio(self):
         return self.__controlador_passeio
+    
+    @property
+    def controlador_relatorio(self):
+        return self.__controlador_relatorio
 
     def inicializa_sistema(self):
         self.abre_tela()
@@ -70,11 +76,14 @@ class ControladorSistema():
     def passeio(self):
         self.__controlador_passeio.inicia()
 
+    def relatorio(self):
+        self.__controlador_relatorio.inicia()
+
     def encerra_sistema(self):
         exit(0)
 
     def abre_tela(self):
-        lista_opcoes = {1: self.pessoa, 2: self.grupo, 3:self.local_viagem, 4:self.passeio, 5:self.passagem, 6:self.pacote, 0: self.encerra_sistema}
+        lista_opcoes = {1: self.pessoa, 2: self.grupo, 3:self.local_viagem, 4:self.passeio, 5:self.passagem, 6:self.pacote, 7:self.relatorio, 0: self.encerra_sistema}
 
         while True:
             opcao_escolhida = self.__tela_sistema.tela_opcoes()

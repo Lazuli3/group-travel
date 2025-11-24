@@ -12,6 +12,7 @@ class TelaSistema:
             [sg.Button('4 - Passeio Turístico')],
             [sg.Button('5 - Passagem')],
             [sg.Button('6 - Pacote')],
+            [sg.Button('7 - Relatório')],
             [sg.Button('0 - Sair')]
         ]
 
@@ -41,6 +42,9 @@ class TelaSistema:
             elif event.startswith('6'):
                 window.close()
                 return 6
+            elif event.startswith('7'):
+                window.close()
+                return 7
             elif event.startswith('0'):
                 window.close()
                 return 0

@@ -502,3 +502,6 @@ class ControladorPacote:
                 excluidos.append(pacote.id)
         
         return excluidos
+    
+    def obter_pacotes(self):
+        return list(self.__pacotes_DAO.get_all())
