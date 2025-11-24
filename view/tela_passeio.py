@@ -7,6 +7,7 @@ class TelaPasseioTuristico:
 
     def mostra_opcoes(self):
         layout = [
+            [sg.Text('Menu', font=("Arial", 14, "bold"))],
             [sg.Button('1 - Incluir passeio turístico')],
             [sg.Button('2 - Listar passeios turísticos')],
             [sg.Button('3 - Excluir passeio turístico')],
@@ -39,6 +40,7 @@ class TelaPasseioTuristico:
         minutos = [f'{i:02d}' for i in range(0, 60)]
         
         layout = [
+            [sg.Text('Dados do Passeio', font=("Arial", 14, "bold"))],
             [sg.Text('Atração turística:'), sg.Input(key='atracao')],
             [sg.Text('Cidade:'), sg.Input(key='cidade')],
             [sg.Text('País:'), sg.Input(key='pais')],
@@ -124,23 +126,57 @@ class TelaPasseioTuristico:
                     sg.popup("ID inválido! Digite um número inteiro.")
                     
     def lista_passeios_turisticos(self, passeios: list):
-        texto = ''
-        for passeio in passeios:
-            texto += f'''{passeio['id']}. Atração: {passeio['atracao']}
-                   Localização: {passeio['localizacao']}
-                   Horário de início: {passeio['horario_inicio']}
-                   Horário de fim: {passeio['horario_fim']}
-                   Valor: {passeio['valor']}
-                   Grupo do passeio: {passeio['grupo']}\n'''
-            
-        layout = [
-            [sg.Multiline(texto, size=(90,25), disabled=True)],
-            [sg.Button('OK')]
+        dados = [
+            [passeio['id'], passeio['atracao'], passeio['localizacao'],
+            passeio['horario_inicio'], passeio['horario_fim'],
+            passeio['valor'], passeio['grupo']] for passeio in passeios
         ]
         
-        window = sg.Window('Lista de Passeios', layout)
+        headings = [
+            'ID', 'Atração', 'Local', 'Início', 'Fim', 'Valor', 'Grupo'
+        ]
+        
+        layout = [
+            [sg.Text('Lista de Locais', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),  # Menos linhas visíveis
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Lista de Locais', layout, size=(800, 450), element_justification='center')
         window.read()
         window.close()
+        
+        #texto = ''
+        #for passeio in passeios:
+        #    texto += f'''{passeio['id']}. Atração: {passeio['atracao']}
+        #           Localização: {passeio['localizacao']}
+        #           Horário de início: {passeio['horario_inicio']}
+        #           Horário de fim: {passeio['horario_fim']}
+        #           Valor: {passeio['valor']}
+        #           Grupo do passeio: {passeio['grupo']}\n'''
+            
+        #layout = [
+        #    [sg.Multiline(texto, size=(90,25), disabled=True)],
+        #    [sg.Button('OK')]
+        #]
+        
+        #window = sg.Window('Lista de Passeios', layout)
+        #window.read()
+        #window.close()
 
     def confirma_exclusao(self, atracao_turistica, nome_grupo):
         layout = [

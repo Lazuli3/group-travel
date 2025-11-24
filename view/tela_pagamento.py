@@ -6,6 +6,7 @@ class TelaPagamento:
 
     def mostra_opcoes(self):
         layout = [
+            [sg.Text('Menu', font=("Arial", 14, "bold"))],
             [sg.Button('1 - Cartão de Crédito')],
             [sg.Button('2 - Pix')],
             [sg.Button('3 - Dinheiro')],
@@ -23,6 +24,7 @@ class TelaPagamento:
 
     def pega_dados_cartao(self, valor: float):
         layout = [
+            [sg.Text('Pagamento (Cartão de Crédito)', font=("Arial", 14, "bold"))],
             [sg.Text('Número do Cartão:'), sg.Input(key='numero')],
             [sg.Text('Bandeira do Cartão:'), sg.Input(key='bandeira')],
             [sg.Text('Número de Parcelas:'), sg.Input(key='parcelas')],
@@ -56,6 +58,7 @@ class TelaPagamento:
 
     def pega_dados_pix(self, valor: float):
         layout = [
+            [sg.Text('Pagamento (Pix)', font=("Arial", 14, "bold"))],
             [sg.Text('Chave Pix:'), sg.Input(key='chave')],
             [sg.Text('Banco:'), sg.Input(key='banco')],
             [sg.Button('Confirmar'), sg.Button('Cancelar')]
@@ -85,6 +88,7 @@ class TelaPagamento:
 
     def pega_dados_dinheiro(self, valor: float):
         layout = [
+            [sg.Text('Pagamento (Dinheiro)', font=("Arial", 14, "bold"))],
             [sg.Text(f'Valor a pagar: R$ {valor:.2f}')],
             [sg.Text('Valor entregue: R$'), sg.Input(key='valor_entregue')],
             [sg.Button('Confirmar'), sg.Button('Cancelar')]
@@ -131,19 +135,52 @@ class TelaPagamento:
             return None
 
     def lista_pagamentos(self, pagamentos: list):
-        texto = ''
-        for pag in pagamentos:
-            texto += f'''{pag['id']}. Pagante: {pag['pagante']} | Tipo: {pag['tipo']}")
-                    Valor: {pag['valor']} | Data: {pag['data']} | Status: {pag['status']}\n'''
-            
-        layout = [
-            [sg.Multiline(texto, size=(90,25), disabled=True)],
-            [sg.Button('OK')]
+        dados = [
+            [pag['id'], pag['pagante'], pag['tipo'], pag['valor'], pag['data'],
+            pag['status']] for pag in pagamentos
         ]
         
-        window = sg.Window('Lista de Pagamentos', layout)
+        headings = [
+            'ID', 'Pagante', 'Tipo', 'Valor', 'Data', 'Status'
+        ]
+        
+        layout = [
+            [sg.Text('Lista de Pagamentos', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),  # Menos linhas visíveis
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Lista de Pagamentos', layout, size=(500, 450), element_justification='center')
         window.read()
         window.close()
+        
+        #texto = ''
+        #for pag in pagamentos:
+        #    texto += f'''{pag['id']}. Pagante: {pag['pagante']} | Tipo: {pag['tipo']}")
+        #            Valor: {pag['valor']} | Data: {pag['data']} | Status: {pag['status']}\n'''
+            
+        #layout = [
+        #    [sg.Multiline(texto, size=(90,25), disabled=True)],
+        #    [sg.Button('OK')]
+        #]
+        
+        #window = sg.Window('Lista de Pagamentos', layout)
+        #window.read()
+        #window.close()
 
 
     def seleciona_pagamento(self):

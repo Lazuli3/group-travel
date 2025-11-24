@@ -4,7 +4,7 @@ class TelaGrupo:
 
     def mostra_opcoes(self):
         layout = [
-            [sg.Text('============ Menu ============')],
+            [sg.Text('Menu', font=("Arial", 14, "bold"))],
             [sg.Button('1 - Criar grupo')],
             [sg.Button('2 - Listar grupo')],
             [sg.Button('3 - Adicionar membro ao grupo')],
@@ -113,43 +113,104 @@ class TelaGrupo:
 
 
     def lista_grupos(self, grupos):
-        texto = "ID   | Nome | Membros | Descrição\n"
-        texto += "="*75 + "\n"
-
-        for g in grupos:
-            texto += (
-                f"{g['id']:<5} {g['nome']:<25} "
-                f"{g['total_membros']:<10} {g['descricao']:<30}\n"
-            )
-
-        layout = [
-            [sg.Multiline(texto, size=(80, 20), disabled=True)],
-            [sg.Button("OK")]
+        dados = [
+            [grupo['id'], grupo['nome'], grupo['total_membros'],
+            grupo['descricao']] for grupo in grupos
         ]
-
-        window = sg.Window("Grupos Cadastrados", layout)
+        
+        headings = ['ID', 'Nome', 'Membros', 'Descrição']
+        
+        layout = [
+            [sg.Text('Lista de Grupos', font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),  # Menos linhas visíveis
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Lista de Grupos', layout, size=(450, 450), element_justification='center')
         window.read()
         window.close()
+        
+        #texto = "ID   | Nome | Membros | Descrição\n"
+        #texto += "="*75 + "\n"
+
+        #for g in grupos:
+        #    texto += (
+        #        f"{g['id']:<5} {g['nome']:<25} "
+        #        f"{g['total_membros']:<10} {g['descricao']:<30}\n"
+        #    )
+
+        #layout = [
+        #    [sg.Multiline(texto, size=(80, 20), disabled=True)],
+        #    [sg.Button("OK")]
+        #]
+
+        #window = sg.Window("Grupos Cadastrados", layout)
+        #window.read()
+        #window.close()
 
 
     def lista_membros(self, nome_grupo, membros):
-        texto = f"MEMBROS DO GRUPO: {nome_grupo}\n" + "="*80 + "\n"
-        texto += f"{'Nome':<30} {'CPF':<20} {'Telefone':<15}\n"
-        texto += "-"*80 + "\n"
-
-        for m in membros:
-            texto += (
-                f"{m['nome']:<30} {m['cpf']:<20} {m['telefone']:<15}\n"
-            )
-
-        layout = [
-            [sg.Multiline(texto, size=(90, 25), disabled=True)],
-            [sg.Button("OK")]
+        dados = [
+            [membro['nome'], membro['cpf'], membro['telefone']] for membro in membros
         ]
-
-        window = sg.Window("Lista de Membros", layout)
+        
+        headings = ['Nome', 'CPF', 'Telefone'] 
+        
+        layout = [
+            [sg.Text(f"Membros do grupo '{nome_grupo}'", font=("Arial", 14, "bold"), justification='center')],
+            [sg.Table(
+                values=dados,
+                headings=headings,
+                auto_size_columns=True,
+                justification='left',
+                num_rows=min(15, len(dados)),  # Menos linhas visíveis
+                key='-TABLE-',
+                enable_events=False,
+                display_row_numbers=False,
+                alternating_row_color='#E8E8E8',
+                header_background_color='#425261',
+                header_text_color='white',
+                background_color='white',
+                text_color='black'
+            )],
+            [sg.Button('OK', size=(10, 1))]
+        ]
+        
+        window = sg.Window('Lista de Membros', layout, size=(450, 450), element_justification='center')
         window.read()
         window.close()
+        
+        #texto = f"MEMBROS DO GRUPO: {nome_grupo}\n" + "="*80 + "\n"
+        #texto += f"{'Nome':<30} {'CPF':<20} {'Telefone':<15}\n"
+        #texto += "-"*80 + "\n"
+
+        #for m in membros:
+        #    texto += (
+        #        f"{m['nome']:<30} {m['cpf']:<20} {m['telefone']:<15}\n"
+        #    )
+
+        #layout = [
+        #    [sg.Multiline(texto, size=(90, 25), disabled=True)],
+        #    [sg.Button("OK")]
+        #]
+
+        #window = sg.Window("Lista de Membros", layout)
+        #window.read()
+        #window.close()
 
 
     def confirma_exclusao(self, nome_grupo):
